@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="RiseThrough"/>
+<meta name="theme-color" content="#FF4D6D"/>
+<title>RiseThrough</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#0A0A0F;font-family:'Barlow',sans-serif;color:#F0EEF6;overscroll-behavior:none;max-width:430px;margin:0 auto;min-height:100vh}
+input,textarea,button{font-family:'Barlow',sans-serif}
+input::placeholder,textarea::placeholder{color:#3a3a52}
+::-webkit-scrollbar{display:none}
+input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:4px;outline:none;cursor:pointer;background:#1E1E2E}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;cursor:pointer;background:#FF4D6D}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px #FF4D6D44}50%{box-shadow:0 0 40px #FF4D6D88}}
+
+.app{min-height:100vh;padding-bottom:80px}
+.card{background:#12121A;border-radius:20px;padding:24px;margin:0 24px 20px;border:1px solid #1E1E2E;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FF4D6D,#7B61FF);border-radius:20px 20px 0 0}
+.s-title{font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.sub{font-size:12px;color:#6B6880;margin-bottom:16px;line-height:1.5}
+.btn{display:block;width:100%;padding:15px 20px;font-family:'Bebas Neue',sans-serif;font-size:17px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:none;border-radius:14px;color:#fff;transition:opacity .2s}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-outline{background:transparent!important;border:2px solid currentColor!important}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;justify-content:space-around;padding:10px 0 16px;border-top:1px solid #1E1E2E;background:#0A0A0F;z-index:100}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:#6B6880;font-size:9px;letter-spacing:.07em;text-transform:uppercase;border:none;background:transparent;padding:0 6px;transition:color .2s}
+.nav button.active{color:#FF4D6D}
+.nav button span{font-size:20px}
+.hero{padding:26px 24px 0;animation:fadeIn .5s ease both}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:44px;font-weight:900;line-height:1;text-transform:uppercase}
+.hero p{font-size:13px;color:#6B6880;margin-top:6px;margin-bottom:26px}
+.input-wrap{margin-bottom:16px}
+.input-wrap label{display:block;font-size:11px;color:#6B6880;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.input-wrap .field-wrap{position:relative}
+.input-wrap .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.input-wrap input{width:100%;background:#0D0D16;border:1.5px solid #1E1E2E;border-radius:12px;color:#F0EEF6;font-size:14px;padding:12px 14px;outline:none;transition:border-color .2s}
+.input-wrap input.with-icon{padding-left:42px}
+.input-wrap input.error{border-color:#FF4D6D}
+.input-wrap .err-msg{font-size:11px;color:#FF4D6D;margin-top:4px}
+.area-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.area-chip{padding:10px 6px;border-radius:12px;border:1.5px solid #1E1E2E;color:#6B6880;font-size:11px;font-weight:600;letter-spacing:.05em;cursor:pointer;text-align:center;transition:all .2s;text-transform:uppercase;background:transparent}
+.area-chip.active{border-color:#FF4D6D;background:#FF4D6D22;color:#FF4D6D}
+.mood-row{display:flex;gap:6px}
+.mood-btn{flex:1;padding:12px 4px;border-radius:14px;border:2px solid #1E1E2E;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .2s}
+.mood-btn .emoji{font-size:24px}
+.mood-btn .lbl{font-size:9px;color:#6B6880;letter-spacing:.06em;text-transform:uppercase}
+.check-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #1E1E2E;cursor:pointer}
+.check-row:last-child{border-bottom:none}
+.checkbox{width:22px;height:22px;border-radius:6px;border:2px solid #6B6880;background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:12px;color:#fff}
+.checkbox.checked{border-color:#7B61FF;background:#7B61FF}
+.affirmation{margin:0 24px 20px;padding:18px 22px;border-left:4px solid #FF4D6D;background:#FF4D6D11;border-radius:0 16px 16px 0}
+.affirmation .aff-label{font-size:10px;color:#FF4D6D;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.affirmation .aff-text{font-size:15px;font-style:italic;line-height:1.6}
+.stat-pills{display:flex;gap:10px;padding:0 24px;margin-bottom:20px;overflow-x:auto}
+.stat-pill{background:#12121A;border:1px solid #1E1E2E;border-radius:14px;padding:12px 16px;flex-shrink:0}
+.stat-pill .pill-label{font-size:10px;color:#6B6880;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.stat-pill .pill-val{font-family:'Bebas Neue',sans-serif;font-size:22px}
+.chat-log{height:300px;overflow-y:auto;padding:10px 0}
+.bubble-wrap{padding:6px 14px;display:flex;gap:8px;align-items:flex-start}
+.bubble-wrap.mine{flex-direction:row-reverse}
+.bubble{padding:10px 13px;font-size:13px;line-height:1.5;color:#F0EEF6;max-width:76%}
+.bubble.theirs{background:#1E1E2E;border-radius:16px 16px 16px 3px}
+.bubble.mine{background:#7B61FF;border-radius:16px 16px 3px 16px}
+.bubble-name{font-size:11px;color:#7B61FF;margin-bottom:3px;font-weight:600}
+.bubble-time{font-size:10px;color:#6B6880;margin-top:3px}
+.auth-shell{min-height:100vh;padding:0 24px 40px;position:relative;overflow:hidden}
+.auth-blob1{position:fixed;top:-80px;right:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,#FF4D6D22,transparent 70%);pointer-events:none}
+.auth-blob2{position:fixed;bottom:-60px;left:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#7B61FF22,transparent 70%);pointer-events:none}
+.auth-logo{text-align:center;padding:48px 0 8px;animation:fadeIn .4s ease both}
+.auth-logo .fire{font-size:52px;animation:float 3s ease-in-out infinite;display:block}
+.auth-logo h1{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.1em;color:#FF4D6D;margin-top:8px}
+.auth-logo p{font-size:12px;color:#6B6880;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.strength-bars{display:flex;gap:4px;margin-bottom:4px}
+.strength-bar{flex:1;height:3px;border-radius:2px;transition:background .3s}
+.digit-input{width:42px;height:54px;text-align:center;background:#0D0D16;border:2px solid #1E1E2E;border-radius:12px;color:#F0EEF6;font-family:'Bebas Neue',sans-serif;font-size:26px;outline:none;transition:border-color .2s}
+.digit-input.filled{border-color:#7B61FF}
+.trial-banner{margin:12px 24px 0;padding:10px 16px;background:#FFD16611;border:1px solid #FFD16644;border-radius:12px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.plan-toggle{background:#12121A;border-radius:16px;padding:6px;display:flex;gap:6px;margin-bottom:20px;border:1px solid #1E1E2E}
+.plan-opt{flex:1;padding:14px 10px;border-radius:12px;text-align:center;cursor:pointer;transition:all .25s}
+.plan-opt.active{background:#7B61FF}
+.plan-opt .plan-name{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.plan-opt .plan-price{font-family:'Bebas Neue',sans-serif;font-size:26px;margin-top:2px}
+.plan-opt .plan-sub{font-size:10px;color:#6B6880;margin-top:2px}
+.best-badge{font-size:10px;background:#FFD16622;color:#FFD166;border-radius:6px;padding:2px 8px;margin-top:6px;display:inline-block}
+.plan-opt.active .plan-sub{color:rgba(255,255,255,.7)}
+.plan-opt.active .best-badge{background:rgba(255,255,255,.2);color:#fff}
+.feature-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1E1E2E}
+.feature-check{width:16px;height:16px;border-radius:50%;background:#00C98D;display:flex;align-items:center;justify-content:center;margin-left:auto;flex-shrink:0;font-size:10px;color:#fff}
+.insight-section{margin-bottom:18px}
+.insight-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.insight-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #1E1E2E;align-items:flex-start}
+.insight-item:last-child{border-bottom:none}
+.insight-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #1E1E2E}
+.result-row:last-child{border-bottom:none}
+.result-label{font-size:13px;color:#6B6880}
+.result-val{font-family:'Bebas Neue',sans-serif;font-size:16px}
+.btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 24px}
+.btn-grid .full{grid-column:1/-1}
+.log-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #1E1E2E}
+.log-row:last-child{border-bottom:none}
+.safe-space-note{margin:0 24px 14px;padding:12px 16px;background:#7B61FF11;border:1px solid #7B61FF33;border-radius:14px}
+.voice-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.rec-indicator{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 14px;background:#FF4D6D11;border-radius:12px;border:1px solid #FF4D6D44;font-size:12px;color:#FF4D6D}
+textarea{width:100%;background:#0A0A0F;border:1px solid #1E1E2E;border-radius:12px;color:#F0EEF6;font-size:14px;padding:14px;resize:none;outline:none;line-height:1.6}
+.welcome-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.dots{display:flex;gap:6px;margin-top:28px}
+.dot{width:8px;height:8px;border-radius:50%}
+.chart-wrap{width:100%;margin-bottom:8px}
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:80px;padding:0 4px}
+.bar{flex:1;border-radius:4px 4px 0 0;transition:height .3s;min-height:4px}
+.bar-labels{display:flex;gap:4px;padding:4px 4px 0}
+.bar-label{flex:1;text-align:center;font-size:9px;color:#6B6880}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const PAIN_AREAS = ["Head","Neck","Shoulders","Back","Chest","Hips","Legs","Feet"];
+const TRAUMA_CHECKS = [
+  {id:"sleep",label:"Sleep felt disrupted or restless",icon:"🌙"},
+  {id:"anxiety",label:"I felt anxious or on-edge today",icon:"⚡"},
+  {id:"trigger",label:"Something triggered a stress response",icon:"🔴"},
+  {id:"safe",label:"I felt safe in my body today",icon:"🛡️"},
+  {id:"grounded",label:"I felt grounded and present",icon:"🌱"},
+  {id:"support",label:"I reached out to someone for support",icon:"🤝"},
+];
+const MOODS = [
+  {emoji:"😤",label:"Struggling",value:1,color:"#FF4D6D"},
+  {emoji:"😔",label:"Low",value:2,color:"#FF8C42"},
+  {emoji:"😐",label:"Neutral",value:3,color:"#FFD166"},
+  {emoji:"🙂",label:"Okay",value:4,color:"#7B61FF"},
+  {emoji:"💪",label:"Strong",value:5,color:"#00C98D"},
+];
+const AFFIRMATIONS = [
+  "Your pain is real. Your healing is possible.",
+  "Every small step forward is still forward.",
+  "You are more than your diagnosis.",
+  "Rest is not giving up. Rest is rebuilding.",
+  "Your body is doing its best. So are you.",
+];
+const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const SEED_CHAT = [
+  {id:1,user:"Maya R.",avatar:"🌸",text:"Anyone else notice their pain spikes mid-week? Wednesday always gets me.",time:"2h ago",mine:false},
+  {id:2,user:"Jordan K.",avatar:"🌊",text:"Yes! Short noon rest really helps me manage that.",time:"1h ago",mine:false},
+  {id:3,user:"Sam T.",avatar:"🌿",text:"Gentle reminder: rest is not failure 💚 Proud I did my check-in today.",time:"45m ago",mine:false},
+  {id:4,user:"Alex P.",avatar:"🔥",text:"Does anyone use heat therapy? Just got a heating pad for back pain.",time:"20m ago",mine:false},
+];
+
+function seedHistory() {
+  return Array.from({length:7},(_,i)=>{
+    const pain=Math.floor(Math.random()*5)+3, mood=Math.floor(Math.random()*3)+2, checks=Math.floor(Math.random()*4)+1;
+    return {id:i,date:DAYS[i],fullDate:new Date(Date.now()-(6-i)*86400000).toLocaleDateString("en-US",{month:"short",day:"numeric"}),
+      painLevel:pain,mood,checkedCount:checks,notes:"",
+      score:Math.round(((10-pain)*3+mood*4+checks*5)/3)};
+  });
+}
+
+// ── STATE ─────────────────────────────────────────────────────
+const state = {
+  authStep: "login",
+  currentUser: null,
+  verifyData: null,
+  tab: "checkin",
+  screen: "form",
+  history: seedHistory(),
+  painLevel: 5,
+  selectedAreas: [],
+  traumaChecks: {},
+  mood: null,
+  notes: "",
+  affIdx: Math.floor(Math.random()*AFFIRMATIONS.length),
+  isListening: false,
+  voiceStatus: "",
+  chatMessages: [...SEED_CHAT],
+  chatInput: "",
+  chatName: "You",
+  aiInsights: null,
+  aiLoading: false,
+  pdfLoading: false,
+  loginEmail: "", loginPass: "", loginErrors: {}, loginLoading: false,
+  regName: "", regEmail: "", regPass: "", regConfirm: "", regAgreed: false, regErrors: {}, regLoading: false,
+  verifyInput: ["","","","","",""], verifyError: "", verifyLoading: false,
+  selectedPlan: "monthly", subscribeLoading: false,
+  recognition: null,
+};
+
+// Check session
+try {
+  const s = sessionStorage.getItem("rt_session");
+  if(s) { state.currentUser = JSON.parse(s); state.authStep = "app"; state.chatName = state.currentUser.name || "You"; }
+} catch(e){}
+
+// ── RENDER ENGINE ─────────────────────────────────────────────
+function $(id){ return document.getElementById(id); }
+function render() {
+  const app = document.getElementById("app");
+  if(!app) return;
+  app.innerHTML = getHTML();
+  bindEvents();
+  scrollToBottom();
+}
+
+function scoreColor(s){ return s>=20?"#00C98D":s>=12?"#FF8C42":"#FF4D6D"; }
+function painColor(p){ return p<=3?"#00C98D":p<=6?"#FF8C42":"#FF4D6D"; }
+function painLabel(p){ return ["None","Minimal","Minimal","Mild","Mild","Moderate","Moderate","Severe","Severe","Intense","Intense"][p]; }
+function daysLeft(user){ return Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000)); }
+function isPaid(user){ return user?.plan==="monthly"||user?.plan==="annual"; }
+
+// ── HTML BUILDERS ─────────────────────────────────────────────
+function navHTML(activeTab) {
+  return `<nav class="nav">
+    ${[["checkin","✅","Check-In"],["history","📈","Trends"],["insights","🤖","AI"],["community","💬","Community"]].map(([id,icon,label])=>
+      `<button class="${activeTab===id?'active':''}" onclick="switchTab('${id}')">${icon}<span style="display:block">${label}</span></button>`
+    ).join("")}
+  </nav>`;
+}
+
+function headerHTML(user) {
+  return `<div style="padding:max(18px,env(safe-area-inset-top,18px)) 24px 0;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FF4D6D;letter-spacing:.08em">🔥 RiseThrough</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:11px;color:#6B6880">${user?.name||""}</span>
+      <button onclick="logout()" style="font-size:10px;color:#6B6880;background:transparent;border:1px solid #1E1E2E;border-radius:8px;padding:4px 10px;cursor:pointer;text-transform:uppercase">Out</button>
+    </div>
+  </div>`;
+}
+
+function trialBannerHTML() {
+  if(!state.currentUser||isPaid(state.currentUser)) return "";
+  const dl = daysLeft(state.currentUser);
+  if(dl===0) return "";
+  return `<div class="trial-banner" onclick="switchTab('paywall')">
+    <span style="font-size:16px">⏳</span>
+    <div style="flex:1"><div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.06em;color:#FFD166">${dl} DAYS LEFT IN FREE TRIAL</div>
+    <div style="font-size:11px;color:#6B6880">Tap to upgrade</div></div>
+    <span style="color:#FFD166">→</span>
+  </div>`;
+}
+
+function heroHTML(accent, title, sub, accentColor="#FF4D6D") {
+  return `<div class="hero"><h1><span style="color:${accentColor}">${accent}</span><br>${title}</h1><p>${sub}</p></div>`;
+}
+
+function miniBarChart(data, key, color) {
+  const max = Math.max(...data.map(d=>d[key]),1);
+  const bars = data.map(d=>`<div class="bar" style="background:${color};opacity:.8;height:${Math.max(8,Math.round((d[key]/max)*72))}px"></div>`).join("");
+  const labels = data.map(d=>`<div class="bar-label">${d.day}</div>`).join("");
+  return `<div class="mini-chart">${bars}</div><div class="bar-labels">${labels}</div>`;
+}
+
+// ── AUTH SCREENS ──────────────────────────────────────────────
+function loginHTML() {
+  const e = state.loginErrors;
+  return `<div class="auth-shell">
+    <div class="auth-blob1"></div><div class="auth-blob2"></div>
+    <div class="auth-logo"><span class="fire">🔥</span><h1>RISETHROUGH</h1><p>Chronic Pain & Trauma Recovery</p></div>
+    <div style="margin-top:32px;margin-bottom:28px;animation:fadeIn .5s ease both">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;text-transform:uppercase"><span style="color:#FF4D6D">Welcome</span><br>Back</div>
+      <p style="font-size:13px;color:#6B6880;margin-top:6px">Sign in to continue your healing journey</p>
+    </div>
+    <div class="input-wrap">
+      <label>Email</label>
+      <div class="field-wrap"><span class="icon">✉️</span>
+        <input id="li-email" class="with-icon ${e.email?'error':''}" type="email" placeholder="you@email.com" value="${state.loginEmail}" oninput="state.loginEmail=this.value"/>
+      </div>${e.email?`<div class="err-msg">⚠ ${e.email}</div>`:""}
+    </div>
+    <div class="input-wrap">
+      <label>Password</label>
+      <div class="field-wrap"><span class="icon">🔒</span>
+        <input id="li-pass" class="with-icon ${e.pass?'error':''}" type="password" placeholder="••••••••" value="${state.loginPass}" oninput="state.loginPass=this.value"/>
+      </div>${e.pass?`<div class="err-msg">⚠ ${e.pass}</div>`:""}
+    </div>
+    <div style="text-align:right;margin-bottom:20px;margin-top:-8px"><span style="font-size:12px;color:#7B61FF;cursor:pointer">Forgot password?</span></div>
+    <button class="btn" style="background:#FF4D6D" onclick="doLogin()" ${state.loginLoading?"disabled":""}>${state.loginLoading?"Signing in…":"Sign In →"}</button>
+    <p style="text-align:center;margin-top:24px;font-size:13px;color:#6B6880">No account? <span style="color:#7B61FF;cursor:pointer;font-weight:600" onclick="switchAuth('register')">Create one free</span></p>
+  </div>`;
+}
+
+function registerHTML() {
+  const e = state.regErrors;
+  const s = state.regPass.length===0?0:state.regPass.length<6?1:state.regPass.length<10?2:3;
+  const sc = ["#1E1E2E","#FF4D6D","#FF8C42","#00C98D"][s];
+  const sl = ["","Weak","Fair","Strong"][s];
+  return `<div class="auth-shell">
+    <div class="auth-blob1"></div><div class="auth-blob2"></div>
+    <div class="auth-logo"><span class="fire">🔥</span><h1>RISETHROUGH</h1><p>Chronic Pain & Trauma Recovery</p></div>
+    <div style="margin-top:24px;animation:fadeIn .5s ease both">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;text-transform:uppercase"><span style="color:#FF4D6D">Start</span><br>Your Journey</div>
+      <p style="font-size:13px;color:#6B6880;margin-top:6px;margin-bottom:20px">Free for 7 days · No credit card needed</p>
+      <div style="background:linear-gradient(135deg,#7B61FF22,#FF4D6D11);border:1px solid #7B61FF44;border-radius:16px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:28px">🎁</span>
+        <div><div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:#7B61FF">7-DAY FREE TRIAL</div>
+        <div style="font-size:12px;color:#6B6880;margin-top:2px">Then €4.99/month or €49.99/year.</div></div>
+      </div>
+    </div>
+    <div class="input-wrap"><label>Full Name</label><div class="field-wrap"><span class="icon">👤</span>
+      <input class="with-icon ${e.name?'error':''}" type="text" placeholder="Your name" value="${state.regName}" oninput="state.regName=this.value"/>
+    </div>${e.name?`<div class="err-msg">⚠ ${e.name}</div>`:""}</div>
+    <div class="input-wrap"><label>Email</label><div class="field-wrap"><span class="icon">✉️</span>
+      <input class="with-icon ${e.email?'error':''}" type="email" placeholder="you@email.com" value="${state.regEmail}" oninput="state.regEmail=this.value"/>
+    </div>${e.email?`<div class="err-msg">⚠ ${e.email}</div>`:""}</div>
+    <div class="input-wrap"><label>Password</label><div class="field-wrap"><span class="icon">🔒</span>
+      <input class="with-icon ${e.pass?'error':''}" type="password" placeholder="Min 6 characters" value="${state.regPass}" oninput="state.regPass=this.value;render()"/>
+    </div>${e.pass?`<div class="err-msg">⚠ ${e.pass}</div>`:""}</div>
+    ${state.regPass.length>0?`<div style="margin-top:-10px;margin-bottom:14px">
+      <div class="strength-bars">${[1,2,3].map(i=>`<div class="strength-bar" style="background:${i<=s?sc:'#1E1E2E'}"></div>`).join("")}</div>
+      <div style="font-size:11px;color:${sc}">${sl}</div>
+    </div>`:""}
+    <div class="input-wrap"><label>Confirm Password</label><div class="field-wrap"><span class="icon">🔐</span>
+      <input class="with-icon ${e.confirm?'error':''}" type="password" placeholder="Repeat password" value="${state.regConfirm}" oninput="state.regConfirm=this.value"/>
+    </div>${e.confirm?`<div class="err-msg">⚠ ${e.confirm}</div>`:""}</div>
+    <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:24px;cursor:pointer" onclick="state.regAgreed=!state.regAgreed;render()">
+      <div style="width:20px;height:20px;border-radius:6px;border:2px solid ${state.regAgreed?'#7B61FF':'#6B6880'};background:${state.regAgreed?'#7B61FF':'transparent'};flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:all .2s;font-size:12px;color:#fff">${state.regAgreed?"✓":""}</div>
+      <div style="font-size:12px;color:#6B6880;line-height:1.5">I agree to the <span style="color:#7B61FF">Terms of Service</span> and <span style="color:#7B61FF">Privacy Policy</span>.</div>
+    </div>
+    ${e.agreed?`<div style="font-size:11px;color:#FF4D6D;margin-top:-18px;margin-bottom:14px">⚠ ${e.agreed}</div>`:""}
+    <button class="btn" style="background:#FF4D6D" onclick="doRegister()" ${state.regLoading?"disabled":""}>${state.regLoading?"Creating account…":"Create Free Account →"}</button>
+    <p style="text-align:center;margin-top:24px;font-size:13px;color:#6B6880">Have an account? <span style="color:#7B61FF;cursor:pointer;font-weight:600" onclick="switchAuth('login')">Sign in</span></p>
+  </div>`;
+}
+
+function verifyHTML() {
+  return `<div class="auth-shell">
+    <div class="auth-blob1"></div><div class="auth-blob2"></div>
+    <div class="auth-logo"><span class="fire">🔥</span><h1>RISETHROUGH</h1></div>
+    <div style="margin-top:24px;animation:fadeIn .5s ease both">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;text-transform:uppercase"><span style="color:#FF4D6D">Verify</span><br>Your Email</div>
+      <p style="font-size:14px;color:#6B6880;margin-top:8px;margin-bottom:24px;line-height:1.6">We sent a 6-digit code to <strong style="color:#F0EEF6">${state.verifyData?.email}</strong></p>
+      <div style="background:#7B61FF11;border:1px solid #7B61FF33;border-radius:12px;padding:10px 14px;margin-bottom:20px;font-size:12px;color:#7B61FF">
+        💡 Demo mode: your code is <strong>${state.verifyData?.code}</strong>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px">
+      ${state.verifyInput.map((v,i)=>`<input class="digit-input ${v?'filled':''}" id="d${i}" maxlength="1" type="tel" value="${v}" oninput="handleDigit(${i},this.value)" onkeydown="handleDigitKey(${i},event)"/>`).join("")}
+    </div>
+    ${state.verifyError?`<p style="font-size:12px;color:#FF4D6D;text-align:center;margin-bottom:12px">⚠ ${state.verifyError}</p>`:""}
+    <button class="btn" style="background:#FF4D6D" onclick="doVerify()" ${state.verifyLoading?"disabled":""}>${state.verifyLoading?"Verifying…":"Verify & Continue →"}</button>
+    <p style="text-align:center;margin-top:16px"><span style="font-size:12px;color:#6B6880;cursor:pointer" onclick="switchAuth('register')">← Back</span></p>
+  </div>`;
+}
+
+function welcomeHTML() {
+  return `<div class="welcome-screen">
+    <span style="font-size:80px;animation:float 2s ease-in-out infinite;display:block">🔥</span>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:.1em;color:#FF4D6D;margin-top:16px">YOU'RE IN!</div>
+    <p style="font-size:16px;margin-top:8px;line-height:1.6">Welcome, <strong>${state.currentUser?.name}</strong>.<br>Your 7-day free trial starts now.</p>
+    <p style="font-size:13px;color:#6B6880;margin-top:12px">Taking you to your dashboard…</p>
+    <div class="dots">${[0,1,2].map(i=>`<div class="dot" style="background:${i===0?'#FF4D6D':'#1E1E2E'};animation:pulse 1.2s ease ${i*.3}s infinite"></div>`).join("")}</div>
+  </div>`;
+}
+
+function paywallHTML() {
+  const dl = daysLeft(state.currentUser);
+  const expired = dl===0;
+  return `<div class="app" style="padding:0 24px 60px;overflow-y:auto;max-height:100vh">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 0 0">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#FF4D6D;letter-spacing:.08em">🔥 RiseThrough</div>
+      <button onclick="logout()" style="font-size:10px;color:#6B6880;background:transparent;border:1px solid #1E1E2E;border-radius:8px;padding:4px 10px;cursor:pointer;text-transform:uppercase">Log Out</button>
+    </div>
+    <div style="margin-top:28px;padding:18px 20px;border-radius:18px;background:${expired?'#FF4D6D15':'#00C98D12'};border:1px solid ${expired?'#FF4D6D44':'#00C98D44'}">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:${expired?'#FF4D6D':'#00C98D'}">${expired?"FREE TRIAL ENDED":"FREE TRIAL ACTIVE"}</div>
+      <p style="font-size:13px;color:#6B6880;margin-top:4px">${expired?"Subscribe to continue your journey.":`${dl} day${dl!==1?"s":""} remaining.`}</p>
+    </div>
+    <div style="text-align:center;padding:28px 0 8px">
+      <div style="font-size:52px">✨</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;line-height:1.05;text-transform:uppercase;margin-top:12px"><span style="color:#FF4D6D">Unlock</span><br>Full Access</div>
+      <p style="font-size:14px;color:#6B6880;margin-top:10px;line-height:1.6">Continue your healing journey with all features.</p>
+    </div>
+    <div style="margin:20px 0 24px">
+      ${[["✅","Unlimited daily check-ins"],["📈","Full trends & history"],["🤖","Claude AI insights"],["💬","Peer support community"],["📄","PDF health reports"],["🎙️","Voice input"]].map(([ic,tx])=>
+        `<div class="feature-row"><span style="font-size:18px">${ic}</span><span style="font-size:14px">${tx}</span><div class="feature-check">✓</div></div>`
+      ).join("")}
+    </div>
+    <div class="plan-toggle">
+      ${[{id:"monthly",label:"Monthly",price:"€4.99",sub:"/month"},{id:"annual",label:"Annual",price:"€49.99",sub:"/year · Save 17%"}].map(p=>
+        `<div class="plan-opt ${state.selectedPlan===p.id?'active':''}" onclick="state.selectedPlan='${p.id}';render()">
+          <div class="plan-name" style="color:${state.selectedPlan===p.id?'#fff':'#6B6880'}">${p.label}</div>
+          <div class="plan-price" style="color:${state.selectedPlan===p.id?'#fff':'#F0EEF6'}">${p.price}</div>
+          <div class="plan-sub">${p.sub}</div>
+          ${p.id==="annual"?`<div class="best-badge">BEST VALUE</div>`:""}
+        </div>`
+      ).join("")}
+    </div>
+    <button class="btn" style="background:#FF4D6D;animation:glow 2.5s ease-in-out infinite" onclick="doSubscribe()" ${state.subscribeLoading?"disabled":""}>${state.subscribeLoading?"Processing…":`Subscribe ${state.selectedPlan==="monthly"?"€4.99/mo":"€49.99/yr"} →`}</button>
+    <p style="font-size:11px;color:#6B6880;text-align:center;margin-top:14px">Cancel anytime · No hidden fees</p>
+    ${!expired?`<p style="text-align:center;margin-top:14px"><span style="font-size:12px;color:#6B6880;cursor:pointer;text-decoration:underline" onclick="state.authStep='app';render()">Continue free trial (${dl} days left)</span></p>`:""}
+  </div>`;
+}
+
+// ── APP SCREENS ───────────────────────────────────────────────
+function checkinFormHTML() {
+  const pl = state.painLevel;
+  const pc = painColor(pl);
+  return `<div class="app">
+    ${headerHTML(state.currentUser)}
+    ${trialBannerHTML()}
+    ${heroHTML("Daily","Check-In","Check in with your body & mind. No judgment.")}
+    <div class="card">
+      <div class="s-title">⚡ Pain Level</div>
+      <div class="sub">How intense is your pain right now?</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:1;color:${pc};transition:color .3s;margin-bottom:8px" id="pain-num">${pl}</div>
+      <div style="font-size:13px;color:#6B6880;margin-bottom:16px">${painLabel(pl)} — slide to adjust</div>
+      <input type="range" min="0" max="10" value="${pl}" id="pain-slider" style="accent-color:${pc}" oninput="state.painLevel=+this.value;document.getElementById('pain-num').textContent=this.value;document.getElementById('pain-num').style.color=this.value<=3?'#00C98D':this.value<=6?'#FF8C42':'#FF4D6D';this.style.accentColor=this.value<=3?'#00C98D':this.value<=6?'#FF8C42':'#FF4D6D'"/>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:#6B6880"><span>0 None</span><span>5 Moderate</span><span>10 Intense</span></div>
+    </div>
+    <div class="card">
+      <div class="s-title">🗺️ Body Map</div>
+      <div class="sub">Tap where you're feeling it today</div>
+      <div class="area-grid">${PAIN_AREAS.map(a=>`<div class="area-chip ${state.selectedAreas.includes(a)?'active':''}" onclick="toggleArea('${a}')">${a}</div>`).join("")}</div>
+    </div>
+    <div class="card">
+      <div class="s-title">💭 Mood Check</div>
+      <div class="sub">How are you feeling emotionally?</div>
+      <div class="mood-row">${MOODS.map(m=>`<div class="mood-btn ${state.mood===m.value?'active':''}" style="${state.mood===m.value?`border-color:${m.color};background:${m.color}22`:''}" onclick="state.mood=${m.value};render()"><span class="emoji">${m.emoji}</span><span class="lbl">${m.label}</span></div>`).join("")}</div>
+    </div>
+    <div class="card">
+      <div class="s-title">🛡️ Recovery Checks</div>
+      <div class="sub">Check all that apply today</div>
+      ${TRAUMA_CHECKS.map(item=>`<div class="check-row" onclick="toggleCheck('${item.id}')">
+        <div class="checkbox ${state.traumaChecks[item.id]?'checked':''}">${state.traumaChecks[item.id]?"✓":""}</div>
+        <span style="margin-right:4px">${item.icon}</span>
+        <span style="font-size:13px;line-height:1.4">${item.label}</span>
+      </div>`).join("")}
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div class="s-title">📝 Your Words</div>
+        <button class="voice-btn" style="border:1.5px solid ${state.isListening?'#FF4D6D':'#7B61FF'};background:${state.isListening?'#FF4D6D22':'#7B61FF22'};color:${state.isListening?'#FF4D6D':'#7B61FF'}" onclick="toggleVoice()">
+          <span style="font-size:16px;${state.isListening?'animation:pulse 1s infinite':''}">${state.isListening?"⏹":"🎙️"}</span>${state.isListening?"Stop":"Voice"}
+        </button>
+      </div>
+      <div class="sub" style="${state.isListening?'color:#FF4D6D':''}">${state.voiceStatus||"Type or tap Voice to speak (optional)"}</div>
+      ${state.isListening?`<div class="rec-indicator"><span style="animation:pulse 1s infinite">🔴</span>Recording — speak clearly</div>`:""}
+      <textarea rows="4" placeholder="How did today feel? Any wins, struggles, or observations..." oninput="state.notes=this.value">${state.notes}</textarea>
+    </div>
+    <div class="affirmation">
+      <div class="aff-label">Today's Reminder</div>
+      <div class="aff-text">"${AFFIRMATIONS[state.affIdx]}"</div>
+    </div>
+    <div style="margin:0 24px 32px">
+      <button class="btn" style="background:#FF4D6D" onclick="submitCheckin()">Submit Check-In →</button>
+    </div>
+    ${navHTML(state.tab)}
+  </div>`;
+}
+
+function resultsHTML() {
+  const score = Math.round(((10-state.painLevel)*3+(state.mood||3)*4+Object.values(state.traumaChecks).filter(Boolean).length*5)/3);
+  const sc = scoreColor(score);
+  const selMood = MOODS.find(m=>m.value===state.mood);
+  const pc = painColor(state.painLevel);
+  const checkedCount = Object.values(state.traumaChecks).filter(Boolean).length;
+  return `<div class="app">
+    ${headerHTML(state.currentUser)}
+    ${trialBannerHTML()}
+    ${heroHTML("Today's","Report","Here's how you showed up today")}
+    <div class="card" style="text-align:center">
+      <div style="font-size:11px;color:#6B6880;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Recovery Index</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:86px;color:${sc};line-height:1">${score}</div>
+      <div style="font-size:13px;color:#6B6880;margin-top:4px">out of 30 · ${score>=20?"Keep pushing!":score>=12?"You're doing okay":"Be gentle with yourself"}</div>
+    </div>
+    <div class="card">
+      <div class="s-title">📊 Snapshot</div>
+      ${[
+        {label:"Pain Level",value:`${state.painLevel}/10 · ${painLabel(state.painLevel)}`,color:pc},
+        {label:"Mood",value:selMood?`${selMood.emoji} ${selMood.label}`:"—",color:selMood?.color},
+        {label:"Pain Areas",value:state.selectedAreas.length?state.selectedAreas.join(", "):"None noted"},
+        {label:"Recovery Checks",value:`${checkedCount}/${TRAUMA_CHECKS.length}`,color:"#7B61FF"},
+      ].map(r=>`<div class="result-row"><span class="result-label">${r.label}</span><span class="result-val" style="color:${r.color||'#F0EEF6'}">${r.value}</span></div>`).join("")}
+    </div>
+    ${state.notes.trim()?`<div class="card"><div class="s-title">📝 Note</div><p style="font-size:14px;color:#6B6880;line-height:1.6">${state.notes}</p></div>`:""}
+    <div class="affirmation"><div class="aff-label">Today's Reminder</div><div class="aff-text">"${AFFIRMATIONS[state.affIdx]}"</div></div>
+    <div class="btn-grid">
+      <button class="btn" style="background:#FF4D6D" onclick="resetForm()">＋ New</button>
+      <button class="btn" style="background:#7B61FF" onclick="switchTab('insights')">🤖 AI</button>
+      <button class="btn full" style="background:#00C98D" onclick="switchTab('community')">💬 Community</button>
+      <button class="btn full" style="background:#FF8C42" onclick="exportPDF()" ${state.pdfLoading?"disabled":""}>${state.pdfLoading?"⏳ Generating…":"📄 Export PDF"}</button>
+    </div>
+    <div style="height:28px"></div>
+    ${navHTML(state.tab)}
+  </div>`;
+}
+
+function trendsHTML() {
+  const h = state.history;
+  const avgPain = (h.reduce((a,b)=>a+b.painLevel,0)/h.length).toFixed(1);
+  const avgScore = (h.reduce((a,b)=>a+b.score,0)/h.length).toFixed(0);
+  const bestDay = h.reduce((a,b)=>b.score>a.score?b:a,h[0]);
+  const last = h[h.length-1], prev = h[h.length-2];
+  const trend = h.length>=2?last.painLevel-prev.painLevel:0;
+  const last7 = h.slice(-7);
+  return `<div class="app">
+    ${headerHTML(state.currentUser)}
+    ${trialBannerHTML()}
+    ${heroHTML("Your","Journey",`${h.length} check-ins tracked`,"#7B61FF")}
+    <div class="stat-pills">
+      ${[{label:"Avg Pain",value:avgPain,color:"#FF4D6D"},{label:"Avg Score",value:avgScore,color:"#7B61FF"},{label:"Best Day",value:bestDay.date,color:"#00C98D"},{label:"Trend",value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"Stable",color:trend>0?"#FF4D6D":trend<0?"#00C98D":"#6B6880"}].map(s=>
+        `<div class="stat-pill"><div class="pill-label">${s.label}</div><div class="pill-val" style="color:${s.color}">${s.value}</div></div>`
+      ).join("")}
+    </div>
+    <div class="card">
+      <div class="s-title">📉 Pain Over Time</div>
+      <div class="sub">Lower is better</div>
+      ${miniBarChart(last7,"painLevel","#FF4D6D")}
+    </div>
+    <div class="card">
+      <div class="s-title">📈 Recovery Score</div>
+      <div class="sub">Higher is better · max 30</div>
+      ${miniBarChart(last7,"score","#7B61FF")}
+    </div>
+    <div class="card">
+      <div class="s-title">💭 Mood Trend</div>
+      <div class="sub">1 = Struggling · 5 = Strong</div>
+      ${miniBarChart(last7,"mood","#00C98D")}
+    </div>
+    <div class="card">
+      <div class="s-title">🗂 Check-In Log</div>
+      ${[...h].reverse().map((entry,i)=>`<div class="log-row">
+        <div><div style="font-weight:600;font-size:13px">${entry.fullDate}</div>
+        <div style="font-size:11px;color:#6B6880;margin-top:2px">Pain ${entry.painLevel}/10 · ${MOODS.find(m=>m.value===entry.mood)?.emoji||"—"} · ${entry.checkedCount} checks</div></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:${scoreColor(entry.score)}">${entry.score}</div>
+      </div>`).join("")}
+    </div>
+    ${navHTML(state.tab)}
+  </div>`;
+}
+
+function insightsHTML() {
+  return `<div class="app">
+    ${headerHTML(state.currentUser)}
+    ${trialBannerHTML()}
+    ${heroHTML("AI","Insights","Powered by Claude — your personal recovery analyst","#7B61FF")}
+    <div class="card">
+      <div class="s-title">🤖 What Claude Sees</div>
+      <div class="sub">Claude analyzes your check-ins to find patterns, wins, and suggestions.</div>
+      ${!state.aiInsights&&!state.aiLoading?`
+        <div style="text-align:center;padding:16px 0 8px">
+          <div style="font-size:52px;margin-bottom:14px">🧠</div>
+          <p style="font-size:14px;color:#6B6880;margin-bottom:20px;line-height:1.6">Complete a check-in, then tap below for personalized insights.</p>
+          <button class="btn" style="background:#7B61FF" onclick="fetchInsights()">Analyze My Data →</button>
+        </div>`:""}
+      ${state.aiLoading?`<div style="text-align:center;padding:32px 0"><span style="font-size:42px;display:inline-block;animation:spin 1.5s linear infinite">🔄</span><p style="font-size:14px;color:#6B6880;margin-top:12px">Claude is reading your data…</p></div>`:""}
+      ${state.aiInsights?.error?`<p style="font-size:14px;color:#FF4D6D;text-align:center;padding:16px">${state.aiInsights.error}</p>`:""}
+      ${state.aiInsights&&!state.aiInsights.error?`
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.06em;color:#7B61FF;line-height:1.1;margin-bottom:14px;text-transform:uppercase">${state.aiInsights.headline}</div>
+        <div style="font-size:14px;line-height:1.7;margin-bottom:22px;padding:14px;background:#7B61FF11;border-radius:12px;border-left:3px solid #7B61FF">${state.aiInsights.summary}</div>
+        ${insightListHTML("🔍","Patterns",state.aiInsights.patterns,"#FF8C42")}
+        ${insightListHTML("🏆","Your Wins",state.aiInsights.wins,"#00C98D")}
+        ${insightListHTML("💡","Suggestions",state.aiInsights.suggestions,"#7B61FF")}
+        <div style="margin:18px 0 6px;padding:16px;background:#FF4D6D11;border-left:4px solid #FF4D6D;border-radius:0 12px 12px 0">
+          <div style="font-size:10px;color:#FF4D6D;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Personalized Affirmation</div>
+          <div style="font-size:15px;font-style:italic;line-height:1.6">"${state.aiInsights.affirmation}"</div>
+        </div>
+        <div style="margin-top:18px"><button class="btn" style="background:#7B61FF" onclick="fetchInsights()">↻ Refresh</button></div>
+      `:""}
+    </div>
+    ${navHTML(state.tab)}
+  </div>`;
+}
+
+function insightListHTML(icon, title, items, color) {
+  if(!items||!items.length) return "";
+  return `<div class="insight-section">
+    <div class="insight-title" style="color:${color}">${icon} ${title}</div>
+    ${items.map((item,i)=>`<div class="insight-item">
+      <div class="insight-dot" style="background:${color}"></div>
+      <span style="font-size:13px;line-height:1.55">${item}</span>
+    </div>`).join("")}
+  </div>`;
+}
+
+function communityHTML() {
+  return `<div class="app">
+    ${headerHTML(state.currentUser)}
+    ${trialBannerHTML()}
+    ${heroHTML("Peer","Support","You are not alone on this journey","#00C98D")}
+    <div class="safe-space-note">
+      <div style="font-size:10px;color:#7B61FF;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Safe Space</div>
+      <div style="font-size:12px;color:#6B6880;line-height:1.5">Be kind · No medical advice · Support, don't diagnose 💜</div>
+    </div>
+    <div style="margin:0 24px 14px;background:#12121A;border:1px solid #1E1E2E;border-radius:20px;overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid #1E1E2E;display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#00C98D;animation:pulse 2s infinite"></div>
+        <span style="font-size:12px;color:#6B6880">Community is active</span>
+      </div>
+      <div class="chat-log" id="chat-log">
+        ${state.chatMessages.map(msg=>`<div class="bubble-wrap ${msg.mine?'mine':''}">
+          <span style="font-size:22px;flex-shrink:0">${msg.avatar}</span>
+          <div>
+            ${!msg.mine?`<div class="bubble-name">${msg.user}</div>`:""}
+            <div class="bubble ${msg.mine?'mine':'theirs'}">${msg.text}</div>
+            <div class="bubble-time" style="text-align:${msg.mine?'right':'left'}">${msg.time}</div>
+          </div>
+        </div>`).join("")}
+      </div>
+      <div style="border-top:1px solid #1E1E2E;padding:12px;display:flex;gap:8px">
+        <input id="chat-input" value="${state.chatInput}" oninput="state.chatInput=this.value" onkeydown="if(event.key==='Enter')sendMessage()"
+          placeholder="Share how you're feeling…"
+          style="flex:1;background:#0A0A0F;border:1px solid #1E1E2E;border-radius:12px;color:#F0EEF6;font-size:13px;padding:10px 14px;outline:none"/>
+        <button onclick="sendMessage()" style="padding:10px 16px;background:#7B61FF;border:none;border-radius:12px;color:#fff;font-size:18px;cursor:pointer">→</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="s-title">👤 Display Name</div>
+      <div class="sub">How you appear in the community</div>
+      <input value="${state.chatName}" oninput="state.chatName=this.value" style="width:100%;background:#0A0A0F;border:1px solid #1E1E2E;border-radius:12px;color:#F0EEF6;font-size:14px;padding:12px 14px;outline:none"/>
+    </div>
+    ${navHTML(state.tab)}
+  </div>`;
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────
+function getHTML() {
+  if(state.authStep==="login") return loginHTML();
+  if(state.authStep==="register") return registerHTML();
+  if(state.authStep==="verify") return verifyHTML();
+  if(state.authStep==="welcome") return welcomeHTML();
+  if(state.authStep==="paywall") return paywallHTML();
+  // App
+  if(state.tab==="history") return trendsHTML();
+  if(state.tab==="insights") return insightsHTML();
+  if(state.tab==="community") return communityHTML();
+  if(state.screen==="results") return resultsHTML();
+  return checkinFormHTML();
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────
+function switchAuth(step){ state.authStep=step; render(); }
+function switchTab(tab){
+  if(tab==="paywall"){state.authStep="paywall";render();return;}
+  state.tab=tab;
+  if(tab==="checkin") state.screen="form";
+  render();
+}
+
+function doLogin(){
+  const e={};
+  if(!state.loginEmail.includes("@")) e.email="Enter a valid email";
+  if(state.loginPass.length<6) e.pass="Password must be at least 6 characters";
+  if(Object.keys(e).length){state.loginErrors=e;render();return;}
+  state.loginLoading=true; render();
+  setTimeout(()=>{
+    const users=JSON.parse(localStorage.getItem("rt_users")||"[]");
+    const user=users.find(u=>u.email===state.loginEmail&&u.password===state.loginPass);
+    if(!user){state.loginErrors={pass:"Incorrect email or password"};state.loginLoading=false;render();return;}
+    if(!user.verified){state.loginErrors={pass:"Please verify your email first."};state.loginLoading=false;render();return;}
+    state.loginLoading=false;
+    state.currentUser=user;
+    state.chatName=user.name||"You";
+    sessionStorage.setItem("rt_session",JSON.stringify(user));
+    const dl=daysLeft(user);
+    state.authStep=(!isPaid(user)&&dl===0)?"paywall":"app";
+    render();
+  },800);
+}
+
+function doRegister(){
+  const e={};
+  if(state.regName.trim().length<2) e.name="Enter your full name";
+  if(!state.regEmail.includes("@")) e.email="Enter a valid email";
+  if(state.regPass.length<6) e.pass="Min 6 characters";
+  if(state.regPass!==state.regConfirm) e.confirm="Passwords don't match";
+  if(!state.regAgreed) e.agreed="Please accept the terms";
+  if(Object.keys(e).length){state.regErrors=e;render();return;}
+  state.regLoading=true; render();
+  setTimeout(()=>{
+    const users=JSON.parse(localStorage.getItem("rt_users")||"[]");
+    if(users.find(u=>u.email===state.regEmail)){state.regErrors={email:"Email already registered"};state.regLoading=false;render();return;}
+    const code=Math.floor(100000+Math.random()*900000).toString();
+    const newUser={name:state.regName.trim(),email:state.regEmail,password:state.regPass,verified:false,verifyCode:code,trialStart:Date.now(),createdAt:Date.now(),plan:"trial"};
+    users.push(newUser); localStorage.setItem("rt_users",JSON.stringify(users));
+    state.verifyData={email:state.regEmail,code,name:state.regName.trim()};
+    state.regLoading=false; state.authStep="verify"; render();
+  },900);
+}
+
+function handleDigit(i,val){
+  if(!/^\d*$/.test(val)) return;
+  state.verifyInput[i]=val.slice(-1);
+  render();
+  if(val&&i<5) setTimeout(()=>{ const next=$(`d${i+1}`); if(next) next.focus(); },10);
+}
+function handleDigitKey(i,e){ if(e.key==="Backspace"&&!state.verifyInput[i]&&i>0) setTimeout(()=>{ const prev=$(`d${i-1}`); if(prev) prev.focus(); },10); }
+
+function doVerify(){
+  const entered=state.verifyInput.join("");
+  if(entered.length<6){state.verifyError="Enter all 6 digits";render();return;}
+  state.verifyLoading=true; render();
+  setTimeout(()=>{
+    if(entered===state.verifyData.code){
+      const users=JSON.parse(localStorage.getItem("rt_users")||"[]");
+      const idx=users.findIndex(u=>u.email===state.verifyData.email);
+      if(idx>=0){users[idx].verified=true;localStorage.setItem("rt_users",JSON.stringify(users));}
+      const u=users[idx];
+      state.currentUser=u; state.chatName=u.name||"You";
+      sessionStorage.setItem("rt_session",JSON.stringify(u));
+      state.verifyLoading=false; state.authStep="welcome"; render();
+      setTimeout(()=>{state.authStep="app";render();},3000);
+    } else {state.verifyError="Incorrect code. Try again.";state.verifyLoading=false;render();}
+  },700);
+}
+
+function doSubscribe(){
+  state.subscribeLoading=true; render();
+  setTimeout(()=>{
+    const users=JSON.parse(localStorage.getItem("rt_users")||"[]");
+    const idx=users.findIndex(u=>u.email===state.currentUser.email);
+    if(idx>=0){users[idx].plan=state.selectedPlan;localStorage.setItem("rt_users",JSON.stringify(users));}
+    state.currentUser={...state.currentUser,plan:state.selectedPlan};
+    sessionStorage.setItem("rt_session",JSON.stringify(state.currentUser));
+    state.subscribeLoading=false; state.authStep="app"; render();
+  },1200);
+}
+
+function logout(){
+  sessionStorage.removeItem("rt_session");
+  state.currentUser=null; state.authStep="login";
+  state.loginEmail=""; state.loginPass=""; state.loginErrors={};
+  render();
+}
+
+function toggleArea(area){
+  const i=state.selectedAreas.indexOf(area);
+  if(i>=0) state.selectedAreas.splice(i,1); else state.selectedAreas.push(area);
+  const el=document.querySelector(`.area-chip[onclick="toggleArea('${area}')"]`);
+  if(el) el.classList.toggle("active");
+}
+
+function toggleCheck(id){
+  state.traumaChecks[id]=!state.traumaChecks[id];
+  const rows=document.querySelectorAll(".check-row");
+  rows.forEach(row=>{
+    if(row.getAttribute("onclick")===`toggleCheck('${id}')`){
+      const cb=row.querySelector(".checkbox");
+      if(cb){ cb.classList.toggle("checked",state.traumaChecks[id]); cb.textContent=state.traumaChecks[id]?"✓":""; }
+    }
+  });
+}
+
+function submitCheckin(){
+  const score=Math.round(((10-state.painLevel)*3+(state.mood||3)*4+Object.values(state.traumaChecks).filter(Boolean).length*5)/3);
+  state.history=[...state.history.slice(-13),{id:Date.now(),date:new Date().toLocaleDateString("en-US",{weekday:"short"}),
+    fullDate:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),
+    painLevel:state.painLevel,mood:state.mood,checkedCount:Object.values(state.traumaChecks).filter(Boolean).length,
+    notes:state.notes,score}];
+  state.aiInsights=null; state.screen="results"; render();
+}
+
+function resetForm(){
+  state.painLevel=5; state.selectedAreas=[]; state.traumaChecks={};
+  state.mood=null; state.notes=""; state.screen="form"; state.tab="checkin"; render();
+}
+
+function sendMessage(){
+  if(!state.chatInput.trim()) return;
+  state.chatMessages.push({id:Date.now(),user:state.chatName,avatar:"🔥",text:state.chatInput.trim(),time:"Just now",mine:true});
+  state.chatInput=""; render();
+}
+
+function scrollToBottom(){
+  const log=$("chat-log");
+  if(log) setTimeout(()=>{log.scrollTop=log.scrollHeight;},50);
+}
+
+function toggleVoice(){
+  if(state.isListening){
+    state.recognition?.stop(); state.isListening=false; state.voiceStatus=""; render(); return;
+  }
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){state.voiceStatus="Voice not supported in this browser.";render();return;}
+  const rec=new SR(); rec.continuous=false; rec.interimResults=true; rec.lang="en-US";
+  rec.onstart=()=>{state.isListening=true;state.voiceStatus="Listening…";render();};
+  rec.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join("");state.notes=t;if(e.results[0].isFinal){state.voiceStatus="✓ Saved!";render();}else{const ta=document.querySelector("textarea");if(ta)ta.value=t;}};
+  rec.onerror=()=>{state.isListening=false;state.voiceStatus="Mic error — try again";render();};
+  rec.onend=()=>{state.isListening=false;render();};
+  state.recognition=rec; rec.start();
+}
+
+async function fetchInsights(){
+  state.aiLoading=true; state.aiInsights=null; render();
+  try{
+    const rows=state.history.slice(-7).map(h=>`${h.fullDate}: Pain ${h.painLevel}/10, Mood ${h.mood}/5, Score ${h.score}/30`).join("\n");
+    const selMood=MOODS.find(m=>m.value===state.mood);
+    const prompt=`You are a compassionate AI assistant specializing in chronic pain and trauma recovery. Analyze this person's data and give warm empathetic insights.\n\n7-day history:\n${rows}\n\nToday: Pain ${state.painLevel}/10 (${painLabel(state.painLevel)}), Mood: ${selMood?selMood.label:"not recorded"}, Areas: ${state.selectedAreas.join(", ")||"none"}, Checks: ${Object.values(state.traumaChecks).filter(Boolean).length}/${TRAUMA_CHECKS.length}\n\nRespond ONLY with valid JSON, no markdown:\n{"headline":"max 8 words","summary":"2-3 sentences","patterns":["p1","p2","p3"],"wins":["w1","w2"],"suggestions":["s1","s2","s3"],"affirmation":"one sentence"}`;
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+    const data=await res.json();
+    const raw=(data.content||[]).map(i=>i.text||"").join("");
+    state.aiInsights=JSON.parse(raw.replace(/```json|```/g,"").trim());
+  }catch(e){state.aiInsights={error:"Could not load insights. Please try again."};}
+  state.aiLoading=false; render();
+}
+
+async function exportPDF(){
+  state.pdfLoading=true; render();
+  try{
+    const score=Math.round(((10-state.painLevel)*3+(state.mood||3)*4+Object.values(state.traumaChecks).filter(Boolean).length*5)/3);
+    const mod=await import("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    const {jsPDF}=mod.default||mod; const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+    const W=210,P=20;
+    doc.setFillColor(255,77,109);doc.rect(0,0,W,30,"F");
+    doc.setTextColor(255,255,255);doc.setFontSize(24);doc.setFont("helvetica","bold");doc.text("RISETHROUGH",P,14);
+    doc.setFontSize(10);doc.setFont("helvetica","normal");doc.text("Daily Pain & Recovery Report",P,22);
+    doc.text(new Date().toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}),W-P,22,{align:"right"});
+    let y=42;const sc=score>=20?[0,201,141]:score>=12?[255,140,66]:[255,77,109];
+    doc.setFillColor(18,18,26);doc.roundedRect(P,y,W-P*2,32,4,4,"F");
+    doc.setTextColor(...sc);doc.setFontSize(30);doc.setFont("helvetica","bold");doc.text(String(score),P+10,y+21);
+    doc.setTextColor(160,160,180);doc.setFontSize(11);doc.setFont("helvetica","normal");doc.text("Recovery Index (out of 30)",P+28,y+12);
+    doc.setFontSize(9);doc.text(score>=20?"Keep pushing!":score>=12?"You're doing okay":"Be gentle with yourself",P+28,y+22);y+=40;
+    const selMood=MOODS.find(m=>m.value===state.mood);
+    const section=(title,rows)=>{const h=12+rows.length*9;doc.setFillColor(22,22,35);doc.roundedRect(P,y,W-P*2,h,4,4,"F");doc.setTextColor(255,77,109);doc.setFontSize(10);doc.setFont("helvetica","bold");doc.text(title,P+6,y+8);rows.forEach((row,i)=>{doc.setTextColor(140,140,165);doc.setFontSize(9);doc.setFont("helvetica","normal");doc.text(row.label,P+6,y+16+i*9);doc.setTextColor(220,218,230);doc.text(row.value,W-P-6,y+16+i*9,{align:"right"});});y+=h+6;};
+    section("PAIN SNAPSHOT",[{label:"Pain Level",value:`${state.painLevel}/10 — ${painLabel(state.painLevel)}`},{label:"Mood",value:selMood?selMood.label:"Not recorded"},{label:"Areas",value:state.selectedAreas.length?state.selectedAreas.join(", "):"None"},{label:"Checks",value:`${Object.values(state.traumaChecks).filter(Boolean).length} of ${TRAUMA_CHECKS.length}`}]);
+    section("7-DAY TREND",state.history.slice(-7).map(h=>({label:h.fullDate,value:`Pain ${h.painLevel}/10  Score ${h.score}/30`})));
+    doc.setFillColor(255,77,109);doc.rect(0,285,W,12,"F");doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont("helvetica","normal");doc.text("RiseThrough — Chronic Pain & Trauma Recovery",P,292);doc.text("Generated "+new Date().toLocaleString(),W-P,292,{align:"right"});
+    doc.save(`RiseThrough_${new Date().toISOString().split("T")[0]}.pdf`);
+  }catch(err){alert("PDF export failed.");}
+  state.pdfLoading=false; render();
+}
+
+function bindEvents(){}
+
+// ── BOOT ──────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
