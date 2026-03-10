@@ -176,7 +176,7 @@ const AuthShell=({children})=>(
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:27,fontWeight:800,marginTop:12}}>
           <span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span>
         </div>
-        <div style={{fontSize:11,color:C.textLight,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:4}}>Chronic Pain &amp; Trauma Recovery</div>
+        <div style={{fontSize:11,color:C.textLight,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:4}}>Chronic Pain & Trauma Recovery</div>
       </div>
       {children}
     </div>
@@ -245,7 +245,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
   };
   if(showTerms) return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
-      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:19,fontWeight:800,color:C.textDark,marginBottom:14}}>Terms &amp; Conditions</div>
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:19,fontWeight:800,color:C.textDark,marginBottom:14}}>Terms & Conditions</div>
       <div className="glass" style={{borderRadius:16,padding:18,maxHeight:"52vh",overflowY:"auto",marginBottom:18,fontSize:13,lineHeight:1.7,color:C.textMid}}>
         <p><strong>1. Acceptance</strong><br/>By using Pain2Care, you agree to these Terms.</p><br/>
         <p><strong>2. Not Medical Advice</strong><br/>Pain2Care is a self-tracking tool only — not a medical device or diagnosis tool. Always consult a qualified healthcare provider.</p><br/>
@@ -259,7 +259,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
         <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${agreed?C.blue:"rgba(26,111,160,0.28)"}`,background:agreed?C.blue:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.2s"}}>
           {agreed&&<span style={{color:"#fff",fontSize:13,fontWeight:900}}>✓</span>}
         </div>
-        <span style={{fontSize:13,color:C.textMid,fontWeight:600}}>I agree to the Terms &amp; Conditions</span>
+        <span style={{fontSize:13,color:C.textMid,fontWeight:600}}>I agree to the Terms & Conditions</span>
       </div>
       <button className="btn-blue" onClick={()=>setShowTerms(false)} disabled={!agreed}>Continue →</button>
     </div>
@@ -304,7 +304,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
         <div style={{width:20,height:20,borderRadius:5,border:`2px solid ${agreed?C.blue:"rgba(26,111,160,0.28)"}`,background:agreed?C.blue:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
           {agreed&&<span style={{color:"#fff",fontSize:11,fontWeight:900}}>✓</span>}
         </div>
-        <span style={{fontSize:12,color:C.textMid}}>I agree to the <span style={{color:C.blue,fontWeight:700}}>Terms &amp; Conditions</span></span>
+        <span style={{fontSize:12,color:C.textMid}}>I agree to the <span style={{color:C.blue,fontWeight:700}}>Terms & Conditions</span></span>
       </div>
       {errors.agreed&&<div style={{fontSize:11,color:C.red,marginBottom:10}}>⚠ {errors.agreed}</div>}
       <button className="btn-blue" onClick={doRegister} disabled={loading}>{loading?"Creating…":"Create Account →"}</button>
@@ -688,7 +688,7 @@ const ViolenceModule=({user,onShowPaywall})=>{
       <GCard style={{background:"rgba(123,63,158,0.07)",border:"1px solid rgba(123,63,158,0.18)"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:7}}>
           <span style={{fontSize:18}}>🔒</span>
-          <div style={{fontWeight:800,fontSize:13,color:C.purple}}>Private &amp; Encrypted</div>
+          <div style={{fontWeight:800,fontSize:13,color:C.purple}}>Private & Encrypted</div>
         </div>
         <div style={{fontSize:13,color:C.textMid,lineHeight:1.6}}>Your documentation is stored securely. Only you control who sees it.</div>
       </GCard>
@@ -792,7 +792,7 @@ const CommunityModule=({user})=>{
       <GCard style={{background:"rgba(26,140,122,0.07)",border:"1px solid rgba(26,140,122,0.17)"}}>
         <div style={{display:"flex",alignItems:"center",gap:9}}>
           <span style={{fontSize:16}}>🔒</span>
-          <div style={{fontWeight:700,fontSize:13,color:C.teal}}>Anonymous &amp; Safe Space</div>
+          <div style={{fontWeight:700,fontSize:13,color:C.teal}}>Anonymous & Safe Space</div>
         </div>
         <div style={{fontSize:12,color:C.textLight,marginTop:5}}>Your real name is never shown unless you choose to share it.</div>
       </GCard>
@@ -947,7 +947,7 @@ function App(){
   const [step,setStep]=useState("login");
   const [user,setUser]=useState(null);
   const [vData,setVData]=useState(null);
-  useEffect(()=>{try{const s=sessionStorage.getItem("p2c_session");if(s){const u=JSON.parse(s);setUser(u);setStep("app");}}catch(e){}});
+  useEffect(()=>{try{const s=sessionStorage.getItem("p2c_session");if(s){const u=JSON.parse(s);setUser(u);setStep("app");}}catch(e){}},[]); 
   const handleLogin=(u)=>{setUser(u);sessionStorage.setItem("p2c_session",JSON.stringify(u));const d=Math.max(0,7-Math.floor((Date.now()-(u.trialStart||Date.now()))/86400000));const paid=u.plan==="monthly"||u.plan==="annual";setStep(!paid&&d===0?"paywall":"app");};
   const handleReg=({email,code,name})=>{setVData({email,code,name});setStep("verify");};
   const handleVerified=()=>{const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");const u=users.find(u=>u.email===vData.email);if(u){setUser(u);sessionStorage.setItem("p2c_session",JSON.stringify(u));}setStep("silhouette");};
