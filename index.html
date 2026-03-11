@@ -107,19 +107,19 @@ let fbAuth=null,fbDb=null,fbSet=null,fbRef=null,fbOnVal=null,fbSignIn=null,fbSig
 /* ── TRANSLATIONS ── */
 const TRANSLATIONS={
   en:{
-    hello:"Hello",howFeeling:{T.howFeeling},
-    todayReminder:"Today\'s Reminder",yourModules:{T.yourModules},
+    hello:"Hello",howFeeling:"How are you feeling today?",
+    todayReminder:"Today's Reminder",yourModules:"Your Modules",
     painModule:"Pain Module",chronicPain:"Chronic Pain",
     violenceReport:"Violence Report",documentation:"Documentation",
     communityChat:"Community Chat",anonymous:"Anonymous",
     traumaRecovery:"Trauma Recovery",selfGuided:"Self-Guided",
-    painHistory:{T.painHistory},checkInsRecorded:n=>`${n} check-in${n!==1?"s":""} · tap to view your journey`,
+    painHistory:"Pain History & Trends",checkInsRecorded:n=>`${n} check-in${n!==1?"s":""} · tap to view your journey`,
     lastPain:"Last Pain",avgPain:"Avg Pain",checkIns:"Check-Ins",
-    logCheckIn:"Log Pain Check-In \u2192",newCheckIn:{T.newCheckIn},
-    home:{T.home},pain:{T.pain},safety:{T.safety},recovery:{T.recovery},chat:{T.chat},profile:{T.profile},
-    daysLeft:n=>`${n} days left in free trial`,tapToUpgrade:{T.tapToUpgrade},
-    trackTab:"\uD83E\uDE7A Track",historyTab:"\uD83D\uDCC8 History",noDataYet:{T.noDataYet},
-    noDataSub:{T.noDataSub},startCheckIn:"Start Check-In \u2192",
+    logCheckIn:"Log Pain Check-In →",newCheckIn:"+ New Check-In",
+    home:"HOME",pain:"PAIN",safety:"SAFETY",recovery:"RECOVERY",chat:"CHAT",profile:"PROFILE",
+    daysLeft:n=>`${n} days left in free trial`,tapToUpgrade:"Tap to upgrade",
+    trackTab:"🩺 Track",historyTab:"📈 History",noDataYet:"No data yet",
+    noDataSub:"Complete your first check-in to see trends.",startCheckIn:"Start Check-In →",
     avgScore:"Avg Score",bestDay:"Best Day",trend:"Trend",
   },
   fi:{
@@ -1228,7 +1228,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
 
       {/* Tab bar */}
       <div style={{display:"flex",margin:"6px 18px 10px",borderRadius:14,background:"rgba(26,111,160,0.08)",padding:3}}>
-        {[{id:"track",label:{T.trackTab},},{id:"trends",label:{T.historyTab}}].map(t=>(
+        {[{id:"track",label:T.trackTab},{id:"trends",label:T.historyTab}].map(t=>(
           <button key={t.id} onClick={()=>setPainTab(t.id)}
             style={{flex:1,padding:"9px 0",borderRadius:11,border:"none",cursor:"pointer",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:13,transition:"all 0.2s",
               background:painTab===t.id?"rgba(255,255,255,0.85)":"transparent",
