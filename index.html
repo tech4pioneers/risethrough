@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -1984,24 +1987,17 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser})=>{
       </div>
     </div>
   );
+
+  const deleteAllData=async()=>{
     setDeleting(true);
     // Clear localStorage
     const keysToDelete=Object.keys(localStorage).filter(k=>k.includes(user?.uid||user?.email||"local")||k.includes("p2c_"));
     keysToDelete.forEach(k=>localStorage.removeItem(k));
     sessionStorage.removeItem("p2c_session");
-    // Delete from Firebase
-    if(window._fbReady&&fbDb&&fbRef&&user?.uid){
-      try{
-        const {remove}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
-        await remove(fbRef(fbDb,`users/${user.uid}`));
-        await remove(fbRef(fbDb,`vdocs/${user.uid}`));
-      }catch(e){}
-      try{
-        if(fbAuth?.currentUser){
-          const {deleteUser}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-          await deleteUser(fbAuth.currentUser);
-        }
-      }catch(e){}
+    // Delete from Firebase (use fbSet with null to remove nodes)
+    if(window._fbReady&&fbDb&&fbRef&&fbSet&&user?.uid){
+      try{await fbSet(fbRef(fbDb,`users/${user.uid}`),null);}catch(e){}
+      try{await fbSet(fbRef(fbDb,`vdocs/${user.uid}`),null);}catch(e){}
     }
     await new Promise(r=>setTimeout(r,1000));
     setDeleting(false);
