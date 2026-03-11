@@ -427,13 +427,14 @@ const Logo=({size=56})=>(
 const GCard=({children,style={}})=>(
   <div className="glass" style={{borderRadius:20,padding:22,margin:"0 18px 16px",...style}}>{children}</div>
 );
-const SectionTitle=({icon,title,sub})=>(
+const SectionTitle=({icon,title,sub,onBack})=>(
   <div style={{padding:"18px 22px 4px",animation:"fadeIn 0.4s ease both"}}>
     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:2}}>
+      {onBack&&<button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer",flexShrink:0}}>← Back</button>}
       {icon&&<span style={{fontSize:22}}>{icon}</span>}
       <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark,letterSpacing:"-0.01em"}}>{title}</div>
     </div>
-    {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:icon?32:0,marginTop:3}}>{sub}</div>}
+    {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:onBack?(icon?80:52):(icon?32:0),marginTop:3}}>{sub}</div>}
   </div>
 );
 const BottomNav=({tab,setTab})=>{
@@ -994,7 +995,7 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
 };
 
 /* ══ PAIN MODULE ══ */
-const PainModule=({user,history,setHistory,onShowPaywall})=>{
+const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
   const [painLevel,setPainLevel]=useState(5);
   const [areaSymptoms,setAreaSymptoms]=useState({}); // {areaId: {symptoms:[{type}], intensity}}
   const [mood,setMood]=useState(null);
@@ -1087,7 +1088,7 @@ const PainModule=({user,history,setHistory,onShowPaywall})=>{
   return(
     <div>
       {popup&&<AreaPopup area={popup} current={areaSymptoms[popup.id]} onSave={handleAreaSave} onClose={()=>setPopup(null)}/>}
-      <SectionTitle icon="🩺" title="Pain Module" sub="Track & visualise your pain"/>
+      <SectionTitle icon="🩺" title="Pain Module" sub="Track & visualise your pain" onBack={onBack}/>
       <GCard>
         <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:3}}>⚡ Pain Level</div>
         <div style={{fontSize:12,color:C.textLight,marginBottom:13}}>How intense is your overall pain right now?</div>
@@ -1159,12 +1160,12 @@ const PainModule=({user,history,setHistory,onShowPaywall})=>{
 };
 
 /* ══ VIOLENCE MODULE ══ */
-const ViolenceModule=({user,onShowPaywall})=>{
+const ViolenceModule=({user,onShowPaywall,onBack})=>{
   const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
   const storageKey=`p2c_vdocs_${user?.uid||user?.email||"local"}`;
   const pinKey=`p2c_vpin_${user?.uid||user?.email||"local"}`;
 
-  const [screen,setScreen]=useState("main"); // main | newDoc | pinSetup | pinEntry | photos | viewDoc
+  const [screen,setScreen]=useState("main"); // main | newDoc | pinSetup | pinEntry | pinEntryRecords | photos | viewDoc | share | shareConfirm
   const [records,setRecords]=useState(()=>{try{return JSON.parse(localStorage.getItem(storageKey)||"[]");}catch(e){return[];}});
   const [pin,setPin]=useState(()=>localStorage.getItem(pinKey)||"");
   const [pinInput,setPinInput]=useState("");
@@ -1173,6 +1174,7 @@ const ViolenceModule=({user,onShowPaywall})=>{
   const [pinError,setPinError]=useState("");
   const [pinAttempts,setPinAttempts]=useState(0);
   const [pinLocked,setPinLocked]=useState(false);
+  const [recordsUnlocked,setRecordsUnlocked]=useState(false);
   const [photos,setPhotos]=useState([]);
   const [activeDoc,setActiveDoc]=useState(null);
   const fileRef=useRef(null);
@@ -1247,8 +1249,44 @@ const ViolenceModule=({user,onShowPaywall})=>{
     </div>
   );
 
-  // PIN Entry screen
-  if(screen==="pinEntry") return(
+  // PIN Entry for Records
+  if(screen==="pinEntryRecords") return(
+    <div style={{animation:"fadeIn 0.3s ease both"}}>
+      <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={()=>{setScreen("main");setPinInput("");setPinError("");}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>🔒 Your Records</div>
+      </div>
+      <GCard style={{marginTop:14,textAlign:"center"}}>
+        {pinLocked?(
+          <div style={{padding:20}}>
+            <div style={{fontSize:36,marginBottom:12}}>🔒</div>
+            <div style={{fontWeight:800,color:C.red,fontSize:15}}>Too many attempts</div>
+            <div style={{fontSize:13,color:C.textLight,marginTop:8}}>Please wait 5 minutes before trying again.</div>
+          </div>
+        ):(
+          <>
+            <div style={{fontSize:13,color:C.textMid,marginBottom:20}}>Enter your PIN to view your incident records.</div>
+            <PinPad value={pinInput} onChange={v=>{
+              setPinInput(v);
+              if(v.length===4){
+                if(v===pin){
+                  setPinInput("");setPinError("");setPinAttempts(0);
+                  setRecordsUnlocked(true);
+                  setScreen("main");
+                } else {
+                  const attempts=pinAttempts+1;
+                  setPinAttempts(attempts);
+                  if(attempts>=3){setPinLocked(true);setTimeout(()=>{setPinLocked(false);setPinAttempts(0);},300000);}
+                  setPinError(`Incorrect PIN${attempts>=2?` · ${3-attempts} attempt${3-attempts===1?"":"s"} left`:""}`);
+                  setTimeout(()=>setPinInput(""),500);
+                }
+              }
+            }} label="Enter PIN" error={pinError}/>
+          </>
+        )}
+      </GCard>
+    </div>
+  );
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
         <button onClick={()=>{setScreen("main");setPinInput("");setPinError("");}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
@@ -1511,7 +1549,7 @@ const ViolenceModule=({user,onShowPaywall})=>{
   // Main screen
   return(
     <div>
-      <SectionTitle icon="🛡️" title="Violence Documentation" sub="Private & secure"/>
+      <SectionTitle icon="🛡️" title="Violence Documentation" sub="Private & secure" onBack={onBack}/>
       <GCard style={{background:"rgba(123,63,158,0.07)",border:"1px solid rgba(123,63,158,0.18)"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
           <span style={{fontSize:18}}>🔒</span>
@@ -1535,21 +1573,44 @@ const ViolenceModule=({user,onShowPaywall})=>{
 
       {records.length>0&&(
         <GCard>
-          <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:13}}>📋 Your Records ({records.length})</div>
-          {records.slice(0,10).map((r,i)=>(
-            <div key={r.id} onClick={()=>{setActiveDoc(r);setScreen("viewDoc");}}
-              style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<Math.min(records.length,10)-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:"pointer"}}>
-              <div style={{width:38,height:38,borderRadius:11,background:"rgba(123,63,158,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>📄</div>
-              <div style={{flex:1}}>
-                <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{r.type}</div>
-                <div style={{fontSize:11,color:C.textLight,marginTop:2}}>{r.date}{r.location?` · ${r.location}`:""}</div>
-              </div>
-              <div style={{display:"flex",alignItems:"center",gap:6}}>
-                {r.shared&&<span style={{fontSize:10,background:"rgba(45,154,110,0.13)",color:C.green,borderRadius:7,padding:"2px 8px",fontWeight:700}}>Shared</span>}
-                <span style={{color:C.textLight,fontSize:16}}>›</span>
+          <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:13}}>📋 Your Records ({recordsUnlocked?records.length:"🔒"})</div>
+          {!recordsUnlocked?(
+            <div onClick={()=>{
+              if(!pin){setScreen("pinSetup");}
+              else{setScreen("pinEntryRecords");setPinInput("");setPinError("");}
+            }} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10,padding:"20px 0",cursor:"pointer"}}>
+              <div style={{fontSize:38}}>🔒</div>
+              <div style={{fontWeight:700,fontSize:14,color:C.purple}}>Unlock to view records</div>
+              <div style={{fontSize:12,color:C.textLight}}>Tap to enter your PIN</div>
+              <div style={{marginTop:4,display:"flex",gap:6}}>
+                {records.slice(0,3).map((_,i)=>(
+                  <div key={i} style={{width:36,height:44,borderRadius:9,background:"rgba(123,63,158,0.08)",border:"1px solid rgba(123,63,158,0.15)"}}/>
+                ))}
+                {records.length>3&&<div style={{width:36,height:44,borderRadius:9,background:"rgba(123,63,158,0.05)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:C.textLight}}>+{records.length-3}</div>}
               </div>
             </div>
-          ))}
+          ):(
+            <>
+              {records.slice(0,10).map((r,i)=>(
+                <div key={r.id} onClick={()=>{setActiveDoc(r);setScreen("viewDoc");}}
+                  style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<Math.min(records.length,10)-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:"pointer"}}>
+                  <div style={{width:38,height:38,borderRadius:11,background:"rgba(123,63,158,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>📄</div>
+                  <div style={{flex:1}}>
+                    <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{r.type}</div>
+                    <div style={{fontSize:11,color:C.textLight,marginTop:2}}>{r.date}{r.location?` · ${r.location}`:""}</div>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                    {r.shared&&<span style={{fontSize:10,background:"rgba(45,154,110,0.13)",color:C.green,borderRadius:7,padding:"2px 8px",fontWeight:700}}>Shared</span>}
+                    <span style={{color:C.textLight,fontSize:16}}>›</span>
+                  </div>
+                </div>
+              ))}
+              <div onClick={()=>setRecordsUnlocked(false)}
+                style={{textAlign:"center",marginTop:10,fontSize:11,color:C.textLight,cursor:"pointer",padding:"6px 0"}}>
+                🔒 Lock records
+              </div>
+            </>
+          )}
         </GCard>
       )}
 
@@ -1563,8 +1624,12 @@ const ViolenceModule=({user,onShowPaywall})=>{
         ].map((item,i,arr)=>(
           <div key={item.label} onClick={()=>{
             if(records.length===0) return;
-            if(records.length===1){setActiveDoc(records[0]);setScreen("share");}
-            else{setActiveDoc(records[0]);setScreen("share");}
+            if(!recordsUnlocked){
+              if(!pin){setScreen("pinSetup");}
+              else{setScreen("pinEntryRecords");setPinInput("");setPinError("");}
+              return;
+            }
+            setActiveDoc(records[0]);setScreen("share");
           }}
             style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:records.length>0?"pointer":"default",opacity:records.length>0?1:0.4}}>
             <span style={{fontSize:20}}>{item.icon}</span>
@@ -1579,7 +1644,7 @@ const ViolenceModule=({user,onShowPaywall})=>{
 };
 
 /* ══ TRAUMA MODULE ══ */
-const TraumaModule=({user})=>{
+const TraumaModule=({user,onBack})=>{
   const [active,setActive]=useState(null); // exercise id or "anchor"
   const anchorKey=`p2c_anchor_${user?.uid||user?.email||"local"}`;
   const [anchor,setAnchor]=useState(()=>{try{return JSON.parse(localStorage.getItem(anchorKey)||"null");}catch(e){return null;}});
@@ -1706,7 +1771,7 @@ const TraumaModule=({user})=>{
   // Main view
   return(
     <div>
-      <SectionTitle icon="🧠" title="Trauma Recovery" sub="Self-guided exercises & empowerment"/>
+      <SectionTitle icon="🧠" title="Trauma Recovery" sub="Self-guided exercises & empowerment" onBack={onBack}/>
 
       {/* Anchor card */}
       <div style={{padding:"0 18px",marginBottom:4}}>
@@ -1750,7 +1815,7 @@ const TraumaModule=({user})=>{
 };
 
 /* ══ COMMUNITY ══ */
-const CommunityModule=({user})=>{
+const CommunityModule=({user,onBack})=>{
   const [channel,setChannel]=useState(null);
   const [allMessages,setAllMessages]=useState(()=>{
     const init={};
@@ -1772,7 +1837,7 @@ const CommunityModule=({user})=>{
   // Channel list view
   if(!channel) return(
     <div>
-      <SectionTitle icon="💬" title="Community Chat" sub="Choose a topic to join"/>
+      <SectionTitle icon="💬" title="Community Chat" sub="Choose a topic to join" onBack={onBack}/>
       <GCard style={{background:"rgba(26,140,122,0.07)",border:"1px solid rgba(26,140,122,0.17)"}}>
         <div style={{display:"flex",alignItems:"center",gap:9}}>
           <span style={{fontSize:16}}>🔒</span>
@@ -1853,12 +1918,12 @@ const CommunityModule=({user})=>{
 };
 
 /* ══ TRENDS TAB ══ */
-const TrendsTab=({history})=>{
+const TrendsTab=({history,onBack})=>{
   const chartData=history.slice(-7).map(h=>({day:h.date,Pain:h.painLevel,Score:h.score}));
   const trend=history.length>=2?history[history.length-1].painLevel-history[history.length-2].painLevel:0;
   return(
     <div>
-      <SectionTitle icon="📈" title="Your Journey" sub={`${history.length} check-ins tracked`}/>
+      <SectionTitle icon="📈" title="Your Journey" sub={`${history.length} check-ins tracked`} onBack={onBack}/>
       <div style={{display:"flex",gap:10,padding:"8px 18px 4px",overflowX:"auto"}}>
         {[{label:"Avg Pain",value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Best Day",value:history.reduce((a,b)=>b.score>a.score?b:a,history[0]).date,color:C.green},{label:"Trend",value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"=",color:trend>0?C.red:trend<0?C.green:C.textLight}].map(s=>(
           <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 13px",flexShrink:0}}>
@@ -2005,6 +2070,10 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser})=>{
     setTimeout(()=>onLogout(),1500);
   };
 
+  if(screen==="notifications") return <NotificationsScreen onBack={()=>setScreen("main")} user={user}/>;
+  if(screen==="language") return <LanguageScreen onBack={()=>setScreen("main")} user={user}/>;
+  if(screen==="help") return <HelpScreen onBack={()=>setScreen("main")}/>;
+
   if(deleted) return(
     <div style={{minHeight:"60vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"0 24px"}}>
       <div style={{fontSize:48}}>✅</div>
@@ -2119,20 +2188,163 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser})=>{
         <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:13}}>Account</div>
         {[
           {icon:"✏️",label:"Edit Profile",action:()=>{setEditName(user?.name||"");setEditDob(user?.dob||"");setEditGender(user?.gender||"");setEditSilhouette(user?.silhouette||2);setScreen("editProfile");}},
-          {icon:"🔔",label:"Notifications",action:null},
-          {icon:"🌍",label:"Language",action:null},
+          {icon:"🔔",label:"Notifications",action:()=>setScreen("notifications")},
+          {icon:"🌍",label:"Language",action:()=>setScreen("language")},
           {icon:"🔐",label:"My Data & Privacy (GDPR)",action:()=>setScreen("mydata"),highlight:true},
-          {icon:"❓",label:"Help & Support",action:null},
+          {icon:"❓",label:"Help & Support",action:()=>setScreen("help")},
         ].map((item,i,arr)=>(
           <div key={item.label} onClick={item.action||undefined}
-            style={{display:"flex",alignItems:"center",gap:11,padding:"12px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:item.action?"pointer":"default"}}>
+            style={{display:"flex",alignItems:"center",gap:11,padding:"12px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:"pointer"}}>
             <span style={{fontSize:17}}>{item.icon}</span>
             <span style={{flex:1,fontSize:13,fontWeight:600,color:item.highlight?C.blue:C.textMid}}>{item.label}</span>
-            <span style={{color:item.action?C.blue:C.textLight,fontSize:15}}>›</span>
+            <span style={{color:C.blue,fontSize:15}}>›</span>
           </div>
         ))}
       </GCard>
       <div style={{margin:"0 18px 32px"}}><button className="btn-outline" onClick={onLogout}>Sign Out</button></div>
+    </div>
+  );
+};
+
+/* ══ NOTIFICATIONS SCREEN ══ */
+const NotificationsScreen=({onBack,user})=>{
+  const key=`p2c_notifs_${user?.uid||"local"}`;
+  const [prefs,setPrefs]=useState(()=>{try{return JSON.parse(localStorage.getItem(key)||"{}");}catch(e){return{};}});
+  const toggle=(k)=>{
+    const updated={...prefs,[k]:!prefs[k]};
+    setPrefs(updated);
+    localStorage.setItem(key,JSON.stringify(updated));
+  };
+  const items=[
+    {id:"daily",icon:"📅",label:"Daily Check-in Reminder",desc:"Remind me to log my pain daily"},
+    {id:"morning",icon:"🌅",label:"Morning Wellness Check",desc:"Good morning nudge at 8:00 AM"},
+    {id:"evening",icon:"🌙",label:"Evening Reflection",desc:"End of day check-in at 8:00 PM"},
+    {id:"community",icon:"💬",label:"Community Replies",desc:"When someone replies to your message"},
+    {id:"tips",icon:"💡",label:"Recovery Tips",desc:"Weekly wellness tips & exercises"},
+  ];
+  return(
+    <div style={{animation:"fadeIn 0.3s ease both"}}>
+      <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>🔔 Notifications</div>
+      </div>
+      <GCard style={{marginTop:14}}>
+        {items.map((item,i,arr)=>(
+          <div key={item.id} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
+            <span style={{fontSize:20,flexShrink:0}}>{item.icon}</span>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{item.label}</div>
+              <div style={{fontSize:11,color:C.textLight,marginTop:2}}>{item.desc}</div>
+            </div>
+            <div onClick={()=>toggle(item.id)}
+              style={{width:44,height:26,borderRadius:13,background:prefs[item.id]?C.blue:"rgba(26,111,160,0.15)",cursor:"pointer",position:"relative",transition:"background 0.2s",flexShrink:0}}>
+              <div style={{position:"absolute",top:3,left:prefs[item.id]?20:3,width:20,height:20,borderRadius:"50%",background:"#fff",boxShadow:"0 1px 4px rgba(0,0,0,0.2)",transition:"left 0.2s"}}/>
+            </div>
+          </div>
+        ))}
+      </GCard>
+      <GCard style={{background:"rgba(26,111,160,0.04)"}}>
+        <div style={{fontSize:12,color:C.textLight,lineHeight:1.7}}>📱 Push notifications require the app to be installed on your home screen. Go to Safari → Share → Add to Home Screen.</div>
+      </GCard>
+    </div>
+  );
+};
+
+/* ══ LANGUAGE SCREEN ══ */
+const LanguageScreen=({onBack,user})=>{
+  const key=`p2c_lang_${user?.uid||"local"}`;
+  const [selected,setSelected]=useState(()=>localStorage.getItem(key)||"en");
+  const langs=[
+    {code:"en",flag:"🇬🇧",label:"English"},
+    {code:"fi",flag:"🇫🇮",label:"Suomi (Finnish)"},
+    {code:"sv",flag:"🇸🇪",label:"Svenska (Swedish)"},
+    {code:"ar",flag:"🇸🇦",label:"العربية (Arabic)"},
+    {code:"so",flag:"🇸🇴",label:"Soomaali (Somali)"},
+    {code:"ru",flag:"🇷🇺",label:"Русский (Russian)"},
+  ];
+  return(
+    <div style={{animation:"fadeIn 0.3s ease both"}}>
+      <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>🌍 Language</div>
+      </div>
+      <GCard style={{marginTop:14}}>
+        {langs.map((lang,i,arr)=>(
+          <div key={lang.code} onClick={()=>{setSelected(lang.code);localStorage.setItem(key,lang.code);}}
+            style={{display:"flex",alignItems:"center",gap:13,padding:"13px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:"pointer"}}>
+            <span style={{fontSize:24}}>{lang.flag}</span>
+            <span style={{flex:1,fontSize:14,fontWeight:600,color:C.textDark}}>{lang.label}</span>
+            {selected===lang.code
+              ?<div style={{width:22,height:22,borderRadius:"50%",background:C.blue,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff"}}>✓</div>
+              :<div style={{width:22,height:22,borderRadius:"50%",border:"2px solid rgba(26,111,160,0.2)"}}/>}
+          </div>
+        ))}
+      </GCard>
+      <GCard style={{background:"rgba(244,162,97,0.08)",border:"1px solid rgba(244,162,97,0.2)"}}>
+        <div style={{fontSize:12,color:C.gold,fontWeight:700,marginBottom:4}}>🚧 Coming Soon</div>
+        <div style={{fontSize:12,color:C.textLight,lineHeight:1.6}}>Full translation is in progress. Finnish (Suomi) will be the first language added after English.</div>
+      </GCard>
+    </div>
+  );
+};
+
+/* ══ HELP & SUPPORT SCREEN ══ */
+const HelpScreen=({onBack})=>{
+  const [openFaq,setOpenFaq]=useState(null);
+  const faqs=[
+    {q:"How do I track my pain?",a:"Go to the Pain tab → tap 'Start Check-in'. You can rate your pain, mark body areas, set your mood and add voice notes."},
+    {q:"How do I access Violence Documentation?",a:"Tap the 📸 icon in the bottom navigation. Text records are free. Secure photo storage requires a Premium subscription and your private PIN."},
+    {q:"What is the Anchor feature?",a:"Found in Trauma Recovery → ⚓ My Anchor. Save your power song and a calming image to access quickly when you need grounding."},
+    {q:"How do I cancel my subscription?",a:"Subscriptions are managed through the App Store or Google Play. Go to your device settings → Subscriptions to cancel."},
+    {q:"Is my data private?",a:"Yes. Your health data is stored encrypted on Firebase EU servers. Violence documentation is PIN-protected. See Profile → My Data (GDPR) for full details."},
+    {q:"How do I share an incident report?",a:"Go to Violence Documentation → tap a record → Share Record → choose who to share with."},
+  ];
+  return(
+    <div style={{animation:"fadeIn 0.3s ease both"}}>
+      <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
+        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>❓ Help & Support</div>
+      </div>
+
+      <GCard style={{marginTop:14,background:"rgba(26,111,160,0.06)",border:"1px solid rgba(26,111,160,0.15)"}}>
+        <div style={{fontWeight:800,fontSize:13,color:C.blue,marginBottom:12}}>📞 Contact Us</div>
+        {[
+          {icon:"📧",label:"Email Support",value:"support@pain2care.app"},
+          {icon:"🌐",label:"Website",value:"pain2care.app"},
+          {icon:"🆘",label:"Crisis Line (Finland)",value:"09 2525 0111"},
+        ].map((c,i,arr)=>(
+          <div key={c.label} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
+            <span style={{fontSize:18}}>{c.icon}</span>
+            <div style={{flex:1}}>
+              <div style={{fontWeight:700,fontSize:12,color:C.textDark}}>{c.label}</div>
+              <div style={{fontSize:12,color:C.blue,marginTop:1}}>{c.value}</div>
+            </div>
+          </div>
+        ))}
+      </GCard>
+
+      <GCard>
+        <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:12}}>💬 Frequently Asked Questions</div>
+        {faqs.map((faq,i)=>(
+          <div key={i} style={{borderBottom:i<faqs.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
+            <div onClick={()=>setOpenFaq(openFaq===i?null:i)}
+              style={{display:"flex",alignItems:"center",gap:10,padding:"12px 0",cursor:"pointer"}}>
+              <span style={{flex:1,fontSize:13,fontWeight:700,color:C.textDark}}>{faq.q}</span>
+              <span style={{color:C.blue,fontSize:16,transition:"transform 0.2s",transform:openFaq===i?"rotate(90deg)":"none"}}>›</span>
+            </div>
+            {openFaq===i&&(
+              <div style={{fontSize:13,color:C.textMid,lineHeight:1.7,paddingBottom:12,paddingLeft:4}}>{faq.a}</div>
+            )}
+          </div>
+        ))}
+      </GCard>
+
+      <GCard style={{background:"rgba(26,111,160,0.04)"}}>
+        <div style={{fontSize:12,color:C.textLight,textAlign:"center",lineHeight:1.7}}>
+          Pain2Care v1.0 · Tech4Pioneers<br/>
+          <span style={{color:C.blue}}>pain2care.app</span>
+        </div>
+      </GCard>
     </div>
   );
 };
@@ -2156,11 +2368,11 @@ const MainApp=({user:initialUser,onLogout,onShowPaywall})=>{
   const renderContent=()=>{
     switch(tab){
       case "home": return <HomeTab user={user} onModuleSelect={setTab} onShowPaywall={onShowPaywall} history={history}/>;
-      case "pain": return <PainModule user={user} history={history} setHistory={setHistory} onShowPaywall={onShowPaywall}/>;
-      case "violence": return <ViolenceModule user={user} onShowPaywall={onShowPaywall}/>;
-      case "trauma": return <TraumaModule user={user}/>;
-      case "community": return <CommunityModule user={user}/>;
-      case "trends": return <TrendsTab history={history}/>;
+      case "pain": return <PainModule user={user} history={history} setHistory={setHistory} onShowPaywall={onShowPaywall} onBack={()=>setTab("home")}/>;
+      case "violence": return <ViolenceModule user={user} onShowPaywall={onShowPaywall} onBack={()=>setTab("home")}/>;
+      case "trauma": return <TraumaModule user={user} onBack={()=>setTab("home")}/>;
+      case "community": return <CommunityModule user={user} onBack={()=>setTab("home")}/>;
+      case "trends": return <TrendsTab history={history} onBack={()=>setTab("home")}/>;
       case "profile": return <ProfileTab user={user} onLogout={onLogout} onShowPaywall={onShowPaywall} onUpdateUser={handleUpdateUser}/>;
       default: return <HomeTab user={user} onModuleSelect={setTab} onShowPaywall={onShowPaywall} history={history}/>;
     }
