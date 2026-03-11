@@ -15,6 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#c8e8f8 0%,#a8d4f0 25%,#bce0f5 50%,#d4edf8 75%,#b8dcf0 100%);min-height:100vh;overscroll-behavior:none}
@@ -399,7 +400,7 @@ const EXERCISES=[
 const seedHistory=()=>Array.from({length:7},(_,i)=>{
   const pain=Math.floor(Math.random()*5)+3,mood=Math.floor(Math.random()*3)+2,checks=Math.floor(Math.random()*4)+1;
   return{id:i,date:DAYS[i],fullDate:new Date(Date.now()-(6-i)*86400000).toLocaleDateString("en-US",{month:"short",day:"numeric"}),
-    painLevel:pain,mood,checkedCount:checks,areas:[],notes:"",score:Math.round(((10-pain)*3+mood*4+checks*5)/3)};
+    painLevel:pain,mood,checkedCount:checks,areas:[],notes:"",score:Math.min(30,Math.round(((10-pain)*3+mood*4+checks*5)/3))};
 });
 
 /* ── Logo SVG ── */
@@ -969,7 +970,7 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
       </div>
       {history.length>0&&(
         <div style={{display:"flex",gap:10,padding:"0 18px",marginBottom:18,overflowX:"auto"}}>
-          {[{label:"Last Pain",value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Check-Ins",value:history.length,color:C.green}].map(s=>(
+          {[{label:"Last Pain",value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:"Avg Pain",value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.gold},{label:"Check-Ins",value:history.length,color:C.green}].map(s=>(
             <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 14px",flexShrink:0,minWidth:85}}>
               <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
               <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:21,color:s.color}}>{s.value}</div>
@@ -1045,7 +1046,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
   };
 
   const handleSubmit=()=>{
-    const score=Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3);
+    const score=Math.min(30,Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3));
     const areas=Object.entries(areaSymptoms).map(([id,data])=>({id,...data}));
     setHistory(prev=>[...prev.slice(-13),{id:Date.now(),date:new Date().toLocaleDateString("en-US",{weekday:"short"}),fullDate:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),painLevel,mood,checkedCount,areas,notes,score}]);
     setScreen("results");
@@ -1053,7 +1054,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
   const resetForm=()=>{setPainLevel(5);setAreaSymptoms({});setTraumaChecks({});setMood(null);setNotes("");setScreen("form");};
 
   if(screen==="results"){
-    const score=Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3);
+    const score=Math.min(30,Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3));
     const sc=score>=20?C.green:score>=12?C.gold:C.red;
     const activeAreas=Object.entries(areaSymptoms).filter(([,v])=>v?.symptoms?.length>0);
     return(
@@ -1612,20 +1613,141 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
   // Share confirmation
   if(screen==="shareConfirm"&&activeDoc){
     const lastShare=activeDoc.shareLog?.[activeDoc.shareLog.length-1];
+
+    const generatePDF=()=>{
+      try{
+        const {jsPDF}=window.jspdf;
+        const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+        const pw=210; // page width
+        const margin=20;
+        const cw=pw-margin*2;
+
+        // Header bar
+        doc.setFillColor(123,63,158);
+        doc.rect(0,0,pw,28,\"F\");
+        doc.setTextColor(255,255,255);
+        doc.setFontSize(18);
+        doc.setFont("helvetica","bold");
+        doc.text("Pain2Care",margin,18);
+        doc.setFontSize(10);
+        doc.setFont("helvetica","normal");
+        doc.text("Incident Documentation Report",margin+42,18);
+        doc.text("CONFIDENTIAL",pw-margin,18,"right");
+
+        // Generated info
+        doc.setTextColor(100,100,100);
+        doc.setFontSize(9);
+        const genDate=new Date().toLocaleString("en-FI",{dateStyle:"long",timeStyle:"short"});
+        doc.text(`Generated: ${genDate}`,margin,36);
+        doc.text(`Prepared for: ${lastShare?.recipient||"Recipient"}`,margin,42);
+
+        // Divider
+        doc.setDrawColor(123,63,158);
+        doc.setLineWidth(0.5);
+        doc.line(margin,46,pw-margin,46);
+
+        // Incident details
+        let y=55;
+        doc.setTextColor(30,30,30);
+        doc.setFontSize(14);
+        doc.setFont("helvetica","bold");
+        doc.text("Incident Details",margin,y);
+        y+=8;
+
+        const fields=[
+          ["Type of Incident",activeDoc.type||"—"],
+          ["Date",activeDoc.date||"—"],
+          ["Location",activeDoc.location||"—"],
+          ["Witnesses",activeDoc.witnesses||"—"],
+        ];
+
+        fields.forEach(([label,value])=>{
+          doc.setFontSize(9);
+          doc.setFont("helvetica","bold");
+          doc.setTextColor(100,100,100);
+          doc.text(label.toUpperCase(),margin,y);
+          doc.setFont("helvetica","normal");
+          doc.setTextColor(30,30,30);
+          doc.setFontSize(11);
+          doc.text(String(value),margin,y+6);
+          y+=16;
+        });
+
+        // Description
+        y+=4;
+        doc.setDrawColor(220,220,220);
+        doc.line(margin,y,pw-margin,y);
+        y+=8;
+        doc.setFontSize(14);
+        doc.setFont("helvetica","bold");
+        doc.setTextColor(30,30,30);
+        doc.text("Description",margin,y);
+        y+=8;
+        doc.setFont("helvetica","normal");
+        doc.setFontSize(11);
+        doc.setTextColor(50,50,50);
+        const descLines=doc.splitTextToSize(activeDoc.desc||"No description provided.",cw);
+        doc.text(descLines,margin,y);
+        y+=descLines.length*6+10;
+
+        // Sharing history
+        if(activeDoc.shareLog?.length>0){
+          doc.line(margin,y,pw-margin,y);
+          y+=8;
+          doc.setFontSize(14);
+          doc.setFont("helvetica","bold");
+          doc.setTextColor(30,30,30);
+          doc.text("Sharing History",margin,y);
+          y+=8;
+          activeDoc.shareLog.forEach(log=>{
+            doc.setFontSize(10);
+            doc.setFont("helvetica","normal");
+            doc.setTextColor(60,60,60);
+            doc.text(`• Shared with ${log.recipient} — ${log.date}`,margin,y);
+            y+=7;
+          });
+          y+=4;
+        }
+
+        // Footer
+        doc.setFillColor(245,245,250);
+        doc.rect(0,272,pw,25,"F");
+        doc.setTextColor(120,120,120);
+        doc.setFontSize(8);
+        doc.text("This document was generated by Pain2Care · tech4pioneers.github.io/risethrough",margin,282);
+        doc.text("This report is confidential and intended solely for the named recipient.",margin,288);
+        doc.text(`Report ID: ${activeDoc.id}`,pw-margin,282,"right");
+
+        // Save
+        const fileName=`Pain2Care_Report_${activeDoc.type||"Incident"}_${new Date().toISOString().slice(0,10)}.pdf`.replace(/\s+/g,"_");
+        doc.save(fileName);
+      } catch(e){
+        alert("PDF generation failed: "+e.message);
+      }
+    };
+
     return(
       <div style={{animation:"scaleIn 0.3s ease both",minHeight:"60vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 24px",gap:16}}>
         <div style={{fontSize:56}}>✅</div>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:C.green,textAlign:"center"}}>Record Shared!</div>
         <div style={{fontSize:14,color:C.textMid,textAlign:"center",lineHeight:1.7}}>
-          <strong>{activeDoc.type}</strong> has been prepared for sharing with<br/>
+          <strong>{activeDoc.type}</strong> prepared for<br/>
           <strong>{lastShare?.icon} {lastShare?.recipient}</strong><br/>
           <span style={{fontSize:12,color:C.textLight}}>{lastShare?.date}</span>
         </div>
-        <div style={{fontSize:12,color:C.textLight,textAlign:"center",background:"rgba(26,111,160,0.06)",borderRadius:13,padding:"10px 16px",lineHeight:1.6}}>
-          In the full version this generates a secure PDF report sent directly to the recipient.
+
+        {/* PDF download */}
+        <div style={{width:"100%",maxWidth:320,background:"rgba(123,63,158,0.07)",border:"1px solid rgba(123,63,158,0.2)",borderRadius:16,padding:"16px 18px"}}>
+          <div style={{fontWeight:800,fontSize:13,color:C.purple,marginBottom:6}}>📄 Download PDF Report</div>
+          <div style={{fontSize:12,color:C.textLight,marginBottom:12,lineHeight:1.5}}>A confidential report with all incident details, ready to share with {lastShare?.recipient}.</div>
+          <button onClick={generatePDF}
+            style={{width:"100%",padding:"13px",borderRadius:50,border:"none",background:`linear-gradient(135deg,${C.purple},#9c4fbf)`,color:"#fff",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:14,cursor:"pointer"}}>
+            ⬇️ Download PDF
+          </button>
         </div>
-        <button onClick={()=>setScreen("viewDoc")} className="btn-blue" style={{width:"100%",maxWidth:300}}>← Back to Record</button>
-        <button onClick={()=>setScreen("share")} className="btn-outline" style={{width:"100%",maxWidth:300}}>Share with Someone Else</button>
+
+        <button onClick={()=>setScreen("viewDoc")} className="btn-blue" style={{width:"100%",maxWidth:320}}>← Back to Record</button>
+        <button onClick={()=>setScreen("share")} className="btn-outline" style={{width:"100%",maxWidth:320}}>Share with Someone Else</button>
       </div>
     );
   }
