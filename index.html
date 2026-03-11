@@ -103,6 +103,127 @@ let fbAuth=null,fbDb=null,fbSet=null,fbRef=null,fbOnVal=null,fbSignIn=null,fbSig
   }catch(e){console.warn("Firebase offline, using localStorage",e);}
 })();
 
+
+/* ── TRANSLATIONS ── */
+const TRANSLATIONS={
+  en:{
+    hello:"Hello",howFeeling:{T.howFeeling},
+    todayReminder:"Today\'s Reminder",yourModules:{T.yourModules},
+    painModule:"Pain Module",chronicPain:"Chronic Pain",
+    violenceReport:"Violence Report",documentation:"Documentation",
+    communityChat:"Community Chat",anonymous:"Anonymous",
+    traumaRecovery:"Trauma Recovery",selfGuided:"Self-Guided",
+    painHistory:{T.painHistory},checkInsRecorded:n=>`${n} check-in${n!==1?"s":""} · tap to view your journey`,
+    lastPain:"Last Pain",avgPain:"Avg Pain",checkIns:"Check-Ins",
+    logCheckIn:"Log Pain Check-In \u2192",newCheckIn:{T.newCheckIn},
+    home:{T.home},pain:{T.pain},safety:{T.safety},recovery:{T.recovery},chat:{T.chat},profile:{T.profile},
+    daysLeft:n=>`${n} days left in free trial`,tapToUpgrade:{T.tapToUpgrade},
+    trackTab:"\uD83E\uDE7A Track",historyTab:"\uD83D\uDCC8 History",noDataYet:{T.noDataYet},
+    noDataSub:{T.noDataSub},startCheckIn:"Start Check-In \u2192",
+    avgScore:"Avg Score",bestDay:"Best Day",trend:"Trend",
+  },
+  fi:{
+    hello:"Hei",howFeeling:"Miten voit tänään?",
+    todayReminder:"Päivän muistutus",yourModules:"Moduulit",
+    painModule:"Kipumoduli",chronicPain:"Krooninen kipu",
+    violenceReport:"Väkivaltaraportti",documentation:"Dokumentointi",
+    communityChat:"Yhteisökeskustelu",anonymous:"Anonyymi",
+    traumaRecovery:"Traumasta toipuminen",selfGuided:"Iteohjattu",
+    painHistory:"Kiputrendit & historia",checkInsRecorded:n=>`${n} kirjaus${n!==1?"ta":""} · katso matkaasi`,
+    lastPain:"Viim. kipu",avgPain:"Kipu keskim.",checkIns:"Kirjaukset",
+    logCheckIn:"Kirjaa kiputarkistus \u2192",newCheckIn:"+ Uusi kirjaus",
+    home:"KOTI",pain:"KIPU",safety:"TURVA",recovery:"TOIPUMINEN",chat:"CHAT",profile:"PROFIILI",
+    daysLeft:n=>`${n} päivää ilmaisjaksoa jäljellä`,tapToUpgrade:"Napauta päivittääksesi",
+    trackTab:"\uD83E\uDE7A Seuraa",historyTab:"\uD83D\uDCC8 Historia",noDataYet:"Ei vielä tietoja",
+    noDataSub:"Tee ensimmäinen kirjaus nähdäksesi trendit.",startCheckIn:"Aloita kirjaus \u2192",
+    avgScore:"Keskim. pisteet",bestDay:"Paras päivä",trend:"Trendi",
+  },
+  sv:{
+    hello:"Hej",howFeeling:"Hur mår du idag?",
+    todayReminder:"Dagens påminnelse",yourModules:"Dina moduler",
+    painModule:"Smärtmodul",chronicPain:"Kronisk smärta",
+    violenceReport:"Våldsrapport",documentation:"Dokumentation",
+    communityChat:"Gemenskapschatt",anonymous:"Anonym",
+    traumaRecovery:"Traumaåterhämtning",selfGuided:"Självledd",
+    painHistory:"Smärthistorik & trender",checkInsRecorded:n=>`${n} registrering${n!==1?"ar":""} · se din resa`,
+    lastPain:"Senaste smärta",avgPain:"Genomsn. smärta",checkIns:"Registreringar",
+    logCheckIn:"Logga smärtkontroll \u2192",newCheckIn:"+ Ny registrering",
+    home:"HEM",pain:"SMÄRTA",safety:"SÄKERHET",recovery:"ÅTERHÄMT.",chat:"CHATT",profile:"PROFIL",
+    daysLeft:n=>`${n} dagar kvar av provperioden`,tapToUpgrade:"Tryck för att uppgradera",
+    trackTab:"\uD83E\uDE7A Spåra",historyTab:"\uD83D\uDCC8 Historik",noDataYet:"Ingen data ännu",
+    noDataSub:"Gör din första registrering för att se trender.",startCheckIn:"Starta registrering \u2192",
+    avgScore:"Genomsn. poäng",bestDay:"Bästa dag",trend:"Trend",
+  },
+  de:{
+    hello:"Hallo",howFeeling:"Wie geht es dir heute?",
+    todayReminder:"Heutige Erinnerung",yourModules:"Deine Module",
+    painModule:"Schmerzmodul",chronicPain:"Chronische Schmerzen",
+    violenceReport:"Gewaltbericht",documentation:"Dokumentation",
+    communityChat:"Gemeinschafts-Chat",anonymous:"Anonym",
+    traumaRecovery:"Trauma-Erholung",selfGuided:"Selbstgeleitet",
+    painHistory:"Schmerzhistorie & Trends",checkInsRecorded:n=>`${n} Eintrag${n!==1?"einträge":""} · Reise ansehen`,
+    lastPain:"Letzter Schmerz",avgPain:"Durchschn. Schmerz",checkIns:"Einträge",
+    logCheckIn:"Schmerzkontrolle speichern \u2192",newCheckIn:"+ Neuer Eintrag",
+    home:"STARTSEITE",pain:"SCHMERZ",safety:"SICHERHEIT",recovery:"ERHOLUNG",chat:"CHAT",profile:"PROFIL",
+    daysLeft:n=>`Noch ${n} Tage der Testphase`,tapToUpgrade:"Tippen zum Upgraden",
+    trackTab:"\uD83E\uDE7A Verfolgen",historyTab:"\uD83D\uDCC8 Verlauf",noDataYet:"Noch keine Daten",
+    noDataSub:"Erstelle deinen ersten Eintrag, um Trends zu sehen.",startCheckIn:"Eintrag starten \u2192",
+    avgScore:"Durchschn. Punkte",bestDay:"Bester Tag",trend:"Trend",
+  },
+  es:{
+    hello:"Hola",howFeeling:"¿Cómo te sientes hoy?",
+    todayReminder:"Recordatorio de hoy",yourModules:"Tus módulos",
+    painModule:"Módulo de dolor",chronicPain:"Dolor crónico",
+    violenceReport:"Informe de violencia",documentation:"Documentación",
+    communityChat:"Chat comunitario",anonymous:"Anónimo",
+    traumaRecovery:"Recuperación del trauma",selfGuided:"Autoguiado",
+    painHistory:"Historial de dolor y tendencias",checkInsRecorded:n=>`${n} registro${n!==1?"s":""} · ver tu camino`,
+    lastPain:"Último dolor",avgPain:"Dolor prom.",checkIns:"Registros",
+    logCheckIn:"Registrar control de dolor \u2192",newCheckIn:"+ Nuevo registro",
+    home:"INICIO",pain:"DOLOR",safety:"SEGURIDAD",recovery:"RECUPERAC.",chat:"CHAT",profile:"PERFIL",
+    daysLeft:n=>`${n} días restantes de prueba`,tapToUpgrade:"Toca para actualizar",
+    trackTab:"\uD83E\uDE7A Registrar",historyTab:"\uD83D\uDCC8 Historial",noDataYet:"Sin datos todavía",
+    noDataSub:"Completa tu primer registro para ver tendencias.",startCheckIn:"Iniciar registro \u2192",
+    avgScore:"Puntuación prom.",bestDay:"Mejor día",trend:"Tendencia",
+  },
+  ar:{
+    hello:"مرحباً",howFeeling:"كيف تشعر اليوم؟",
+    todayReminder:"تذكير اليوم",yourModules:"وحداتك",
+    painModule:"وحدة الألم",chronicPain:"ألم مزمن",
+    violenceReport:"تقرير العنف",documentation:"توثيق",
+    communityChat:"دردشة المجتمع",anonymous:"مجهول",
+    traumaRecovery:"التعافي من الصدمة",selfGuided:"موجّه ذاتياً",
+    painHistory:"سجل الألم والاتجاهات",checkInsRecorded:n=>`${n} تسجيل`,
+    lastPain:"آخر ألم",avgPain:"متوسط الألم",checkIns:"التسجيلات",
+    logCheckIn:"تسجيل فحص الألم \u2192",newCheckIn:"+ تسجيل جديد",
+    home:"الرئيسية",pain:"الألم",safety:"الأمان",recovery:"التعافي",chat:"دردشة",profile:"الملف",
+    daysLeft:n=>`${n} أيام متبقية`,tapToUpgrade:"اضغط للترقية",
+    trackTab:"\uD83E\uDE7A تتبع",historyTab:"\uD83D\uDCC8 السجل",noDataYet:"لا توجد بيانات بعد",
+    noDataSub:"أكمل أول تسجيل لرؤية الاتجاهات.",startCheckIn:"بدء التسجيل \u2192",
+    avgScore:"متوسط النقاط",bestDay:"أفضل يوم",trend:"الاتجاه",
+  },
+  so:{
+    hello:"Salaan",howFeeling:"Sideed u danaynaysaa maanta?",
+    todayReminder:"Xusuusin maanta",yourModules:"Moodulashaada",
+    painModule:"Moodulka xanuunka",chronicPain:"Xanuun joogto ah",
+    violenceReport:"Warbixinta rabshadaha",documentation:"Diiwaangelinta",
+    communityChat:"Sheekada bulshada",anonymous:"Magac la\'aaan",
+    traumaRecovery:"Bogsiinta dhaawaca",selfGuided:"Iskaa-hoggaamiya",
+    painHistory:"Taariikhdа xanuunka",checkInsRecorded:n=>`${n} diiwaangelinta`,
+    lastPain:"Xanuunkii dambe",avgPain:"Xanuun dhexdhexaad",checkIns:"Diiwaangelinaha",
+    logCheckIn:"Diiwangeli xanuunka \u2192",newCheckIn:"+ Diiwaangelin cusub",
+    home:"HOYGA",pain:"XANUUN",safety:"AMAAN",recovery:"BOGSIIN",chat:"SHEEKO",profile:"PROFILE",
+    daysLeft:n=>`${n} maalmood oo tijaabo`,tapToUpgrade:"Taabo si aad u cusboonaysiiso",
+    trackTab:"\uD83E\uDE7A Raadi",historyTab:"\uD83D\uDCC8 Taariikhda",noDataYet:"Wali xog ma jirto",
+    noDataSub:"Diiwaangeli markii ugu horreysa.",startCheckIn:"Bilow diiwaangelinta \u2192",
+    avgScore:"Dhibcaha dhexdhexaadka",bestDay:"Maalinta ugu fiican",trend:"Jihada",
+  },
+};
+const getLang=(user)=>{
+  const code=localStorage.getItem(`p2c_lang_${user?.uid||"local"}`)||"en";
+  return TRANSLATIONS[code]||TRANSLATIONS.en;
+};
+
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
 /* ── BODY MAP DATA ── */
@@ -438,7 +559,8 @@ const SectionTitle=({icon,title,sub,onBack})=>(
     {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:onBack?(icon?80:52):(icon?32:0),marginTop:3}}>{sub}</div>}
   </div>
 );
-const BottomNav=({tab,setTab})=>{
+const BottomNav=({tab,setTab,user})=>{
+  const T=getLang(user);
   const items=[{id:"home",icon:"🏠",label:"Home"},{id:"pain",icon:"🩺",label:"Pain"},{id:"violence",icon:"🛡️",label:"Safety"},{id:"trauma",icon:"🧠",label:"Recovery"},{id:"community",icon:"💬",label:"Chat"},{id:"profile",icon:"👤",label:"Profile"}];
   return(
     <div className="glass" style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,display:"flex",justifyContent:"space-around",padding:"8px 0 max(10px,env(safe-area-inset-bottom))",zIndex:100,borderRadius:"20px 20px 0 0",borderBottom:"none",boxShadow:"0 -4px 20px rgba(26,80,130,0.1)"}}>
@@ -470,7 +592,7 @@ const AppShell=({children,tab,setTab,user,onLogout})=>(
       </div>
     </div>
     <div style={{overflowY:"auto",maxHeight:"100vh",paddingBottom:88}}>{children}</div>
-    <BottomNav tab={tab} setTab={setTab}/>
+    <BottomNav tab={tab} setTab={setTab} user={user}/>
   </div>
 );
 
@@ -941,14 +1063,15 @@ const PaywallScreen=({user,onSubscribe,onLogout})=>{
 
 /* ══ HOME TAB ══ */
 const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
+  const T=getLang(user);
   const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
   const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
   const affIdx=Math.floor(Date.now()/86400000)%AFFIRMATIONS.length;
   const modules=[
-    {id:"pain",icon:"🩺",title:"Pain Module",sub:"Chronic Pain",color:C.red,border:"rgba(230,57,70,0.2)"},
-    {id:"violence",icon:"📸",title:"Violence Report",sub:"Documentation",color:C.purple,border:"rgba(123,63,158,0.2)"},
-    {id:"community",icon:"💬",title:"Community Chat",sub:"Anonymous",color:C.teal,border:"rgba(26,140,122,0.2)"},
-    {id:"trauma",icon:"🧠",title:"Trauma Recovery",sub:"Self-Guided",color:C.blue,border:"rgba(26,111,160,0.2)"},
+    {id:"pain",icon:"🩺",title:T.painModule,sub:T.chronicPain,color:C.red,border:"rgba(230,57,70,0.2)"},
+    {id:"violence",icon:"📸",title:T.violenceReport,sub:T.documentation,color:C.purple,border:"rgba(123,63,158,0.2)"},
+    {id:"community",icon:"💬",title:T.communityChat,sub:T.anonymous,color:C.teal,border:"rgba(26,140,122,0.2)"},
+    {id:"trauma",icon:"🧠",title:T.traumaRecovery,sub:T.selfGuided,color:C.blue,border:"rgba(26,111,160,0.2)"},
   ];
   return(
     <div style={{padding:"10px 0",animation:"fadeIn 0.4s ease both"}}>
@@ -961,16 +1084,16 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
         </div>
       )}
       <div style={{padding:"0 22px",marginBottom:18}}>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Hello, {user?.name?.split(" ")[0]||"Friend"} 👋</div>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>{T.hello}, {user?.name?.split(" ")[0]||"Friend"} 👋</div>
         <div style={{fontSize:13,color:C.textLight,marginTop:3}}>How are you feeling today?</div>
       </div>
       <div className="glass" style={{margin:"0 18px 18px",borderRadius:17,padding:18,background:"rgba(26,111,160,0.07)",border:"1px solid rgba(26,111,160,0.15)"}}>
-        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Today's Reminder 💙</div>
+        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>{T.todayReminder} 💙</div>
         <div style={{fontSize:14,fontStyle:"italic",lineHeight:1.65,color:C.textMid}}>"{AFFIRMATIONS[affIdx]}"</div>
       </div>
       {history.length>0&&(
         <div style={{display:"flex",gap:10,padding:"0 18px",marginBottom:18,overflowX:"auto"}}>
-          {[{label:"Last Pain",value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:"Avg Pain",value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.gold},{label:"Check-Ins",value:history.length,color:C.green}].map(s=>(
+          {[{label:T.lastPain,value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:T.avgPain,value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.gold},{label:T.checkIns,value:history.length,color:C.green}].map(s=>(
             <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 14px",flexShrink:0,minWidth:85}}>
               <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
               <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:21,color:s.color}}>{s.value}</div>
@@ -1007,6 +1130,7 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
 
 /* ══ PAIN MODULE ══ */
 const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
+  const T=getLang(user);
   const [painTab,setPainTab]=useState("track"); // track | trends
   const [painLevel,setPainLevel]=useState(5);
   const [areaSymptoms,setAreaSymptoms]=useState({}); // {areaId: {symptoms:[{type}], intensity}}
@@ -1104,7 +1228,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
 
       {/* Tab bar */}
       <div style={{display:"flex",margin:"6px 18px 10px",borderRadius:14,background:"rgba(26,111,160,0.08)",padding:3}}>
-        {[{id:"track",label:"🩺 Track",},{id:"trends",label:"📈 History"}].map(t=>(
+        {[{id:"track",label:{T.trackTab},},{id:"trends",label:{T.historyTab}}].map(t=>(
           <button key={t.id} onClick={()=>setPainTab(t.id)}
             style={{flex:1,padding:"9px 0",borderRadius:11,border:"none",cursor:"pointer",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:13,transition:"all 0.2s",
               background:painTab===t.id?"rgba(255,255,255,0.85)":"transparent",
@@ -1128,9 +1252,9 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
             <>
               <div style={{display:"flex",gap:10,padding:"0 18px 4px",overflowX:"auto"}}>
                 {[
-                  {label:"Avg Pain",value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.red},
+                  {label:T.avgPain,value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.red},
                   {label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},
-                  {label:"Check-Ins",value:history.length,color:C.green},
+                  {label:T.checkIns,value:history.length,color:C.green},
                   {label:"Trend",value:(()=>{const t=history.length>=2?history[history.length-1].painLevel-history[history.length-2].painLevel:0;return t>0?`+${t}↑`:t<0?`${t}↓`:"→";})(),color:(()=>{const t=history.length>=2?history[history.length-1].painLevel-history[history.length-2].painLevel:0;return t>0?C.red:t<0?C.green:C.textLight;})()},
                 ].map(s=>(
                   <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 13px",flexShrink:0}}>
@@ -2019,7 +2143,7 @@ const TrendsTab=({history,onBack})=>{
     <div>
       <SectionTitle icon="📈" title="Your Journey" sub={`${history.length} check-ins tracked`} onBack={onBack}/>
       <div style={{display:"flex",gap:10,padding:"8px 18px 4px",overflowX:"auto"}}>
-        {[{label:"Avg Pain",value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Best Day",value:history.reduce((a,b)=>b.score>a.score?b:a,history[0]).date,color:C.green},{label:"Trend",value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"=",color:trend>0?C.red:trend<0?C.green:C.textLight}].map(s=>(
+        {[{label:T.avgPain,value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Best Day",value:history.reduce((a,b)=>b.score>a.score?b:a,history[0]).date,color:C.green},{label:"Trend",value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"=",color:trend>0?C.red:trend<0?C.green:C.textLight}].map(s=>(
           <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 13px",flexShrink:0}}>
             <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
             <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:20,color:s.color}}>{s.value}</div>
@@ -2352,9 +2476,10 @@ const LanguageScreen=({onBack,user})=>{
     {code:"en",flag:"🇬🇧",label:"English"},
     {code:"fi",flag:"🇫🇮",label:"Suomi (Finnish)"},
     {code:"sv",flag:"🇸🇪",label:"Svenska (Swedish)"},
+    {code:"de",flag:"🇩🇪",label:"Deutsch (German)"},
+    {code:"es",flag:"🇪🇸",label:"Español (Spanish)"},
     {code:"ar",flag:"🇸🇦",label:"العربية (Arabic)"},
     {code:"so",flag:"🇸🇴",label:"Soomaali (Somali)"},
-    {code:"ru",flag:"🇷🇺",label:"Русский (Russian)"},
   ];
   return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
