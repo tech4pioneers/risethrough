@@ -75,8 +75,261 @@ const C={
   gold:"#f4a261",purple:"#7B3F9E"
 };
 
+/* ── FIREBASE ── */
+const FB={
+  apiKey:"AIzaSyCHu8EZEVUYFGDueH06mAhaxZeMEeTD4qU",
+  authDomain:"pain2care.firebaseapp.com",
+  databaseURL:"https://pain2care-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"pain2care"
+};
+let fbAuth=null,fbDb=null,fbSet=null,fbRef=null,fbOnVal=null,fbSignIn=null,fbSignUp=null,fbSignOut=null,fbOnAuth=null;
+(async()=>{
+  try{
+    const app=(await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js")).initializeApp(FB);
+    const auth=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    const db=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+    fbAuth=auth.getAuth(app);
+    fbDb=db.getDatabase(app);
+    fbSet=db.set; fbRef=db.ref; fbOnVal=db.onValue;
+    fbSignIn=auth.signInWithEmailAndPassword;
+    fbSignUp=auth.createUserWithEmailAndPassword;
+    fbSignOut=auth.signOut;
+    fbOnAuth=auth.onAuthStateChanged;
+    window._fbReady=true;
+  }catch(e){console.warn("Firebase offline, using localStorage",e);}
+})();
+
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const PAIN_AREAS=["Head","Neck","Shoulders","Upper Back","Lower Back","Chest","Hips","Legs","Knees","Feet"];
+
+/* ── BODY MAP DATA ── */
+// Each area has: id, label, front/back side, sub-areas, symptom types
+const SYMPTOM_TYPES=[
+  {id:"pain",label:"Pain",color:"#e63946",icon:"🔴"},
+  {id:"numb",label:"Numbness",color:"#5bb8e8",icon:"🔵"},
+  {id:"swell",label:"Swelling",color:"#f4c261",icon:"🟡"},
+  {id:"burn",label:"Burning",color:"#f4a261",icon:"🟠"},
+  {id:"radiate",label:"Radiating",color:"#9b59b6",icon:"🟣"},
+];
+
+// Front body areas with sub-areas
+const FRONT_AREAS=[
+  {id:"forehead",label:"Forehead",cx:65,cy:18,rx:14,ry:8,shape:"ellipse",parent:"Head"},
+  {id:"face",label:"Face/Jaw",cx:65,cy:30,rx:12,ry:10,shape:"ellipse",parent:"Head"},
+  {id:"neck_f",label:"Neck",cx:65,cy:47,rx:8,ry:7,shape:"ellipse",parent:"Neck"},
+  {id:"lshoulder",label:"L. Shoulder",cx:38,cy:62,rx:12,ry:9,shape:"ellipse",parent:"Shoulders"},
+  {id:"rshoulder",label:"R. Shoulder",cx:92,cy:62,rx:12,ry:9,shape:"ellipse",parent:"Shoulders"},
+  {id:"chest",label:"Chest",cx:65,cy:72,rx:18,ry:14,shape:"ellipse",parent:"Chest"},
+  {id:"luparm",label:"L. Upper Arm",cx:32,cy:78,rx:8,ry:13,shape:"ellipse",parent:"Arms"},
+  {id:"ruparm",label:"R. Upper Arm",cx:98,cy:78,rx:8,ry:13,shape:"ellipse",parent:"Arms"},
+  {id:"lelbow",label:"L. Elbow",cx:26,cy:96,rx:7,ry:6,shape:"ellipse",parent:"Arms"},
+  {id:"relbow",label:"R. Elbow",cx:104,cy:96,rx:7,ry:6,shape:"ellipse",parent:"Arms"},
+  {id:"lfarm",label:"L. Forearm",cx:22,cy:110,rx:6,ry:10,shape:"ellipse",parent:"Arms"},
+  {id:"rfarm",label:"R. Forearm",cx:108,cy:110,rx:6,ry:10,shape:"ellipse",parent:"Arms"},
+  {id:"lwrist",label:"L. Wrist/Hand",cx:18,cy:124,rx:7,ry:7,shape:"ellipse",parent:"Arms"},
+  {id:"rwrist",label:"R. Wrist/Hand",cx:112,cy:124,rx:7,ry:7,shape:"ellipse",parent:"Arms"},
+  {id:"abdomen",label:"Abdomen",cx:65,cy:95,rx:16,ry:13,shape:"ellipse",parent:"Abdomen"},
+  {id:"liver",label:"Liver Area",cx:75,cy:108,rx:10,ry:7,shape:"ellipse",parent:"Abdomen"},
+  {id:"stomach",label:"Stomach",cx:60,cy:108,rx:9,ry:7,shape:"ellipse",parent:"Abdomen"},
+  {id:"pelvis",label:"Pelvis/Groin",cx:65,cy:122,rx:15,ry:9,shape:"ellipse",parent:"Hips"},
+  {id:"lhip",label:"L. Hip",cx:50,cy:133,rx:10,ry:9,shape:"ellipse",parent:"Hips"},
+  {id:"rhip",label:"R. Hip",cx:80,cy:133,rx:10,ry:9,shape:"ellipse",parent:"Hips"},
+  {id:"lthigh",label:"L. Thigh",cx:53,cy:152,rx:11,ry:14,shape:"ellipse",parent:"Legs"},
+  {id:"rthigh",label:"R. Thigh",cx:77,cy:152,rx:11,ry:14,shape:"ellipse",parent:"Legs"},
+  {id:"lknee",label:"L. Knee",cx:53,cy:172,rx:9,ry:8,shape:"ellipse",parent:"Legs"},
+  {id:"rknee",label:"R. Knee",cx:77,cy:172,rx:9,ry:8,shape:"ellipse",parent:"Legs"},
+  {id:"lshin",label:"L. Shin",cx:52,cy:188,rx:7,ry:10,shape:"ellipse",parent:"Legs"},
+  {id:"rshin",label:"R. Shin",cx:78,cy:188,rx:7,ry:10,shape:"ellipse",parent:"Legs"},
+  {id:"lankle",label:"L. Ankle/Foot",cx:50,cy:204,rx:8,ry:7,shape:"ellipse",parent:"Feet"},
+  {id:"rankle",label:"R. Ankle/Foot",cx:80,cy:204,rx:8,ry:7,shape:"ellipse",parent:"Feet"},
+];
+
+const BACK_AREAS=[
+  {id:"skull",label:"Back of Head",cx:65,cy:18,rx:14,ry:10,shape:"ellipse",parent:"Head"},
+  {id:"neck_b",label:"Neck (back)",cx:65,cy:32,rx:8,ry:7,shape:"ellipse",parent:"Neck"},
+  {id:"ltrap",label:"L. Trapezius",cx:44,cy:52,rx:13,ry:9,shape:"ellipse",parent:"Shoulders"},
+  {id:"rtrap",label:"R. Trapezius",cx:86,cy:52,rx:13,ry:9,shape:"ellipse",parent:"Shoulders"},
+  {id:"lupback",label:"L. Upper Back",cx:52,cy:70,rx:12,ry:13,shape:"ellipse",parent:"Upper Back"},
+  {id:"rupback",label:"R. Upper Back",cx:78,cy:70,rx:12,ry:13,shape:"ellipse",parent:"Upper Back"},
+  {id:"spine",label:"Spine",cx:65,cy:80,rx:5,ry:20,shape:"ellipse",parent:"Upper Back"},
+  {id:"llowback",label:"L. Lower Back",cx:53,cy:102,rx:11,ry:11,shape:"ellipse",parent:"Lower Back"},
+  {id:"rlowback",label:"R. Lower Back",cx:77,cy:102,rx:11,ry:11,shape:"ellipse",parent:"Lower Back"},
+  {id:"lkidney",label:"L. Kidney",cx:50,cy:93,rx:8,ry:7,shape:"ellipse",parent:"Lower Back"},
+  {id:"rkidney",label:"R. Kidney",cx:80,cy:93,rx:8,ry:7,shape:"ellipse",parent:"Lower Back"},
+  {id:"lglute",label:"L. Glute",cx:52,cy:122,rx:13,ry:12,shape:"ellipse",parent:"Hips"},
+  {id:"rglute",label:"R. Glute",cx:78,cy:122,rx:13,ry:12,shape:"ellipse",parent:"Hips"},
+  {id:"lhamst",label:"L. Hamstring",cx:52,cy:148,rx:11,ry:14,shape:"ellipse",parent:"Legs"},
+  {id:"rhamst",label:"R. Hamstring",cx:78,cy:148,rx:11,ry:14,shape:"ellipse",parent:"Legs"},
+  {id:"lkneeb",label:"L. Knee (back)",cx:52,cy:170,rx:9,ry:8,shape:"ellipse",parent:"Legs"},
+  {id:"rkneeb",label:"R. Knee (back)",cx:78,cy:170,rx:9,ry:8,shape:"ellipse",parent:"Legs"},
+  {id:"lcalf",label:"L. Calf",cx:51,cy:187,rx:8,ry:11,shape:"ellipse",parent:"Legs"},
+  {id:"rcalf",label:"R. Calf",cx:79,cy:187,rx:8,ry:11,shape:"ellipse",parent:"Legs"},
+  {id:"lheel",label:"L. Heel",cx:50,cy:204,rx:8,ry:7,shape:"ellipse",parent:"Feet"},
+  {id:"rheel",label:"R. Heel",cx:80,cy:204,rx:8,ry:7,shape:"ellipse",parent:"Feet"},
+];
+
+// Body silhouette paths for 3 body types (front)
+const BODY_SILHOUETTES={
+  slim:{
+    head:{cx:65,cy:16,rx:12,ry:13},
+    neck:{x:60,y:28,w:10,h:10},
+    torso:"M52,38 Q40,42 36,55 L34,130 Q48,134 65,135 Q82,134 96,130 L94,55 Q90,42 78,38 Z",
+    larm:"M52,42 Q42,48 36,60 L30,100 Q34,106 38,100 L42,60 Q46,52 54,46 Z",
+    rarm:"M78,42 Q88,48 94,60 L100,100 Q96,106 92,100 L88,60 Q84,52 76,46 Z",
+    lleg:"M46,132 Q40,145 38,175 L40,210 Q46,213 52,210 L54,175 Q56,145 56,132 Z",
+    rleg:"M74,132 Q74,145 76,175 L78,210 Q84,213 90,210 L92,175 Q90,145 84,132 Z",
+  },
+  normal:{
+    head:{cx:65,cy:16,rx:14,ry:14},
+    neck:{x:58,y:29,w:14,h:11},
+    torso:"M50,40 Q36,44 32,58 L30,132 Q46,138 65,140 Q84,138 100,132 L98,58 Q94,44 80,40 Z",
+    larm:"M50,44 Q38,50 32,64 L26,106 Q30,112 36,106 L40,66 Q44,54 52,48 Z",
+    rarm:"M80,44 Q92,50 98,64 L104,106 Q100,112 94,106 L90,66 Q86,54 78,48 Z",
+    lleg:"M42,138 Q36,152 34,182 L36,214 Q44,218 52,214 L54,182 Q56,152 58,138 Z",
+    rleg:"M72,138 Q74,152 76,182 L78,214 Q86,218 94,214 L96,182 Q94,152 88,138 Z",
+  },
+  large:{
+    head:{cx:65,cy:15,rx:16,ry:15},
+    neck:{x:56,y:29,w:18,h:12},
+    torso:"M48,41 Q30,46 26,62 L24,134 Q44,142 65,145 Q86,142 106,134 L104,62 Q100,46 82,41 Z",
+    larm:"M48,45 Q34,52 28,68 L22,110 Q26,118 34,110 L38,70 Q42,56 50,50 Z",
+    rarm:"M82,45 Q96,52 102,68 L108,110 Q104,118 96,110 L92,70 Q88,56 80,50 Z",
+    lleg:"M38,140 Q30,156 28,186 L30,218 Q40,222 52,218 L54,186 Q56,156 60,140 Z",
+    rleg:"M70,140 Q74,156 76,186 L78,218 Q90,222 100,218 L102,186 Q100,156 94,140 Z",
+  }
+};
+
+/* ── ADVANCED BODY MAP COMPONENT ── */
+const BodyMap=({bodyType="normal",areaSymptoms,onAreaTap,side,onFlip})=>{
+  const areas=side==="front"?FRONT_AREAS:BACK_AREAS;
+  const sil=BODY_SILHOUETTES[bodyType]||BODY_SILHOUETTES.normal;
+
+  // Get color for area based on symptoms
+  const getAreaColor=(areaId)=>{
+    const syms=areaSymptoms[areaId];
+    if(!syms||syms.length===0) return{fill:"rgba(26,111,160,0.08)",stroke:"rgba(26,111,160,0.18)"};
+    // Priority: pain > swelling > burning > radiating > numbness
+    const priority=["pain","burn","radiate","swell","numb"];
+    for(const p of priority){
+      if(syms.find(s=>s.type===p)){
+        const st=SYMPTOM_TYPES.find(t=>t.id===p);
+        return{fill:st.color+"55",stroke:st.color};
+      }
+    }
+    return{fill:"rgba(230,57,70,0.3)",stroke:"#e63946"};
+  };
+
+  return(
+    <div style={{position:"relative",display:"flex",flexDirection:"column",alignItems:"center"}}>
+      {/* Front/Back toggle */}
+      <div style={{display:"flex",gap:0,marginBottom:12,background:"rgba(26,111,160,0.08)",borderRadius:50,padding:3}}>
+        {["front","back"].map(s=>(
+          <button key={s} onClick={()=>onFlip(s)}
+            style={{padding:"7px 20px",borderRadius:50,border:"none",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:12,cursor:"pointer",background:side===s?"rgba(26,111,160,0.9)":"transparent",color:side===s?"#fff":"#6b95ad",transition:"all 0.2s"}}>
+            {s==="front"?"Front View":"Back View"}
+          </button>
+        ))}
+      </div>
+
+      {/* SVG Body */}
+      <div style={{position:"relative",transition:"all 0.4s"}}>
+        <svg viewBox="0 0 130 230" width={160} height={230} style={{overflow:"visible"}}>
+          {/* Silhouette */}
+          <ellipse cx={sil.head.cx} cy={sil.head.cy} rx={sil.head.rx} ry={sil.head.ry} fill="rgba(200,220,240,0.4)" stroke="rgba(26,111,160,0.3)" strokeWidth="1"/>
+          <rect x={sil.neck.x} y={sil.neck.y} width={sil.neck.w} height={sil.neck.h} fill="rgba(200,220,240,0.4)" stroke="rgba(26,111,160,0.3)" strokeWidth="1"/>
+          <path d={sil.torso} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
+          <path d={sil.larm} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
+          <path d={sil.rarm} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
+          <path d={sil.lleg} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
+          <path d={sil.rleg} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
+
+          {/* Clickable areas */}
+          {areas.map(area=>{
+            const {fill,stroke}=getAreaColor(area.id);
+            const hasSymptoms=areaSymptoms[area.id]&&areaSymptoms[area.id].length>0;
+            return(
+              <ellipse key={area.id} cx={area.cx} cy={area.cy} rx={area.rx} ry={area.ry}
+                fill={fill} stroke={stroke} strokeWidth={hasSymptoms?"2":"1"}
+                style={{cursor:"pointer",transition:"all 0.2s"}}
+                onClick={()=>onAreaTap(area)}
+              />
+            );
+          })}
+
+          {/* Symptom dots for active areas */}
+          {areas.map(area=>{
+            const syms=areaSymptoms[area.id];
+            if(!syms||syms.length===0) return null;
+            return syms.slice(0,3).map((s,i)=>{
+              const st=SYMPTOM_TYPES.find(t=>t.id===s.type);
+              return<circle key={s.type} cx={area.cx-4+i*4} cy={area.cy-area.ry-4} r="3" fill={st?.color||"#e63946"}/>;
+            });
+          })}
+        </svg>
+      </div>
+
+      {/* Legend */}
+      <div style={{display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center",marginTop:10,maxWidth:280}}>
+        {SYMPTOM_TYPES.map(s=>(
+          <div key={s.id} style={{display:"flex",alignItems:"center",gap:3,fontSize:10,color:"#6b95ad"}}>
+            <div style={{width:10,height:10,borderRadius:"50%",background:s.color}}/>{s.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ── AREA SYMPTOM POPUP ── */
+const AreaPopup=({area,current,onSave,onClose})=>{
+  const [intensity,setIntensity]=useState(current?.intensity||5);
+  const [types,setTypes]=useState(current?.symptoms?.map(s=>s.type)||[]);
+  const toggleType=(id)=>setTypes(p=>p.includes(id)?p.filter(t=>t!==id):[...p,id]);
+  const save=()=>{
+    if(types.length===0){onSave(area.id,null);onClose();return;}
+    onSave(area.id,{symptoms:types.map(t=>({type:t})),intensity});
+    onClose();
+  };
+  return(
+    <div style={{position:"fixed",inset:0,background:"rgba(26,80,130,0.4)",backdropFilter:"blur(4px)",zIndex:999,display:"flex",alignItems:"flex-end",justifyContent:"center"}}
+      onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+      <div className="glass" style={{width:"100%",maxWidth:430,borderRadius:"24px 24px 0 0",padding:"24px 20px 40px",animation:"fadeIn 0.25s ease both"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
+          <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:"#1a3a52"}}>{area.label}</div>
+          <button onClick={onClose} style={{background:"rgba(26,111,160,0.1)",border:"none",borderRadius:"50%",width:32,height:32,fontSize:16,cursor:"pointer",color:"#6b95ad"}}>×</button>
+        </div>
+
+        {/* Symptom types */}
+        <div style={{fontSize:11,fontWeight:700,color:"#6b95ad",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:10}}>What do you feel?</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:18}}>
+          {SYMPTOM_TYPES.map(s=>(
+            <div key={s.id} onClick={()=>toggleType(s.id)}
+              style={{padding:"10px 12px",borderRadius:13,border:`2px solid ${types.includes(s.id)?s.color:"rgba(26,111,160,0.15)"}`,background:types.includes(s.id)?s.color+"18":"rgba(255,255,255,0.5)",cursor:"pointer",display:"flex",alignItems:"center",gap:8,transition:"all 0.15s"}}>
+              <div style={{width:12,height:12,borderRadius:"50%",background:s.color,flexShrink:0}}/>
+              <span style={{fontSize:13,fontWeight:700,color:types.includes(s.id)?"#1a3a52":"#6b95ad"}}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Intensity */}
+        {types.length>0&&(
+          <div style={{marginBottom:18}}>
+            <div style={{fontSize:11,fontWeight:700,color:"#6b95ad",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8}}>Intensity: {intensity}/10</div>
+            <input type="range" min={1} max={10} value={intensity} onChange={e=>setIntensity(Number(e.target.value))}
+              style={{width:"100%",accentColor:"#e63946"}}/>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#6b95ad",marginTop:4}}>
+              <span>1 Minimal</span><span>10 Severe</span>
+            </div>
+          </div>
+        )}
+
+        <div style={{display:"flex",gap:10}}>
+          {current&&<button onClick={()=>{onSave(area.id,null);onClose();}} className="btn-outline" style={{flex:1,padding:"12px"}}>Clear</button>}
+          <button onClick={save} className="btn-blue" style={{flex:2,padding:"12px"}}>{types.length>0?"Save →":"Clear Area"}</button>
+        </div>
+      </div>
+    </div>
+  );
+};
 const MOODS=[
   {emoji:"😤",label:"Struggling",value:1,color:"#e63946"},
   {emoji:"😔",label:"Low",value:2,color:"#f4a261"},
@@ -215,7 +468,24 @@ const LoginScreen=({onLogin,onGoRegister})=>{
     if(!email.includes("@")) e.email="Enter a valid email";
     if(pass.length<6) e.pass="Min 6 characters";
     if(Object.keys(e).length){setErrors(e);return;}
-    setLoading(true); await new Promise(r=>setTimeout(r,800));
+    setLoading(true);
+    // Try Firebase first
+    if(window._fbReady&&fbSignIn){
+      try{
+        const cred=await fbSignIn(fbAuth,email,pass);
+        const uid=cred.user.uid;
+        let profile={};
+        try{const snap=await new Promise(res=>fbOnVal(fbRef(fbDb,`users/${uid}`),res,{onlyOnce:true}));profile=snap.val()||{};}catch(e){}
+        onLogin({uid,email,name:profile.name||email,silhouette:profile.silhouette||2,plan:profile.plan||"free",trialStart:profile.trialStart||Date.now()});
+        setLoading(false);return;
+      }catch(err){
+        if(err.code==="auth/invalid-credential"||err.code==="auth/user-not-found"||err.code==="auth/wrong-password"){
+          setErrors({pass:"Incorrect email or password"});setLoading(false);return;
+        }
+      }
+    }
+    // LocalStorage fallback
+    await new Promise(r=>setTimeout(r,500));
     const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
     const user=users.find(u=>u.email===email&&u.password===pass);
     if(!user){setErrors({pass:"Incorrect email or password"});setLoading(false);return;}
@@ -227,7 +497,7 @@ const LoginScreen=({onLogin,onGoRegister})=>{
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,color:C.textDark}}>Welcome Back 👋</div>
         <div style={{fontSize:13,color:C.textLight,marginTop:4}}>Sign in to continue your healing journey</div>
       </div>
-      {[{label:"Username / Email",key:"email",type:"email",val:email,set:setEmail,ph:"you@email.com",err:errors.email},
+      {[{label:"Email",key:"email",type:"email",val:email,set:setEmail,ph:"you@email.com",err:errors.email},
         {label:"Password",key:"pass",type:"password",val:pass,set:setPass,ph:"••••••••",err:errors.pass}
       ].map(f=>(
         <div key={f.key} style={{marginBottom:14}}>
@@ -259,10 +529,27 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
     if(pass!==confirm) e.confirm="Passwords don't match";
     if(!agreed) e.agreed="Please accept the terms";
     if(Object.keys(e).length){setErrors(e);return;}
-    setLoading(true); await new Promise(r=>setTimeout(r,900));
+    setLoading(true);
+    const code=Math.floor(100000+Math.random()*900000).toString();
+    // Try Firebase first
+    if(window._fbReady&&fbSignUp){
+      try{
+        const cred=await fbSignUp(fbAuth,email,pass);
+        const uid=cred.user.uid;
+        const userData={name:name.trim(),email,dob,gender,trialStart:Date.now(),plan:"trial",silhouette:0};
+        if(fbDb&&fbRef&&fbSet) await fbSet(fbRef(fbDb,`users/${uid}`),userData);
+        setLoading(false);
+        onRegistered({email,code,name:name.trim(),uid});
+        return;
+      }catch(err){
+        if(err.code==="auth/email-already-in-use"){setErrors({email:"Already registered"});setLoading(false);return;}
+        // Fall through to localStorage
+      }
+    }
+    // localStorage fallback
+    await new Promise(r=>setTimeout(r,900));
     const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
     if(users.find(u=>u.email===email)){setErrors({email:"Already registered"});setLoading(false);return;}
-    const code=Math.floor(100000+Math.random()*900000).toString();
     const newUser={name:name.trim(),email,password:pass,dob,gender,verified:false,verifyCode:code,trialStart:Date.now(),plan:"trial",silhouette:1};
     users.push(newUser); localStorage.setItem("p2c_users",JSON.stringify(users));
     setLoading(false); onRegistered({email,code,name:name.trim()});
@@ -274,7 +561,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
         <p><strong>1. Acceptance</strong><br/>By using Pain2Care, you agree to these Terms.</p><br/>
         <p><strong>2. Not Medical Advice</strong><br/>Pain2Care is a self-tracking tool only — not a medical device or diagnosis tool. Always consult a qualified healthcare provider.</p><br/>
         <p><strong>3. Privacy</strong><br/>Your health data is stored securely. We never sell your personal data to third parties.</p><br/>
-        <p><strong>4. Free Trial</strong><br/>A 7-day free trial is provided. After the trial, a subscription is required to continue using the app.</p><br/>
+        <p><strong>4. Free Trial</strong><br/>A 5-day free trial is provided. After the trial, a subscription is required to continue using the app.</p><br/>
         <p><strong>5. Community</strong><br/>The community chat is anonymous and supportive. Harmful or abusive content is not permitted.</p><br/>
         <p><strong>6. Limitation of Liability</strong><br/>Pain2Care is not liable for any decisions made based on app data.</p><br/>
         <p><strong>7. Changes</strong><br/>We may update these terms with notice via the app.</p>
@@ -292,7 +579,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
     <div style={{animation:"fadeIn 0.5s ease both"}}>
       <div style={{marginBottom:18}}>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Create Account</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>Start your free 7-day trial</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>Start your free 5-day trial</div>
       </div>
       {[{label:"Full Name",key:"name",val:name,set:setName,type:"text",ph:"Your full name",err:errors.name},
         {label:"Email",key:"email",val:email,set:setEmail,type:"email",ph:"you@email.com",err:errors.email},
@@ -410,7 +697,7 @@ const WelcomeScreen=({user,onContinue})=>{
     <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
       <div style={{animation:"float 2s ease-in-out infinite"}}><Logo size={76}/></div>
       <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:26,fontWeight:800,color:C.blue,marginTop:18,textAlign:"center"}}>You're In! 🎉</div>
-      <div style={{fontSize:15,color:C.textMid,marginTop:10,textAlign:"center",lineHeight:1.7}}>Welcome, <strong>{user?.name}</strong>.<br/>Your 7-day free trial starts now.</div>
+      <div style={{fontSize:15,color:C.textMid,marginTop:10,textAlign:"center",lineHeight:1.7}}>Welcome, <strong>{user?.name}</strong>.<br/>Your 5-day free trial starts now.</div>
       <div style={{fontSize:13,color:C.textLight,marginTop:10}}>Taking you to your dashboard…</div>
       <div style={{marginTop:22,display:"flex",gap:6}}>
         {[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:i===0?C.blue:"rgba(26,111,160,0.2)",animation:`pulse 1.2s ease ${i*0.3}s infinite`}}/>)}
@@ -420,15 +707,124 @@ const WelcomeScreen=({user,onContinue})=>{
 };
 
 const PaywallScreen=({user,onSubscribe,onLogout})=>{
-  const [plan,setPlan]=useState("monthly"); const [loading,setLoading]=useState(false);
-  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
-  const doSub=async()=>{
-    setLoading(true); await new Promise(r=>setTimeout(r,1200));
-    const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
-    const idx=users.findIndex(u=>u.email===user.email);
-    if(idx>=0){users[idx].plan=plan;localStorage.setItem("p2c_users",JSON.stringify(users));}
-    onSubscribe(plan); setLoading(false);
+  const [tier,setTier]=useState("normal");
+  const [billing,setBilling]=useState("monthly");
+  const [payStep,setPayStep]=useState("plans"); // plans | payment | processing | done
+  const [payMethod,setPayMethod]=useState(null);
+  const [cardNum,setCardNum]=useState(""); const [cardExp,setCardExp]=useState(""); const [cardCvv,setCardCvv]=useState("");
+  const [loading,setLoading]=useState(false);
+  const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
+
+  const PLANS={
+    normal:{
+      label:"Normal",color:C.blue,icon:"💙",
+      monthly:{price:"€3.99",id:"normal_monthly",perMonth:"€3.99/mo"},
+      annual:{price:"€39.90",id:"normal_annual",perMonth:"€3.33/mo",save:"Save 17%"},
+      features:["Unlimited pain check-ins","Body map with symptoms","Trends & history","Community chat","Trauma recovery exercises"],
+    },
+    premium:{
+      label:"Premium",color:C.purple,icon:"⭐",
+      monthly:{price:"€5.99",id:"premium_monthly",perMonth:"€5.99/mo"},
+      annual:{price:"€59.90",id:"premium_annual",perMonth:"€4.99/mo",save:"Save 17%"},
+      features:["Everything in Normal","AI health insights","Violence documentation","Secure photo storage","PDF health reports","Priority support"],
+    },
   };
+
+  const PAY_METHODS=[
+    {id:"card",label:"Credit / Debit Card",icon:"💳"},
+    {id:"mobilepay",label:"MobilePay",icon:"📱"},
+    {id:"paypal",label:"PayPal",icon:"🅿️"},
+    {id:"applepay",label:"Apple Pay",icon:"🍎"},
+    {id:"googlepay",label:"Google Pay",icon:"🔵"},
+    {id:"klarna",label:"Klarna",icon:"🛍️"},
+    {id:"invoice",label:"Invoice / Bank Transfer",icon:"🏦"},
+  ];
+
+  const selectedPlan=PLANS[tier][billing];
+  const planId=selectedPlan.id;
+
+  const doSubscribe=async()=>{
+    setPayStep("processing");
+    await new Promise(r=>setTimeout(r,1800));
+    // Save plan
+    try{
+      const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
+      const idx=users.findIndex(u=>u.email===user?.email);
+      if(idx>=0){users[idx].plan=planId;localStorage.setItem("p2c_users",JSON.stringify(users));}
+    }catch(e){}
+    setPayStep("done");
+    setTimeout(()=>onSubscribe(planId),1200);
+  };
+
+  if(payStep==="processing") return(
+    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:18,padding:"0 24px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
+      <div style={{width:56,height:56,border:"4px solid rgba(26,111,160,0.15)",borderTop:`4px solid ${C.blue}`,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:20,color:C.textDark}}>Processing…</div>
+      <div style={{fontSize:13,color:C.textLight}}>Securing your subscription</div>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
+
+  if(payStep==="done") return(
+    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"0 24px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
+      <div style={{fontSize:62}}>🎉</div>
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:C.green}}>Welcome!</div>
+      <div style={{fontSize:14,color:C.textMid,textAlign:"center",lineHeight:1.7}}>Your <strong>{PLANS[tier].label}</strong> subscription is active.<br/>Enjoy full access to Pain2Care!</div>
+    </div>
+  );
+
+  if(payStep==="payment") return(
+    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
+      <div style={{display:"flex",alignItems:"center",gap:12,padding:"max(18px,env(safe-area-inset-top)) 0 18px"}}>
+        <button onClick={()=>setPayStep("plans")} style={{background:"rgba(255,255,255,0.6)",border:"1px solid rgba(26,111,160,0.15)",borderRadius:12,padding:"7px 12px",fontSize:14,cursor:"pointer",color:C.textMid}}>← Back</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>Payment</div>
+      </div>
+
+      {/* Order summary */}
+      <div className="glass" style={{borderRadius:16,padding:"14px 16px",marginBottom:20}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div>
+            <div style={{fontWeight:800,fontSize:14,color:C.textDark}}>{PLANS[tier].icon} {PLANS[tier].label} {billing==="monthly"?"Monthly":"Annual"}</div>
+            <div style={{fontSize:12,color:C.textLight,marginTop:2}}>{selectedPlan.perMonth} · Cancel anytime</div>
+          </div>
+          <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:tier==="premium"?C.purple:C.blue}}>{selectedPlan.price}</div>
+        </div>
+      </div>
+
+      {/* Payment methods */}
+      <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:10}}>Choose Payment Method</div>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
+        {PAY_METHODS.map(m=>(
+          <div key={m.id} onClick={()=>setPayMethod(m.id)}
+            style={{padding:"13px 16px",borderRadius:14,border:`2px solid ${payMethod===m.id?(tier==="premium"?C.purple:C.blue):"rgba(26,111,160,0.15)"}`,background:payMethod===m.id?"rgba(26,111,160,0.06)":"rgba(255,255,255,0.55)",cursor:"pointer",display:"flex",alignItems:"center",gap:12,transition:"all 0.15s"}}>
+            <span style={{fontSize:20}}>{m.icon}</span>
+            <span style={{fontWeight:700,fontSize:14,color:C.textDark}}>{m.label}</span>
+            {payMethod===m.id&&<span style={{marginLeft:"auto",color:tier==="premium"?C.purple:C.blue,fontWeight:900}}>✓</span>}
+          </div>
+        ))}
+      </div>
+
+      {/* Card fields if card selected */}
+      {payMethod==="card"&&(
+        <div className="glass" style={{borderRadius:16,padding:16,marginBottom:20}}>
+          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12}}>Card Details</div>
+          <input className="field" placeholder="Card number" value={cardNum} onChange={e=>setCardNum(e.target.value)} style={{marginBottom:10}}/>
+          <div style={{display:"flex",gap:10}}>
+            <input className="field" placeholder="MM/YY" value={cardExp} onChange={e=>setCardExp(e.target.value)} style={{flex:1}}/>
+            <input className="field" placeholder="CVV" value={cardCvv} onChange={e=>setCardCvv(e.target.value)} style={{flex:1}}/>
+          </div>
+        </div>
+      )}
+
+      <button className="btn-blue" onClick={doSubscribe} disabled={!payMethod}
+        style={{background:tier==="premium"?`linear-gradient(135deg,${C.purple},#9b5cd4)`:`linear-gradient(135deg,${C.blue},#2296c4)`,animation:"glow 2.5s ease-in-out infinite"}}>
+        Pay {selectedPlan.price} →
+      </button>
+      <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginTop:10}}>🔒 Secure & encrypted · Cancel anytime</div>
+    </div>
+  );
+
+  // Plans page
   return(
     <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 0 0"}}>
@@ -437,50 +833,84 @@ const PaywallScreen=({user,onSubscribe,onLogout})=>{
         </div>
         <button onClick={onLogout} style={{fontSize:11,fontWeight:700,color:C.textLight,background:"rgba(255,255,255,0.5)",border:"1px solid rgba(26,111,160,0.2)",borderRadius:18,padding:"5px 11px",cursor:"pointer"}}>Log Out</button>
       </div>
-      <div style={{textAlign:"center",padding:"24px 0 14px"}}>
-        <div style={{fontSize:44}}>✨</div>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:24,fontWeight:800,color:C.textDark,marginTop:8}}>Unlock Full Access</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:6,lineHeight:1.6}}>Continue your healing journey.</div>
+
+      <div style={{textAlign:"center",padding:"20px 0 12px"}}>
+        <div style={{fontSize:40}}>✨</div>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:23,fontWeight:800,color:C.textDark,marginTop:8}}>Choose Your Plan</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:5}}>Start healing with full access</div>
       </div>
-      {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
+
+      {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"11px 15px",marginBottom:14,display:"flex",alignItems:"center",gap:12,border:"1px solid rgba(244,162,97,0.3)"}}>
         <span style={{fontSize:18}}>⏳</span>
-        <div><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} Days Left in Free Trial</div>
-        <div style={{fontSize:11,color:C.textLight}}>Your trial ends soon</div></div>
+        <div><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} day{daysLeft!==1?"s":""} left in free trial</div>
+        <div style={{fontSize:11,color:C.textLight}}>Subscribe before it ends</div></div>
       </div>}
-      <div style={{marginBottom:18}}>
-        {[["✅","Unlimited check-ins"],["📈","Trends & AI insights"],["🩺","Pain body heat map"],["💬","Community chat"],["📸","Secure documentation"],["📄","PDF health reports"]].map(([icon,text])=>(
-          <div key={text} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 0",borderBottom:"1px solid rgba(26,111,160,0.08)"}}>
-            <span style={{fontSize:15}}>{icon}</span>
-            <span style={{fontSize:13,fontWeight:600,color:C.textMid}}>{text}</span>
-            <div style={{marginLeft:"auto",width:17,height:17,borderRadius:"50%",background:C.green,display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <span style={{color:"#fff",fontSize:10,fontWeight:900}}>✓</span>
+
+      {/* Monthly / Annual toggle */}
+      <div className="glass" style={{borderRadius:50,padding:4,display:"flex",gap:4,marginBottom:16}}>
+        {[{id:"monthly",label:"Monthly"},{id:"annual",label:"Annual · Save 17%"}].map(b=>(
+          <button key={b.id} onClick={()=>setBilling(b.id)}
+            style={{flex:1,padding:"9px",borderRadius:46,border:"none",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:12,cursor:"pointer",background:billing===b.id?"rgba(26,111,160,0.85)":"transparent",color:billing===b.id?"#fff":"#6b95ad",transition:"all 0.2s"}}>
+            {b.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Plan cards */}
+      {Object.entries(PLANS).map(([id,p])=>{
+        const pricing=p[billing];
+        const selected=tier===id;
+        return(
+          <div key={id} onClick={()=>setTier(id)}
+            style={{borderRadius:20,padding:18,marginBottom:12,border:`2.5px solid ${selected?p.color:"rgba(26,111,160,0.13)"}`,background:selected?`${p.color}0d`:"rgba(255,255,255,0.5)",cursor:"pointer",transition:"all 0.2s",position:"relative"}}>
+            {id==="premium"&&<div style={{position:"absolute",top:-10,right:14,background:`linear-gradient(135deg,${C.purple},#9b5cd4)`,color:"#fff",fontSize:10,fontWeight:800,padding:"3px 10px",borderRadius:18}}>BEST VALUE</div>}
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+              <div>
+                <div style={{display:"flex",alignItems:"center",gap:7}}>
+                  <span style={{fontSize:20}}>{p.icon}</span>
+                  <span style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:18,color:p.color}}>{p.label}</span>
+                  {selected&&<div style={{width:18,height:18,borderRadius:"50%",background:p.color,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{color:"#fff",fontSize:10,fontWeight:900}}>✓</span></div>}
+                </div>
+                <div style={{fontSize:11,color:C.textLight,marginTop:3}}>{pricing.perMonth}{billing==="annual"&&<span style={{color:C.green,fontWeight:700,marginLeft:6}}>{pricing.save}</span>}</div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:26,color:p.color}}>{pricing.price}</div>
+                <div style={{fontSize:10,color:C.textLight}}>{billing==="monthly"?"per month":"per year"}</div>
+              </div>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              {p.features.map(f=>(
+                <div key={f} style={{display:"flex",alignItems:"center",gap:8}}>
+                  <div style={{width:14,height:14,borderRadius:"50%",background:`${p.color}22`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                    <span style={{color:p.color,fontSize:9,fontWeight:900}}>✓</span>
+                  </div>
+                  <span style={{fontSize:12,color:C.textMid}}>{f}</span>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-      <div className="glass" style={{borderRadius:15,padding:5,display:"flex",gap:5,marginBottom:18}}>
-        {[{id:"monthly",label:"Monthly",price:"€4.99",sub:"/month"},{id:"annual",label:"Annual",price:"€49.99",sub:"/year · Save 17%"}].map(p=>(
-          <div key={p.id} onClick={()=>setPlan(p.id)}
-            style={{flex:1,padding:"13px 8px",borderRadius:11,textAlign:"center",cursor:"pointer",background:plan===p.id?"rgba(26,111,160,0.88)":"transparent",transition:"all 0.2s"}}>
-            <div style={{fontWeight:800,fontSize:12,color:plan===p.id?"#fff":C.textMid}}>{p.label}</div>
-            <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:plan===p.id?"#fff":C.textDark,marginTop:2}}>{p.price}</div>
-            <div style={{fontSize:10,color:plan===p.id?"rgba(255,255,255,0.7)":C.textLight,marginTop:2}}>{p.sub}</div>
-          </div>
-        ))}
-      </div>
-      <button className="btn-blue" onClick={doSub} disabled={loading} style={{animation:"glow 2.5s ease-in-out infinite"}}>
-        {loading?"Processing…":`Subscribe ${plan==="monthly"?"€4.99/mo":"€49.99/yr"} →`}
+        );
+      })}
+
+      <button onClick={()=>setPayStep("payment")}
+        style={{width:"100%",padding:"16px",borderRadius:50,border:"none",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:15,cursor:"pointer",color:"#fff",background:tier==="premium"?`linear-gradient(135deg,${C.purple},#9b5cd4)`:`linear-gradient(135deg,${C.blue},#2296c4)`,boxShadow:`0 4px 18px ${tier==="premium"?"rgba(123,63,158,0.35)":"rgba(26,111,160,0.32)"}`,animation:"glow 2.5s ease-in-out infinite",marginBottom:10}}>
+        Continue with {PLANS[tier].label} {PLANS[tier][billing].price} →
       </button>
-      <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginTop:10}}>Cancel anytime · No hidden fees</div>
-      {daysLeft>0&&<div style={{textAlign:"center",marginTop:11}}><span onClick={()=>onSubscribe("trial")} style={{fontSize:12,color:C.textLight,cursor:"pointer",textDecoration:"underline"}}>Continue free trial ({daysLeft} days left)</span></div>}
+      <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginBottom:10}}>🔒 Secure payment · Cancel anytime · No hidden fees</div>
+      <div style={{display:"flex",justifyContent:"center",gap:8,flexWrap:"wrap",marginBottom:10}}>
+        {["💳","📱","🅿️","🍎","🔵","🛍️","🏦"].map((icon,i)=>(
+          <span key={i} style={{fontSize:20,opacity:0.7}}>{icon}</span>
+        ))}
+      </div>
+      {daysLeft>0&&<div style={{textAlign:"center",marginTop:8}}><span onClick={()=>onSubscribe("trial")} style={{fontSize:12,color:C.textLight,cursor:"pointer",textDecoration:"underline"}}>Continue free trial ({daysLeft} days left)</span></div>}
     </div>
   );
 };
 
 /* ══ HOME TAB ══ */
 const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
-  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
-  const isPaid=user?.plan==="monthly"||user?.plan==="annual";
+  const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
+  const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
   const affIdx=Math.floor(Date.now()/86400000)%AFFIRMATIONS.length;
   const modules=[
     {id:"pain",icon:"🩺",title:"Pain Module",sub:"Chronic Pain",color:C.red,border:"rgba(230,57,70,0.2)"},
@@ -536,18 +966,23 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
 /* ══ PAIN MODULE ══ */
 const PainModule=({user,history,setHistory,onShowPaywall})=>{
   const [painLevel,setPainLevel]=useState(5);
-  const [selectedAreas,setSelectedAreas]=useState([]);
+  const [areaSymptoms,setAreaSymptoms]=useState({}); // {areaId: {symptoms:[{type}], intensity}}
   const [mood,setMood]=useState(null);
   const [traumaChecks,setTraumaChecks]=useState({});
   const [notes,setNotes]=useState("");
   const [screen,setScreen]=useState("form");
   const [isListening,setIsListening]=useState(false);
   const [voiceStatus,setVoiceStatus]=useState("");
+  const [side,setSide]=useState("front");
+  const [popup,setPopup]=useState(null); // area object
   const recRef=useRef(null);
+  const bodyType=["slim","normal","large"][[1,2,3].indexOf(user?.silhouette||2)]||"normal";
   const painColor=painLevel<=3?C.green:painLevel<=6?C.gold:C.red;
   const painLabel=["None","Minimal","Minimal","Mild","Mild","Moderate","Moderate","Severe","Severe","Intense","Intense"][painLevel];
   const checkedCount=Object.values(traumaChecks).filter(Boolean).length;
   const selMood=MOODS.find(m=>m.value===mood);
+  const activeAreaCount=Object.keys(areaSymptoms).filter(k=>areaSymptoms[k]&&areaSymptoms[k].symptoms?.length>0).length;
+
   const startVoice=()=>{
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
     if(!SR){setVoiceStatus("Voice not supported.");return;}
@@ -559,31 +994,26 @@ const PainModule=({user,history,setHistory,onShowPaywall})=>{
     recRef.current=rec;rec.start();
   };
   const stopVoice=()=>{recRef.current?.stop();setIsListening(false);};
+
+  const handleAreaSave=(areaId,data)=>{
+    setAreaSymptoms(prev=>{
+      if(!data) {const n={...prev};delete n[areaId];return n;}
+      return {...prev,[areaId]:data};
+    });
+  };
+
   const handleSubmit=()=>{
     const score=Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3);
-    setHistory(prev=>[...prev.slice(-13),{id:Date.now(),date:new Date().toLocaleDateString("en-US",{weekday:"short"}),fullDate:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),painLevel,mood,checkedCount,areas:selectedAreas,notes,score}]);
+    const areas=Object.entries(areaSymptoms).map(([id,data])=>({id,...data}));
+    setHistory(prev=>[...prev.slice(-13),{id:Date.now(),date:new Date().toLocaleDateString("en-US",{weekday:"short"}),fullDate:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),painLevel,mood,checkedCount,areas,notes,score}]);
     setScreen("results");
   };
-  const resetForm=()=>{setPainLevel(5);setSelectedAreas([]);setTraumaChecks({});setMood(null);setNotes("");setScreen("form");};
-  const toggleArea=(area)=>setSelectedAreas(p=>p.includes(area)?p.filter(a=>a!==area):[...p,area]);
-
-  const BODY_PARTS=[
-    {id:"Head",cx:65,cy:25,rx:18,ry:20,shape:"ellipse"},
-    {id:"Neck",x:58,y:43,w:14,h:14,shape:"rect"},
-    {id:"Shoulders",parts:[{cx:36,cy:65,rx:15,ry:10},{cx:94,cy:65,rx:15,ry:10}],shape:"dualEllipse"},
-    {id:"Chest",x:43,y:57,w:44,h:32,shape:"rect"},
-    {id:"Upper Back",x:43,y:89,w:44,h:25,shape:"rect"},
-    {id:"Lower Back",x:43,y:114,w:44,h:25,shape:"rect"},
-    {id:"Hips",x:41,y:139,w:48,h:20,shape:"rect"},
-    {id:"Legs",parts:[{x:43,y:159,w:20,h:32},{x:67,y:159,w:20,h:32}],shape:"dualRect"},
-    {id:"Feet",parts:[{cx:53,cy:197,rx:12,ry:7},{cx:77,cy:197,rx:12,ry:7}],shape:"dualEllipse"},
-  ];
-  const aFill=(id)=>selectedAreas.includes(id)?`rgba(230,57,70,${0.25+painLevel*0.065})`:"rgba(26,111,160,0.1)";
-  const aStroke=(id)=>selectedAreas.includes(id)?C.red:"rgba(26,111,160,0.22)";
+  const resetForm=()=>{setPainLevel(5);setAreaSymptoms({});setTraumaChecks({});setMood(null);setNotes("");setScreen("form");};
 
   if(screen==="results"){
     const score=Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3);
     const sc=score>=20?C.green:score>=12?C.gold:C.red;
+    const activeAreas=Object.entries(areaSymptoms).filter(([,v])=>v?.symptoms?.length>0);
     return(
       <div style={{animation:"scaleIn 0.35s ease both"}}>
         <SectionTitle icon="✅" title="Today's Report" sub="Here's how you showed up today"/>
@@ -594,66 +1024,62 @@ const PainModule=({user,history,setHistory,onShowPaywall})=>{
         </GCard>
         <GCard>
           <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:13}}>📊 Snapshot</div>
-          {[{label:"Pain Level",value:`${painLevel}/10 · ${painLabel}`,color:painColor},{label:"Mood",value:selMood?`${selMood.emoji} ${selMood.label}`:"—",color:selMood?.color},{label:"Pain Areas",value:selectedAreas.length?selectedAreas.join(", "):"None"},{label:"Recovery Checks",value:`${checkedCount}/${TRAUMA_CHECKS.length}`,color:C.blue}].map((row,i,arr)=>(
+          {[{label:"Pain Level",value:`${painLevel}/10 · ${painLabel}`,color:painColor},{label:"Mood",value:selMood?`${selMood.emoji} ${selMood.label}`:"—",color:selMood?.color},{label:"Areas Logged",value:`${activeAreaCount} area${activeAreaCount!==1?"s":""}`},{label:"Recovery Checks",value:`${checkedCount}/${TRAUMA_CHECKS.length}`,color:C.blue}].map((row,i,arr)=>(
             <div key={row.label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
               <span style={{fontSize:13,color:C.textLight}}>{row.label}</span>
               <span style={{fontWeight:800,fontSize:13,color:row.color||C.textDark}}>{row.value}</span>
             </div>
           ))}
         </GCard>
+        {activeAreas.length>0&&<GCard>
+          <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:12}}>🗺️ Pain Areas</div>
+          {activeAreas.map(([id,data])=>{
+            const areaInfo=[...FRONT_AREAS,...BACK_AREAS].find(a=>a.id===id);
+            return(
+              <div key={id} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:"1px solid rgba(26,111,160,0.08)"}}>
+                <div style={{display:"flex",gap:4}}>
+                  {data.symptoms.map(s=>{const st=SYMPTOM_TYPES.find(t=>t.id===s.type);return<div key={s.type} style={{width:10,height:10,borderRadius:"50%",background:st?.color||"#e63946"}}/>;}) }
+                </div>
+                <span style={{flex:1,fontSize:13,color:C.textMid,fontWeight:600}}>{areaInfo?.label||id}</span>
+                <span style={{fontSize:12,fontWeight:800,color:painColor}}>{data.intensity}/10</span>
+              </div>
+            );
+          })}
+        </GCard>}
         <div style={{margin:"0 18px 28px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-          <button className="btn-blue" onClick={resetForm}>＋ New Check-In</button>
+          <button className="btn-blue" onClick={resetForm}>+ New Check-In</button>
           <button className="btn-outline" onClick={()=>setScreen("form")}>View Body Map</button>
         </div>
       </div>
     );
   }
+
   return(
     <div>
+      {popup&&<AreaPopup area={popup} current={areaSymptoms[popup.id]} onSave={handleAreaSave} onClose={()=>setPopup(null)}/>}
       <SectionTitle icon="🩺" title="Pain Module" sub="Track & visualise your pain"/>
       <GCard>
         <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:3}}>⚡ Pain Level</div>
-        <div style={{fontSize:12,color:C.textLight,marginBottom:13}}>How intense is your pain right now?</div>
+        <div style={{fontSize:12,color:C.textLight,marginBottom:13}}>How intense is your overall pain right now?</div>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:68,fontWeight:800,lineHeight:1,color:painColor,transition:"color 0.3s",marginBottom:5}}>{painLevel}</div>
         <div style={{fontSize:12,color:C.textLight,marginBottom:11}}>{painLabel}</div>
-        <input type="range" min={0} max={10} value={painLevel} onChange={e=>setPainLevel(Number(e.target.value))}
-          style={{width:"100%",accentColor:painColor}}/>
+        <input type="range" min={0} max={10} value={painLevel} onChange={e=>setPainLevel(Number(e.target.value))} style={{width:"100%",accentColor:painColor}}/>
         <div style={{display:"flex",justifyContent:"space-between",marginTop:5,fontSize:10,color:C.textLight}}>
           <span>0 None</span><span>5 Moderate</span><span>10 Intense</span>
         </div>
       </GCard>
+
       <GCard>
         <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:3}}>🗺️ Pain Body Map</div>
-        <div style={{fontSize:12,color:C.textLight,marginBottom:14}}>Tap areas where you feel pain</div>
-        <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
-          <svg viewBox="0 0 130 210" width="130" height="210">
-            {BODY_PARTS.map(bp=>{
-              const onClick=()=>toggleArea(bp.id);
-              const fill=aFill(bp.id); const stroke=aStroke(bp.id);
-              if(bp.shape==="ellipse") return<ellipse key={bp.id} cx={bp.cx} cy={bp.cy} rx={bp.rx} ry={bp.ry} fill={fill} stroke={stroke} strokeWidth="1.5" style={{cursor:"pointer"}} onClick={onClick}/>;
-              if(bp.shape==="rect") return<rect key={bp.id} x={bp.x} y={bp.y} width={bp.w} height={bp.h} rx="6" fill={fill} stroke={stroke} strokeWidth="1.5" style={{cursor:"pointer"}} onClick={onClick}/>;
-              if(bp.shape==="dualEllipse") return(
-                <g key={bp.id} onClick={onClick} style={{cursor:"pointer"}}>
-                  {bp.parts.map((p,i)=><ellipse key={i} cx={p.cx} cy={p.cy} rx={p.rx} ry={p.ry} fill={fill} stroke={stroke} strokeWidth="1.5"/>)}
-                </g>
-              );
-              if(bp.shape==="dualRect") return(
-                <g key={bp.id} onClick={onClick} style={{cursor:"pointer"}}>
-                  {bp.parts.map((p,i)=><rect key={i} x={p.x} y={p.y} width={p.w} height={p.h} rx="6" fill={fill} stroke={stroke} strokeWidth="1.5"/>)}
-                </g>
-              );
-              return null;
-            })}
-          </svg>
-        </div>
-        <div style={{display:"flex",justifyContent:"center",gap:14,marginBottom:10}}>
-          {[{c:"rgba(45,154,110,0.6)",l:"Mild"},{c:"rgba(244,162,97,0.7)",l:"Medium"},{c:"rgba(230,57,70,0.7)",l:"High"}].map(l=>(
-            <div key={l.l} style={{display:"flex",alignItems:"center",gap:4}}>
-              <div style={{width:12,height:12,borderRadius:3,background:l.c}}/><span style={{fontSize:10,color:C.textLight}}>{l.l}</span>
-            </div>
-          ))}
-        </div>
-        {selectedAreas.length>0&&<div style={{fontSize:12,color:C.red,fontWeight:700,textAlign:"center"}}>Selected: {selectedAreas.join(", ")}</div>}
+        <div style={{fontSize:12,color:C.textLight,marginBottom:4}}>Tap any area to log symptoms. Rotate to see front or back.</div>
+        {activeAreaCount>0&&<div style={{fontSize:12,fontWeight:700,color:C.red,marginBottom:12}}>{activeAreaCount} area{activeAreaCount!==1?"s":""} logged</div>}
+        <BodyMap
+          bodyType={bodyType}
+          areaSymptoms={areaSymptoms}
+          onAreaTap={area=>setPopup(area)}
+          side={side}
+          onFlip={setSide}
+        />
       </GCard>
       <GCard>
         <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:3}}>💭 Mood Check</div>
@@ -704,7 +1130,7 @@ const PainModule=({user,history,setHistory,onShowPaywall})=>{
 
 /* ══ VIOLENCE MODULE ══ */
 const ViolenceModule=({user,onShowPaywall})=>{
-  const isPaid=user?.plan==="monthly"||user?.plan==="annual";
+  const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
   const records=[{id:1,date:"Mar 8, 2026",type:"Physical",desc:"Documented incident at home",shared:false},{id:2,date:"Mar 3, 2026",type:"Documentation",desc:"Photo evidence recorded",shared:true}];
   return(
     <div>
@@ -894,8 +1320,8 @@ const TrendsTab=({history})=>{
 
 /* ══ PROFILE TAB ══ */
 const ProfileTab=({user,onLogout,onShowPaywall})=>{
-  const isPaid=user?.plan==="monthly"||user?.plan==="annual";
-  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
+  const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
+  const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
   return(
     <div>
       <SectionTitle icon="👤" title="Profile" sub="Your account & settings"/>
@@ -906,7 +1332,7 @@ const ProfileTab=({user,onLogout,onShowPaywall})=>{
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>{user?.name}</div>
         <div style={{fontSize:13,color:C.textLight,marginTop:3}}>{user?.email}</div>
         <div style={{marginTop:11,display:"inline-block",padding:"4px 13px",borderRadius:18,background:isPaid?"rgba(45,154,110,0.1)":"rgba(244,162,97,0.1)",fontSize:11,fontWeight:700,color:isPaid?C.green:C.gold}}>
-          {isPaid?"Premium Member":`Free Trial · ${daysLeft} days left`}
+          {isPaid?(user?.plan?.startsWith("premium")?"⭐ Premium Member":"💙 Normal Member"):`Free Trial · ${daysLeft} days left`}
         </div>
       </GCard>
       {!isPaid&&<div style={{margin:"0 18px 14px"}}><button className="btn-blue" onClick={onShowPaywall}>⭐ Upgrade to Premium</button></div>}
@@ -952,16 +1378,102 @@ const MainApp=({user,onLogout,onShowPaywall})=>{
 
 /* ══ ROOT ══ */
 function App(){
-  const [step,setStep]=useState("login");
+  const [step,setStep]=useState("loading");
   const [user,setUser]=useState(null);
   const [vData,setVData]=useState(null);
-  useEffect(()=>{try{const s=sessionStorage.getItem("p2c_session");if(s){const u=JSON.parse(s);setUser(u);setStep("app");}}catch(e){}},[]); 
-  const handleLogin=(u)=>{setUser(u);sessionStorage.setItem("p2c_session",JSON.stringify(u));const d=Math.max(0,7-Math.floor((Date.now()-(u.trialStart||Date.now()))/86400000));const paid=u.plan==="monthly"||u.plan==="annual";setStep(!paid&&d===0?"paywall":"app");};
-  const handleReg=({email,code,name})=>{setVData({email,code,name});setStep("verify");};
-  const handleVerified=()=>{const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");const u=users.find(u=>u.email===vData.email);if(u){setUser(u);sessionStorage.setItem("p2c_session",JSON.stringify(u));}setStep("silhouette");};
-  const handleSil=(sel)=>{const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");const idx=users.findIndex(u=>u.email===user?.email);if(idx>=0){users[idx].silhouette=sel;localStorage.setItem("p2c_users",JSON.stringify(users));}setUser(u=>({...u,silhouette:sel}));setStep("welcome");};
-  const handleLogout=()=>{sessionStorage.removeItem("p2c_session");setUser(null);setStep("login");};
-  const handleSub=(plan)=>{const u={...user,plan};setUser(u);sessionStorage.setItem("p2c_session",JSON.stringify(u));setStep("app");};
+
+  useEffect(()=>{
+    // Wait for Firebase then listen to auth state
+    const tryFb=()=>{
+      if(window._fbReady&&fbOnAuth){
+        fbOnAuth(fbAuth,async(fbUser)=>{
+          if(fbUser){
+            // Logged in — load profile from DB
+            try{
+              const snap=await new Promise(res=>fbOnVal(fbRef(fbDb,`users/${fbUser.uid}`),res,{onlyOnce:true}));
+              const profile=snap.val()||{};
+              const u={uid:fbUser.uid,email:fbUser.email,name:profile.name||fbUser.email,silhouette:profile.silhouette||2,plan:profile.plan||"free",trialStart:profile.trialStart||Date.now()};
+              setUser(u);
+              setStep(profile.silhouette?"app":"silhouette");
+            }catch(e){
+              setUser({uid:fbUser.uid,email:fbUser.email,name:fbUser.email,silhouette:2,plan:"free",trialStart:Date.now()});
+              setStep("app");
+            }
+          } else {
+            // Not logged in — check localStorage fallback
+            try{const s=sessionStorage.getItem("p2c_session");if(s){const u=JSON.parse(s);setUser(u);setStep("app");return;}}catch(e){}
+            setStep("login");
+          }
+        });
+      } else {
+        // Firebase not ready yet — try localStorage
+        try{const s=sessionStorage.getItem("p2c_session");if(s){const u=JSON.parse(s);setUser(u);setStep("app");return;}}catch(e){}
+        setTimeout(tryFb,400);
+        setTimeout(()=>{if(step==="loading")setStep("login");},3000);
+      }
+    };
+    tryFb();
+  },[]);
+
+  const saveUserToDb=async(uid,data)=>{
+    if(fbDb&&fbRef&&fbSet){
+      try{await fbSet(fbRef(fbDb,`users/${uid}`),data);}catch(e){}
+    }
+  };
+
+  const handleLogin=async(u)=>{
+    setUser(u);
+    sessionStorage.setItem("p2c_session",JSON.stringify(u));
+    const paid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(u.plan);
+    const d=Math.max(0,5-Math.floor((Date.now()-(u.trialStart||Date.now()))/86400000));
+    setStep(!paid&&d===0?"paywall":"app");
+  };
+
+  const handleReg=({email,code,name})=>{ setVData({email,code,name}); setStep("verify"); };
+
+  const handleVerified=async()=>{
+    // Firebase user was created in RegisterScreen — now load profile
+    try{
+      const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
+      const u=users.find(u=>u.email===vData.email);
+      if(u){setUser(u);sessionStorage.setItem("p2c_session",JSON.stringify(u));}
+    }catch(e){}
+    setStep("silhouette");
+  };
+
+  const handleSil=async(sel)=>{
+    const updated={...user,silhouette:sel};
+    setUser(updated);
+    sessionStorage.setItem("p2c_session",JSON.stringify(updated));
+    if(updated.uid) await saveUserToDb(updated.uid,{name:updated.name,email:updated.email,silhouette:sel,plan:updated.plan||"free",trialStart:updated.trialStart||Date.now()});
+    // localStorage fallback
+    try{const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");const idx=users.findIndex(u=>u.email===updated.email);if(idx>=0){users[idx].silhouette=sel;localStorage.setItem("p2c_users",JSON.stringify(users));}}catch(e){}
+    setStep("welcome");
+  };
+
+  const handleLogout=async()=>{
+    sessionStorage.removeItem("p2c_session");
+    try{if(fbAuth&&fbSignOut)await fbSignOut(fbAuth);}catch(e){}
+    setUser(null);setStep("login");
+  };
+
+  const handleSub=(plan)=>{
+    const u={...user,plan};
+    setUser(u);
+    sessionStorage.setItem("p2c_session",JSON.stringify(u));
+    if(u.uid) saveUserToDb(u.uid,{...u});
+    setStep("app");
+  };
+
+  if(step==="loading") return(
+    <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:16}}>
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:26,color:"#1a6fa0"}}>
+        <span style={{color:"#e63946"}}>Pain</span><span>2</span><span style={{color:"#1a8c7a"}}>Care</span>
+      </div>
+      <div style={{width:36,height:36,border:"3px solid rgba(26,111,160,0.15)",borderTop:"3px solid #1a6fa0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
   if(step==="login") return<AuthShell><LoginScreen onLogin={handleLogin} onGoRegister={()=>setStep("register")}/></AuthShell>;
   if(step==="register") return<AuthShell><RegisterScreen onGoLogin={()=>setStep("login")} onRegistered={handleReg}/></AuthShell>;
   if(step==="verify") return<AuthShell><VerifyScreen email={vData?.email} code={vData?.code} onVerified={handleVerified} onBack={()=>setStep("register")}/></AuthShell>;
