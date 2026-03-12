@@ -563,7 +563,7 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
 
         {/* Save button */}
         <button onClick={saveArea}
-          style={{width:'100%',background:`linear-gradient(135deg,${C.blue},${C.blueDark||'#0e4f78'})`,color:'white',border:'none',padding:'15px',borderRadius:50,fontFamily:"'Nunito',sans-serif",fontSize:16,fontWeight:800,cursor:'pointer',boxShadow:'0 6px 20px rgba(26,111,160,0.3)'}}>
+          style={{width:'100%',background:`linear-gradient(135deg,${C.blue},#0e4f78)`,color:'white',border:'none',padding:'15px',borderRadius:50,fontFamily:"'Nunito',sans-serif",fontSize:16,fontWeight:800,cursor:'pointer',boxShadow:'0 6px 20px rgba(26,111,160,0.3)'}}>
           {activeSubs.length > 0 ? `Save ${activeSubs.length} area${activeSubs.length!==1?'s':''}` : 'Clear & Close'}
         </button>
       </div>
@@ -673,7 +673,6 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
   const painLabel=["None","Minimal","Minimal","Mild","Mild","Moderate","Moderate","Severe","Severe","Intense","Intense"][painLevel];
   const checkedCount=Object.values(traumaChecks).filter(Boolean).length;
   const selMood=MOODS.find(m=>m.value===mood);
-  const activeAreaCount=Object.keys(areaSymptoms).filter(k=>areaSymptoms[k]&&areaSymptoms[k].symptoms?.length>0).length;
 
   const startVoice=()=>{
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -749,7 +748,6 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
               </div>
             );
           })}
-        </GCard>}
         </GCard>}
         <div style={{margin:"0 18px 28px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           <button className="btn-blue" onClick={resetForm}>+ New Check-In</button>
