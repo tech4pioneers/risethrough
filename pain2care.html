@@ -323,42 +323,273 @@ const BODY_SILHOUETTES={
   }
 };
 
-/* ── ADVANCED BODY MAP COMPONENT ── */
-const BodyMap=({bodyType="normal",areaSymptoms,onAreaTap,side,onFlip})=>{
-  const areas=side==="front"?FRONT_AREAS:BACK_AREAS;
-  const sil=BODY_SILHOUETTES[bodyType]||BODY_SILHOUETTES.normal;
+/* ── BODY MAP V2 ── gender-aware, two-phase, sub-area detail */
 
-  // Get color for area based on symptoms
-  const getAreaColor=(areaId)=>{
-    const syms=areaSymptoms[areaId];
-    if(!syms||syms.length===0) return{fill:"rgba(26,111,160,0.08)",stroke:"rgba(26,111,160,0.18)"};
-    // Priority: pain > swelling > burning > radiating > numbness
-    const priority=["pain","burn","radiate","swell","numb"];
-    for(const p of priority){
-      if(syms.find(s=>s.type===p)){
-        const st=SYMPTOM_TYPES.find(t=>t.id===p);
-        return{fill:st.color+"55",stroke:st.color};
-      }
-    }
-    return{fill:"rgba(230,57,70,0.3)",stroke:"#e63946"};
+// ── GENDER FILTER ────────────────────────────────────────────
+const filterByGender = (items, gender) => {
+  // male-only terms
+  const maleOnly = ['penis','scrotum','testicle','testis','prostate','epididymis'];
+  // female-only terms  
+  const femaleOnly = ['vulva','vagina','clitoris','labia','uterus','ovary','ovaries','cervix','fallopian'];
+  const g = (gender||'').toLowerCase();
+  return items.filter(item => {
+    const t = item.toLowerCase();
+    const isMale = maleOnly.some(w => t.includes(w));
+    const isFemale = femaleOnly.some(w => t.includes(w));
+    if (isMale && g === 'female') return false;
+    if (isFemale && g === 'male') return false;
+    return true;
+  });
+};
+
+// ── COMPLETE SUBAREAS ────────────────────────────────────────
+const SUBAREAS_V2 = {
+  // FRONT
+  forehead:['Forehead (centre)','Forehead (left)','Forehead (right)','Left temple','Right temple'],
+  face:['Left eye','Right eye','Left eyelid','Right eyelid','Nose (bridge)','Nose (tip)','Left nostril','Right nostril','Upper lip','Lower lip','Tongue','Left cheek','Right cheek','Left cheekbone','Right cheekbone','Chin','Jaw (left)','Jaw (right)','Left ear','Right ear','Teeth (upper)','Teeth (lower)','Gums','Sinuses (left)','Sinuses (right)','Throat','Tonsils'],
+  neck_f:['Front of neck','Larynx (Adam\'s apple)','Left side of neck','Right side of neck','Left lymph nodes (neck)','Right lymph nodes (neck)','Thyroid','Base of neck'],
+  lshoulder:['Left shoulder top','Left shoulder front','Left shoulder joint','Left collarbone (clavicle)','Left AC joint','Left deltoid (front)','Left rotator cuff','Left bicep tendon','Left axilla (armpit)','Left lymph nodes (armpit)'],
+  rshoulder:['Right shoulder top','Right shoulder front','Right shoulder joint','Right collarbone (clavicle)','Right AC joint','Right deltoid (front)','Right rotator cuff','Right bicep tendon','Right axilla (armpit)','Right lymph nodes (armpit)'],
+  chest:['Upper chest (left)','Upper chest (right)','Upper chest (centre)','Lower chest (left)','Lower chest (right)','Sternum (upper)','Sternum (centre)','Sternum (lower)','Left ribs (front, upper)','Left ribs (front, lower)','Right ribs (front, upper)','Right ribs (front, lower)','Left breast / pectoral','Right breast / pectoral','Heart area','Left lung area','Right lung area','Left lymph nodes (chest)','Right lymph nodes (chest)'],
+  luparm:['Left upper arm (front)','Left bicep','Left deltoid (outer)'],
+  ruparm:['Right upper arm (front)','Right bicep','Right deltoid (outer)'],
+  lelbow:['Left elbow (front)','Left elbow (inner — funny bone)','Left elbow joint','Left elbow (outer)'],
+  relbow:['Right elbow (front)','Right elbow (inner — funny bone)','Right elbow joint','Right elbow (outer)'],
+  lfarm:['Left forearm (front)','Left forearm (outer)','Left forearm (inner)'],
+  rfarm:['Right forearm (front)','Right forearm (outer)','Right forearm (inner)'],
+  lwrist:['Left wrist (front)','Left wrist (back)','Left wrist (outer)','Left wrist (inner)','Left palm','Left back of hand','Left thumb','Left index finger','Left middle finger','Left ring finger','Left little finger','Left knuckles'],
+  rwrist:['Right wrist (front)','Right wrist (back)','Right wrist (outer)','Right wrist (inner)','Right palm','Right back of hand','Right thumb','Right index finger','Right middle finger','Right ring finger','Right little finger','Right knuckles'],
+  abdomen:['Upper abdomen (centre)','Upper abdomen (left)','Upper abdomen (right)','Lower abdomen (centre)','Lower abdomen (left)','Lower abdomen (right)','Navel area','Stomach area','Liver area (right upper)','Gallbladder area','Spleen area (left upper)','Pancreas area','Left kidney (front)','Right kidney (front)','Left colon','Right colon','Small intestine area','Left flank','Right flank','Left lymph nodes (groin)','Right lymph nodes (groin)'],
+  liver:['Liver (upper right)','Gallbladder','Right rib (lower front)','Right side abdomen (upper)'],
+  stomach:['Stomach / gastric area','Pancreas area','Left rib (lower front)','Left side abdomen (upper)','Spleen area'],
+  pelvis:['Pubic bone','Left groin','Right groin','Left hip (front)','Right hip (front)','Left inguinal area','Right inguinal area','Urethra','Bladder area','Penis','Scrotum / testicles','Left testicle','Right testicle','Vulva','Vagina (external)','Clitoris','Labia (left)','Labia (right)','Uterus area','Ovary (left)','Ovary (right)','Prostate area','Perineum'],
+  lhip:['Left hip (front)','Left hip bone (iliac crest)','Left hip flexor','Left groin (inner)','Left inguinal lymph nodes'],
+  rhip:['Right hip (front)','Right hip bone (iliac crest)','Right hip flexor','Right groin (inner)','Right inguinal lymph nodes'],
+  lthigh:['Left thigh (front, centre)','Left thigh (front, inner)','Left thigh (front, outer)','Left quadriceps'],
+  rthigh:['Right thigh (front, centre)','Right thigh (front, inner)','Right thigh (front, outer)','Right quadriceps'],
+  lknee:['Left kneecap (patella)','Left knee (front)','Left knee (inner)','Left knee (outer)','Left knee joint','Left lateral meniscus','Left medial meniscus'],
+  rknee:['Right kneecap (patella)','Right knee (front)','Right knee (inner)','Right knee (outer)','Right knee joint','Right lateral meniscus','Right medial meniscus'],
+  lshin:['Left shin (upper)','Left shin (lower)','Left tibia','Left ankle (front)','Left ankle (inner)','Left ankle (outer)','Left ankle joint'],
+  rshin:['Right shin (upper)','Right shin (lower)','Right tibia','Right ankle (front)','Right ankle (inner)','Right ankle (outer)','Right ankle joint'],
+  lankle:['Left foot (top)','Left big toe','Left 2nd toe','Left 3rd toe','Left 4th toe','Left little toe','Left ball of foot','Left arch (inner)','Left arch (outer)','Left heel','Left sole','Left plantar fascia'],
+  rankle:['Right foot (top)','Right big toe','Right 2nd toe','Right 3rd toe','Right 4th toe','Right little toe','Right ball of foot','Right arch (inner)','Right arch (outer)','Right heel','Right sole','Right plantar fascia'],
+  // BACK
+  skull:['Back of head (centre)','Back of head (left)','Back of head (right)','Base of skull / occiput (left)','Base of skull / occiput (right)'],
+  neck_b:['Back of neck (centre)','Left neck (back)','Right neck (back)','Cervical spine C1–C2','Cervical spine C3–C4','Cervical spine C5–C7','Base of neck (back)'],
+  ltrap:['Left trapezius (upper)','Left trapezius (mid)','Left shoulder blade (scapula)','Left shoulder blade (inner edge)','Left rhomboid','Left deltoid (back)','Left rotator cuff (back)'],
+  rtrap:['Right trapezius (upper)','Right trapezius (mid)','Right shoulder blade (scapula)','Right shoulder blade (inner edge)','Right rhomboid','Right deltoid (back)','Right rotator cuff (back)'],
+  lupback:['Left upper back','Between shoulder blades (upper)','Between shoulder blades (lower)','Thoracic spine T1–T4','Thoracic spine T5–T8','Left rib (back, upper)','Left mid-back'],
+  rupback:['Right upper back','Between shoulder blades (upper)','Between shoulder blades (lower)','Thoracic spine T1–T4','Thoracic spine T5–T8','Right rib (back, upper)','Right mid-back'],
+  spine:['Cervical spine (neck)','Thoracic spine T1–T4','Thoracic spine T5–T8','Thoracic spine T9–T12','Lumbar spine L1–L2','Lumbar spine L3','Lumbar spine L4–L5'],
+  llowback:['Left lower back','Lumbar spine L1–L2','Lumbar spine L3–L5','Left SI joint (sacroiliac)','Left rib (back, lower)'],
+  rlowback:['Right lower back','Lumbar spine L1–L2','Lumbar spine L3–L5','Right SI joint (sacroiliac)','Right rib (back, lower)'],
+  lkidney:['Left kidney area','Left flank (back)','Left adrenal area'],
+  rkidney:['Right kidney area','Right flank (back)','Right adrenal area'],
+  lglute:['Left glute (upper)','Left glute (lower)','Left glute (deep / piriformis)','Left sit bone (ischium)','Tailbone (coccyx)','Sacrum','Anal area','Rectum area'],
+  rglute:['Right glute (upper)','Right glute (lower)','Right glute (deep / piriformis)','Right sit bone (ischium)','Tailbone (coccyx)','Sacrum','Anal area','Rectum area'],
+  lhamst:['Left hamstring (upper)','Left hamstring (mid)','Left hamstring (lower)','Left inner thigh (adductor)'],
+  rhamst:['Right hamstring (upper)','Right hamstring (mid)','Right hamstring (lower)','Right inner thigh (adductor)'],
+  lkneeb:['Left knee (back)','Left popliteal (behind knee)','Left calf (upper)'],
+  rkneeb:['Right knee (back)','Right popliteal (behind knee)','Right calf (upper)'],
+  lcalf:['Left calf (inner / gastrocnemius)','Left calf (outer / soleus)','Left Achilles tendon','Left ankle (back)'],
+  rcalf:['Right calf (inner / gastrocnemius)','Right calf (outer / soleus)','Right Achilles tendon','Right ankle (back)'],
+  lheel:['Left heel (centre)','Left heel (inner)','Left heel (outer)','Left heel (bottom)','Left sole','Left plantar fascia'],
+  rheel:['Right heel (centre)','Right heel (inner)','Right heel (outer)','Right heel (bottom)','Right sole','Right plantar fascia'],
+};
+
+// Custom areas localStorage
+const CUSTOM_KEY_V2 = 'p2c_custom_areas_v2';
+const loadCustomV2 = () => { try { return JSON.parse(localStorage.getItem(CUSTOM_KEY_V2)||'{}'); } catch { return {}; } };
+const saveCustomV2 = (obj) => { try { localStorage.setItem(CUSTOM_KEY_V2, JSON.stringify(obj)); } catch {} };
+
+const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
+  const gender = user?.gender || '';
+  const sil = BODY_SILHOUETTES[bodyType] || BODY_SILHOUETTES.normal;
+  const [side, setSide] = React.useState('front');
+  const [phase, setPhase] = React.useState(1); // 1=map, 2=detail
+  const [activeArea, setActiveArea] = React.useState(null);
+  const [tempSubs, setTempSubs] = React.useState({}); // name->intensity
+  const [tempSwell, setTempSwell] = React.useState({}); // name->'yes'|'no'
+  const [tempNumb, setTempNumb] = React.useState({}); // name->'yes'|'no'
+  const [customAreas, setCustomAreas] = React.useState(loadCustomV2);
+  const [customInput, setCustomInput] = React.useState('');
+
+  const areas = side === 'front' ? FRONT_AREAS : BACK_AREAS;
+
+  const getAreaColor = (areaId) => {
+    const d = areaSymptoms[areaId];
+    if (!d || Object.keys(d.subareas||{}).length === 0) return { fill:'rgba(26,111,160,0.08)', stroke:'rgba(26,111,160,0.18)' };
+    const max = d.maxIntensity || 0;
+    if (max >= 7) return { fill:'rgba(240,60,50,0.3)', stroke:'#e63946' };
+    if (max >= 4) return { fill:'rgba(255,140,0,0.3)', stroke:'#e65100' };
+    return { fill:'rgba(249,168,37,0.25)', stroke:'#f9a825' };
   };
 
-  return(
-    <div style={{position:"relative",display:"flex",flexDirection:"column",alignItems:"center"}}>
-      {/* Front/Back toggle */}
-      <div style={{display:"flex",gap:0,marginBottom:12,background:"rgba(26,111,160,0.08)",borderRadius:50,padding:3}}>
-        {["front","back"].map(s=>(
-          <button key={s} onClick={()=>onFlip(s)}
-            style={{padding:"7px 20px",borderRadius:50,border:"none",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:12,cursor:"pointer",background:side===s?"rgba(26,111,160,0.9)":"transparent",color:side===s?"#fff":"#6b95ad",transition:"all 0.2s"}}>
-            {s==="front"?"Front View":"Back View"}
+  const openArea = (area) => {
+    const saved = areaSymptoms[area.id] || {};
+    setTempSubs({ ...(saved.subareas || {}) });
+    setTempSwell({ ...(saved.swelling || {}) });
+    setTempNumb({ ...(saved.numbness || {}) });
+    setActiveArea(area);
+    setPhase(2);
+  };
+
+  const saveArea = () => {
+    const hasSubs = Object.keys(tempSubs).some(k => tempSubs[k] > 0);
+    if (!hasSubs) {
+      const next = { ...areaSymptoms };
+      delete next[activeArea.id];
+      onSave(next);
+    } else {
+      const vals = Object.values(tempSubs).filter(v => v > 0);
+      const maxI = vals.length ? Math.max(...vals) : 0;
+      const col = maxI >= 7 ? 3 : maxI >= 4 ? 2 : maxI > 0 ? 1 : 0;
+      const hasSwelling = Object.values(tempSwell).some(v => v === 'yes');
+      const hasNumbness = Object.values(tempNumb).some(v => v === 'yes');
+      onSave({ ...areaSymptoms, [activeArea.id]: {
+        label: activeArea.label,
+        subareas: { ...tempSubs },
+        swelling: { ...tempSwell },
+        numbness: { ...tempNumb },
+        maxIntensity: maxI,
+        colorLevel: col,
+        hasSwelling,
+        hasNumbness,
+      }});
+    }
+    setPhase(1);
+    setActiveArea(null);
+  };
+
+  const addCustom = () => {
+    const val = customInput.trim();
+    if (!val || !activeArea) return;
+    const rid = activeArea.id;
+    const updated = { ...customAreas, [rid]: [...(customAreas[rid]||[]).filter(x=>x!==val), val] };
+    setCustomAreas(updated);
+    saveCustomV2(updated);
+    setCustomInput('');
+  };
+
+  const getSubareas = (areaId) => {
+    const base = filterByGender(SUBAREAS_V2[areaId] || [], gender);
+    const custom = customAreas[areaId] || [];
+    return [...base, ...custom];
+  };
+
+  // ── PHASE 2: DETAIL ──────────────────────────────────────
+  if (phase === 2 && activeArea) {
+    const subs = getSubareas(activeArea.id);
+    const activeSubs = Object.keys(tempSubs).filter(k => tempSubs[k] > 0);
+    return (
+      <div style={{animation:'fadeIn 0.25s ease both'}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
+          <button onClick={()=>{setPhase(1);setActiveArea(null);}}
+            style={{background:'rgba(26,111,160,0.1)',border:'none',borderRadius:50,width:34,height:34,fontSize:18,cursor:'pointer',color:C.blue,display:'flex',alignItems:'center',justifyContent:'center'}}>
+            ←
+          </button>
+          <div>
+            <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:16,color:C.textDark}}>{activeArea.label}</div>
+            <div style={{fontSize:11,color:C.textLight}}>Select sub-areas and set intensity</div>
+          </div>
+        </div>
+
+        <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:12}}>
+          {subs.map(name => {
+            const intensity = tempSubs[name] || 0;
+            const sw = tempSwell[name] || '';
+            const nu = tempNumb[name] || '';
+            const isCustom = (customAreas[activeArea.id]||[]).includes(name);
+            const bgColor = intensity === 0 ? 'rgba(255,255,255,0.55)' :
+              intensity <= 3 ? 'rgba(255,230,50,0.2)' :
+              intensity <= 6 ? 'rgba(255,140,0,0.15)' : 'rgba(240,60,50,0.13)';
+            const borderColor = intensity === 0 ? 'transparent' :
+              intensity <= 3 ? '#f9a825' : intensity <= 6 ? '#e65100' : '#b71c1c';
+            return (
+              <div key={name} style={{background:bgColor,border:`2px solid ${borderColor}`,borderRadius:14,padding:'12px 14px',transition:'all 0.2s'}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:intensity>0?10:0}}>
+                  <span style={{fontSize:13,fontWeight:700,color:C.textDark}}>
+                    {name}{isCustom && <span style={{fontSize:10,color:C.blue,marginLeft:5,fontWeight:600}}>(custom)</span>}
+                  </span>
+                  <span style={{fontSize:11,color:C.textLight,minWidth:58,textAlign:'right'}}>
+                    {intensity===0?'':intensity<=3?'Mild':intensity<=6?'Moderate':intensity<=8?'Severe':'Worst'}
+                  </span>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:intensity>0?10:0}}>
+                  <span style={{fontSize:12}}>😌</span>
+                  <input type="range" min={0} max={10} value={intensity}
+                    onChange={e=>{const v=Number(e.target.value);setTempSubs(p=>v===0?{...p,[name]:0}:{...p,[name]:v});}}
+                    style={{flex:1,accentColor:intensity<=3?'#f9a825':intensity<=6?'#e65100':'#b71c1c'}}/>
+                  <span style={{fontSize:12}}>😭</span>
+                  <span style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:16,color:C.textDark,minWidth:20}}>{intensity}</span>
+                </div>
+                {intensity > 0 && (
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                    {[['swelling','Swelling',sw,setTempSwell],['numbness','Numbness',nu,setTempNumb]].map(([type,label,val,setter])=>(
+                      <div key={type} style={{display:'flex',alignItems:'center',gap:0,borderRadius:50,overflow:'hidden',border:'1.5px solid rgba(107,149,173,0.3)',background:'rgba(255,255,255,0.4)'}}>
+                        <span style={{fontSize:11,fontWeight:700,color:'#3d5a6e',padding:'5px 9px',borderRight:'1.5px solid rgba(107,149,173,0.2)',whiteSpace:'nowrap'}}>{label}</span>
+                        {['Yes','No'].map(opt=>{
+                          const isOn = val===(opt==='Yes'?'yes':'no');
+                          return(
+                            <button key={opt} onClick={()=>setter(p=>({...p,[name]:opt==='Yes'?'yes':'no'}))}
+                              style={{padding:'5px 11px',fontSize:11,fontWeight:800,border:'none',cursor:'pointer',
+                                background:isOn?(opt==='Yes'?'#1976d2':'rgba(107,149,173,0.2)'):'transparent',
+                                color:isOn?(opt==='Yes'?'white':'#3d5a6e'):'#6b95ad',
+                                fontFamily:"'Nunito',sans-serif",transition:'all 0.15s'}}>
+                              {opt}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Custom area input */}
+        <div style={{display:'flex',gap:8,alignItems:'center',padding:'11px 13px',background:'rgba(26,111,160,0.04)',border:'2px dashed rgba(26,111,160,0.2)',borderRadius:14,marginBottom:16}}>
+          <input value={customInput} onChange={e=>setCustomInput(e.target.value)}
+            onKeyDown={e=>e.key==='Enter'&&addCustom()}
+            placeholder="Add custom area..."
+            style={{flex:1,border:'none',background:'transparent',fontFamily:"'Nunito',sans-serif",fontSize:13,fontWeight:600,color:C.textDark,outline:'none'}}/>
+          <button onClick={addCustom}
+            style={{background:C.blue,color:'white',border:'none',padding:'7px 13px',borderRadius:50,fontFamily:"'Nunito',sans-serif",fontSize:12,fontWeight:800,cursor:'pointer',whiteSpace:'nowrap'}}>
+            + Add
+          </button>
+        </div>
+
+        {/* Save button */}
+        <button onClick={saveArea}
+          style={{width:'100%',background:`linear-gradient(135deg,${C.blue},#0e4f78)`,color:'white',border:'none',padding:'15px',borderRadius:50,fontFamily:"'Nunito',sans-serif",fontSize:16,fontWeight:800,cursor:'pointer',boxShadow:'0 6px 20px rgba(26,111,160,0.3)'}}>
+          {activeSubs.length > 0 ? `Save ${activeSubs.length} area${activeSubs.length!==1?'s':''}` : 'Clear & Close'}
+        </button>
+      </div>
+    );
+  }
+
+  // ── PHASE 1: MAP ──────────────────────────────────────────
+  const activeAreaCount = Object.keys(areaSymptoms).filter(k => areaSymptoms[k]?.maxIntensity > 0).length;
+
+  return (
+    <div>
+      {/* View tabs */}
+      <div style={{display:'flex',gap:0,marginBottom:10,background:'rgba(26,111,160,0.08)',borderRadius:50,padding:3}}>
+        {[['front','⬤ Front'],['back','⬤ Back']].map(([s,lbl])=>(
+          <button key={s} onClick={()=>setSide(s)}
+            style={{flex:1,padding:'7px 0',borderRadius:50,border:'none',fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:12,cursor:'pointer',
+              background:side===s?'rgba(26,111,160,0.9)':'transparent',
+              color:side===s?'#fff':'#6b95ad',transition:'all 0.2s'}}>
+            {lbl}
           </button>
         ))}
       </div>
 
-      {/* SVG Body */}
-      <div style={{position:"relative",transition:"all 0.4s"}}>
-        <svg viewBox="0 0 130 230" width={160} height={230} style={{overflow:"visible"}}>
-          {/* Silhouette */}
+      {/* SVG body */}
+      <div style={{display:'flex',justifyContent:'center',position:'relative'}}>
+        <svg viewBox="0 0 130 230" width={160} height={230} style={{overflow:'visible'}}>
           <ellipse cx={sil.head.cx} cy={sil.head.cy} rx={sil.head.rx} ry={sil.head.ry} fill="rgba(200,220,240,0.4)" stroke="rgba(26,111,160,0.3)" strokeWidth="1"/>
           <rect x={sil.neck.x} y={sil.neck.y} width={sil.neck.w} height={sil.neck.h} fill="rgba(200,220,240,0.4)" stroke="rgba(26,111,160,0.3)" strokeWidth="1"/>
           <path d={sil.torso} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
@@ -366,95 +597,63 @@ const BodyMap=({bodyType="normal",areaSymptoms,onAreaTap,side,onFlip})=>{
           <path d={sil.rarm} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
           <path d={sil.lleg} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
           <path d={sil.rleg} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
-
-          {/* Clickable areas */}
-          {areas.map(area=>{
-            const {fill,stroke}=getAreaColor(area.id);
-            const hasSymptoms=areaSymptoms[area.id]&&areaSymptoms[area.id].length>0;
-            return(
+          {areas.map(area => {
+            const {fill,stroke} = getAreaColor(area.id);
+            const d = areaSymptoms[area.id];
+            const active = d && d.maxIntensity > 0;
+            return (
               <ellipse key={area.id} cx={area.cx} cy={area.cy} rx={area.rx} ry={area.ry}
-                fill={fill} stroke={stroke} strokeWidth={hasSymptoms?"2":"1"}
-                style={{cursor:"pointer",transition:"all 0.2s"}}
-                onClick={()=>onAreaTap(area)}
-              />
+                fill={fill} stroke={stroke} strokeWidth={active?2:1}
+                style={{cursor:'pointer',transition:'all 0.2s'}}
+                onClick={()=>openArea(area)}/>
             );
-          })}
-
-          {/* Symptom dots for active areas */}
-          {areas.map(area=>{
-            const syms=areaSymptoms[area.id];
-            if(!syms||syms.length===0) return null;
-            return syms.slice(0,3).map((s,i)=>{
-              const st=SYMPTOM_TYPES.find(t=>t.id===s.type);
-              return<circle key={s.type} cx={area.cx-4+i*4} cy={area.cy-area.ry-4} r="3" fill={st?.color||"#e63946"}/>;
-            });
           })}
         </svg>
       </div>
 
-      {/* Legend */}
-      <div style={{display:"flex",flexWrap:"wrap",gap:6,justifyContent:"center",marginTop:10,maxWidth:280}}>
-        {SYMPTOM_TYPES.map(s=>(
-          <div key={s.id} style={{display:"flex",alignItems:"center",gap:3,fontSize:10,color:"#6b95ad"}}>
-            <div style={{width:10,height:10,borderRadius:"50%",background:s.color}}/>{s.label}
-          </div>
-        ))}
-      </div>
+      {/* Active area chips */}
+      {activeAreaCount > 0 && (
+        <div style={{marginTop:12,display:'flex',flexDirection:'column',gap:8}}>
+          {Object.entries(areaSymptoms).filter(([,d])=>d?.maxIntensity>0).map(([rid,d])=>{
+            const colorCls = d.colorLevel>=3?C.red:d.colorLevel>=2?'#e65100':d.colorLevel>=1?'#b37a00':C.textLight;
+            const bgCls = d.colorLevel>=3?'rgba(240,60,50,0.12)':d.colorLevel>=2?'rgba(255,140,0,0.12)':'rgba(255,230,50,0.2)';
+            const borderCls = d.colorLevel>=3?'rgba(183,28,28,0.3)':d.colorLevel>=2?'rgba(230,81,0,0.3)':'rgba(249,168,37,0.4)';
+            const painAreas = Object.entries(d.subareas||{}).filter(([,v])=>v>0).map(([n,v])=>`${n} (${v}/10)`).join(', ');
+            const swellingYes = Object.entries(d.swelling||{}).filter(([,v])=>v==='yes').map(([n])=>n).join(', ');
+            const numbnessYes = Object.entries(d.numbness||{}).filter(([,v])=>v==='yes').map(([n])=>n).join(', ');
+            const areaInfo=[...FRONT_AREAS,...BACK_AREAS].find(a=>a.id===rid);
+            return (
+              <div key={rid} onClick={()=>openArea(areaInfo||{id:rid,label:d.label})}
+                style={{background:bgCls,border:`1.5px solid ${borderCls}`,borderRadius:14,padding:'11px 13px',cursor:'pointer',transition:'opacity 0.2s'}}
+                onMouseEnter={e=>e.currentTarget.style.opacity='0.8'}
+                onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}}>
+                  <span style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:13,color:C.textDark}}>{d.label}</span>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <span style={{fontSize:12,fontWeight:700,color:colorCls}}>Max {d.maxIntensity}/10</span>
+                    <button onClick={e=>{e.stopPropagation();const n={...areaSymptoms};delete n[rid];onSave(n);}}
+                      style={{background:'none',border:'none',fontSize:14,cursor:'pointer',color:'#6b95ad',padding:'0 2px'}}>✕</button>
+                  </div>
+                </div>
+                {painAreas && <div style={{fontSize:11,color:'#4a6a80',fontWeight:600,marginBottom:4,lineHeight:1.5}}>📍 {painAreas}</div>}
+                <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                  {[['Swelling',swellingYes],['Numbness',numbnessYes]].map(([lbl,val])=>(
+                    <span key={lbl} style={{fontSize:11,fontWeight:700,padding:'3px 10px',borderRadius:50,
+                      background:val?'rgba(25,118,210,0.15)':'rgba(107,149,173,0.1)',
+                      color:val?'#1565c0':'#546e7a'}}>
+                      {lbl}: {val || 'No'}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
 
-/* ── AREA SYMPTOM POPUP ── */
-const AreaPopup=({area,current,onSave,onClose})=>{
-  const [intensity,setIntensity]=useState(current?.intensity||5);
-  const [types,setTypes]=useState(current?.symptoms?.map(s=>s.type)||[]);
-  const toggleType=(id)=>setTypes(p=>p.includes(id)?p.filter(t=>t!==id):[...p,id]);
-  const save=()=>{
-    if(types.length===0){onSave(area.id,null);onClose();return;}
-    onSave(area.id,{symptoms:types.map(t=>({type:t})),intensity});
-    onClose();
-  };
-  return(
-    <div style={{position:"fixed",inset:0,background:"rgba(26,80,130,0.4)",backdropFilter:"blur(4px)",zIndex:999,display:"flex",alignItems:"flex-end",justifyContent:"center"}}
-      onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div className="glass" style={{width:"100%",maxWidth:430,borderRadius:"24px 24px 0 0",padding:"24px 20px 40px",animation:"fadeIn 0.25s ease both"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
-          <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:"#1a3a52"}}>{area.label}</div>
-          <button onClick={onClose} style={{background:"rgba(26,111,160,0.1)",border:"none",borderRadius:"50%",width:32,height:32,fontSize:16,cursor:"pointer",color:"#6b95ad"}}>×</button>
-        </div>
-
-        {/* Symptom types */}
-        <div style={{fontSize:11,fontWeight:700,color:"#6b95ad",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:10}}>What do you feel?</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:18}}>
-          {SYMPTOM_TYPES.map(s=>(
-            <div key={s.id} onClick={()=>toggleType(s.id)}
-              style={{padding:"10px 12px",borderRadius:13,border:`2px solid ${types.includes(s.id)?s.color:"rgba(26,111,160,0.15)"}`,background:types.includes(s.id)?s.color+"18":"rgba(255,255,255,0.5)",cursor:"pointer",display:"flex",alignItems:"center",gap:8,transition:"all 0.15s"}}>
-              <div style={{width:12,height:12,borderRadius:"50%",background:s.color,flexShrink:0}}/>
-              <span style={{fontSize:13,fontWeight:700,color:types.includes(s.id)?"#1a3a52":"#6b95ad"}}>{s.label}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Intensity */}
-        {types.length>0&&(
-          <div style={{marginBottom:18}}>
-            <div style={{fontSize:11,fontWeight:700,color:"#6b95ad",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8}}>Intensity: {intensity}/10</div>
-            <input type="range" min={1} max={10} value={intensity} onChange={e=>setIntensity(Number(e.target.value))}
-              style={{width:"100%",accentColor:"#e63946"}}/>
-            <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#6b95ad",marginTop:4}}>
-              <span>1 Minimal</span><span>10 Severe</span>
-            </div>
-          </div>
-        )}
-
-        <div style={{display:"flex",gap:10}}>
-          {current&&<button onClick={()=>{onSave(area.id,null);onClose();}} className="btn-outline" style={{flex:1,padding:"12px"}}>Clear</button>}
-          <button onClick={save} className="btn-blue" style={{flex:2,padding:"12px"}}>{types.length>0?"Save →":"Clear Area"}</button>
-        </div>
-      </div>
-    </div>
-  );
-};
 const MOODS=[
   {emoji:"😤",label:"Struggling",value:1,color:"#e63946"},
   {emoji:"😔",label:"Low",value:2,color:"#f4a261"},
@@ -477,39 +676,12 @@ const AFFIRMATIONS=[
   "Rest is not giving up. Rest is rebuilding.",
   "Your body is doing its best. So are you.",
 ];
-const CHANNELS=[
-  {id:"general",icon:"💬",label:"General Support",color:"#1a6fa0",desc:"Peer support & open conversation",seed:[
-    {id:1,user:"Maya R.",avatar:"🌸",text:"Anyone else notice their pain spikes mid-week? Wednesday always gets me.",time:"2h ago",mine:false},
-    {id:2,user:"Jordan K.",avatar:"🌊",text:"Yes! A short noon rest really helps me manage that.",time:"1h ago",mine:false},
-    {id:3,user:"Sam T.",avatar:"🌿",text:"Gentle reminder: rest is not failure 💚",time:"45m ago",mine:false},
-  ]},
-  {id:"chronic",icon:"🔥",label:"Chronic Pain",color:"#e63946",desc:"Experiences, tips & chronic conditions",seed:[
-    {id:1,user:"Alex P.",avatar:"💙",text:"Does anyone use heat therapy? Just got a heating pad for back pain.",time:"3h ago",mine:false},
-    {id:2,user:"Rina S.",avatar:"🌻",text:"Heat works great for me! Cold is better for inflammation though.",time:"2h ago",mine:false},
-    {id:3,user:"Tom W.",avatar:"🦋",text:"Fibromyalgia group here? Would love to connect with others.",time:"1h ago",mine:false},
-  ]},
-  {id:"mental",icon:"🧠",label:"Mental Health & Trauma",color:"#7B3F9E",desc:"Mental health, anxiety & trauma support",seed:[
-    {id:1,user:"Lee M.",avatar:"🌙",text:"Therapy has helped me so much with pain-related anxiety. Anyone else?",time:"5h ago",mine:false},
-    {id:2,user:"Dana H.",avatar:"🕊️",text:"Yes — CBT changed how I relate to my pain completely.",time:"4h ago",mine:false},
-    {id:3,user:"Kai B.",avatar:"🌈",text:"Trauma and chronic pain are so connected. Glad this space exists.",time:"2h ago",mine:false},
-  ]},
-  {id:"treatments",icon:"💊",label:"Treatments & Tips",color:"#2d9a6e",desc:"Medications, therapies & natural remedies",seed:[
-    {id:1,user:"Nora K.",avatar:"🍃",text:"Has anyone tried magnesium for muscle pain? My physio recommended it.",time:"6h ago",mine:false},
-    {id:2,user:"Chris V.",avatar:"⚡",text:"Magnesium glycinate is great for sleep too! Game changer for me.",time:"5h ago",mine:false},
-    {id:3,user:"Jade L.",avatar:"🌺",text:"TENS machine has been helpful alongside physio for my back.",time:"3h ago",mine:false},
-  ]},
-  {id:"recovery",icon:"🌱",label:"Daily Recovery",color:"#1a8c7a",desc:"Small wins, motivation & daily progress",seed:[
-    {id:1,user:"Mia F.",avatar:"☀️",text:"Walked to the mailbox today. Small win but I'll take it! 🎉",time:"1h ago",mine:false},
-    {id:2,user:"Ben R.",avatar:"🌊",text:"Celebrated 30 days of consistent check-ins. Keep going everyone!",time:"45m ago",mine:false},
-    {id:3,user:"Zara N.",avatar:"🌸",text:"Morning stretches before getting out of bed = less morning pain for me.",time:"20m ago",mine:false},
-  ]},
-  {id:"crisis",icon:"🆘",label:"Crisis Support",color:"#f4a261",desc:"If you need urgent emotional support",seed:[
-    {id:1,user:"Support Bot",avatar:"💛",text:"This is a safe space. You are not alone. If you're in immediate danger, please contact emergency services.",time:"pinned",mine:false},
-    {id:2,user:"Peer Supporter",avatar:"🤝",text:"I've been through dark days too. Reaching out is the bravest thing you can do.",time:"4h ago",mine:false},
-    {id:3,user:"Support Bot",avatar:"💛",text:"Finland crisis line: 09 2525 0111 · International: findahelpline.com",time:"pinned",mine:false},
-  ]},
+const SEED_CHAT=[
+  {id:1,user:"Maya R.",avatar:"🌸",text:"Anyone else notice their pain spikes mid-week? Wednesday always gets me.",time:"2h ago",mine:false},
+  {id:2,user:"Jordan K.",avatar:"🌊",text:"Yes! Short noon rest really helps me manage that.",time:"1h ago",mine:false},
+  {id:3,user:"Sam T.",avatar:"🌿",text:"Gentle reminder: rest is not failure 💚",time:"45m ago",mine:false},
+  {id:4,user:"Alex P.",avatar:"💙",text:"Does anyone use heat therapy? Just got a heating pad for back pain.",time:"20m ago",mine:false},
 ];
-
 const EXERCISES=[
   {id:"anxiety",icon:"🧘",title:"Anxiety Management",desc:"Breathing & grounding",steps:["Find a comfortable position and close your eyes.","Breathe in slowly for 4 counts.","Hold for 4 counts.","Exhale slowly for 6 counts.","Repeat 5 times, focusing only on your breath.","Name 5 things you can see around you."]},
   {id:"goals",icon:"🎯",title:"Goal Setting",desc:"Small steps toward healing",steps:["Write one thing you'd like to improve this week.","Break it into 3 small daily actions.","Celebrate every small win — they all count.","Review each evening: did you take one step today?"]},
@@ -521,7 +693,7 @@ const EXERCISES=[
 const seedHistory=()=>Array.from({length:7},(_,i)=>{
   const pain=Math.floor(Math.random()*5)+3,mood=Math.floor(Math.random()*3)+2,checks=Math.floor(Math.random()*4)+1;
   return{id:i,date:DAYS[i],fullDate:new Date(Date.now()-(6-i)*86400000).toLocaleDateString("en-US",{month:"short",day:"numeric"}),
-    painLevel:pain,mood,checkedCount:checks,areas:[],notes:"",score:Math.min(30,Math.round(((10-pain)*3+mood*4+checks*5)/3))};
+    painLevel:pain,mood,checkedCount:checks,areas:[],notes:"",score:Math.round(((10-pain)*3+mood*4+checks*5)/3)};
 });
 
 /* ── Logo SVG ── */
@@ -549,27 +721,25 @@ const Logo=({size=56})=>(
 const GCard=({children,style={}})=>(
   <div className="glass" style={{borderRadius:20,padding:22,margin:"0 18px 16px",...style}}>{children}</div>
 );
-const SectionTitle=({icon,title,sub,onBack})=>(
+const SectionTitle=({icon,title,sub})=>(
   <div style={{padding:"18px 22px 4px",animation:"fadeIn 0.4s ease both"}}>
     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:2}}>
-      {onBack&&<button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer",flexShrink:0}}>← Back</button>}
       {icon&&<span style={{fontSize:22}}>{icon}</span>}
       <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark,letterSpacing:"-0.01em"}}>{title}</div>
     </div>
-    {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:onBack?(icon?80:52):(icon?32:0),marginTop:3}}>{sub}</div>}
+    {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:icon?32:0,marginTop:3}}>{sub}</div>}
   </div>
 );
-const BottomNav=({tab,setTab,user})=>{
-  const T=getLang(user);
-  const items=[{id:"home",icon:"🏠",label:"Home"},{id:"pain",icon:"🩺",label:"Pain"},{id:"violence",icon:"🛡️",label:"Safety"},{id:"trauma",icon:"🧠",label:"Recovery"},{id:"community",icon:"💬",label:"Chat"},{id:"profile",icon:"👤",label:"Profile"}];
+const BottomNav=({tab,setTab})=>{
+  const items=[{id:"home",icon:"🏠",label:"Home"},{id:"pain",icon:"🩺",label:"Pain"},{id:"trauma",icon:"🧠",label:"Recovery"},{id:"community",icon:"💬",label:"Community"},{id:"profile",icon:"👤",label:"Profile"}];
   return(
     <div className="glass" style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,display:"flex",justifyContent:"space-around",padding:"8px 0 max(10px,env(safe-area-inset-bottom))",zIndex:100,borderRadius:"20px 20px 0 0",borderBottom:"none",boxShadow:"0 -4px 20px rgba(26,80,130,0.1)"}}>
       {items.map(t=>(
         <button key={t.id} onClick={()=>setTab(t.id)}
-          style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,cursor:"pointer",color:tab===t.id?(t.id==="violence"?C.purple:C.blue):C.textLight,fontSize:8,fontWeight:tab===t.id?800:600,textTransform:"uppercase",letterSpacing:"0.04em",border:"none",background:"transparent",padding:"4px 5px",transition:"color 0.2s",minWidth:0}}>
-          <span style={{fontSize:tab===t.id?21:18,transition:"font-size 0.2s"}}>{t.icon}</span>
+          style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,cursor:"pointer",color:tab===t.id?C.blue:C.textLight,fontSize:9,fontWeight:tab===t.id?800:600,textTransform:"uppercase",letterSpacing:"0.04em",border:"none",background:"transparent",padding:"4px 8px",transition:"color 0.2s",minWidth:0}}>
+          <span style={{fontSize:tab===t.id?22:19,transition:"font-size 0.2s"}}>{t.icon}</span>
           {t.label}
-          {tab===t.id&&<div style={{width:4,height:4,borderRadius:"50%",background:t.id==="violence"?C.purple:C.blue}}/>}
+          {tab===t.id&&<div style={{width:4,height:4,borderRadius:"50%",background:C.blue}}/>}
         </button>
       ))}
     </div>
@@ -592,7 +762,7 @@ const AppShell=({children,tab,setTab,user,onLogout})=>(
       </div>
     </div>
     <div style={{overflowY:"auto",maxHeight:"100vh",paddingBottom:88}}>{children}</div>
-    <BottomNav tab={tab} setTab={setTab} user={user}/>
+    <BottomNav tab={tab} setTab={setTab}/>
   </div>
 );
 
@@ -607,7 +777,7 @@ const AuthShell=({children})=>(
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:27,fontWeight:800,marginTop:12}}>
           <span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span>
         </div>
-        <div style={{fontSize:11,color:C.textLight,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:4}}>Chronic Pain & Trauma Recovery</div>
+        <div style={{fontSize:11,color:C.textLight,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:4}}>Chronic Pain &amp; Trauma Recovery</div>
       </div>
       {children}
     </div>
@@ -622,24 +792,7 @@ const LoginScreen=({onLogin,onGoRegister})=>{
     if(!email.includes("@")) e.email="Enter a valid email";
     if(pass.length<6) e.pass="Min 6 characters";
     if(Object.keys(e).length){setErrors(e);return;}
-    setLoading(true);
-    // Try Firebase first
-    if(window._fbReady&&fbSignIn){
-      try{
-        const cred=await fbSignIn(fbAuth,email,pass);
-        const uid=cred.user.uid;
-        let profile={};
-        try{const snap=await new Promise(res=>fbOnVal(fbRef(fbDb,`users/${uid}`),res,{onlyOnce:true}));profile=snap.val()||{};}catch(e){}
-        onLogin({uid,email,name:profile.name||email,silhouette:profile.silhouette||2,plan:profile.plan||"free",trialStart:profile.trialStart||Date.now()});
-        setLoading(false);return;
-      }catch(err){
-        if(err.code==="auth/invalid-credential"||err.code==="auth/user-not-found"||err.code==="auth/wrong-password"){
-          setErrors({pass:"Incorrect email or password"});setLoading(false);return;
-        }
-      }
-    }
-    // LocalStorage fallback
-    await new Promise(r=>setTimeout(r,500));
+    setLoading(true); await new Promise(r=>setTimeout(r,800));
     const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
     const user=users.find(u=>u.email===email&&u.password===pass);
     if(!user){setErrors({pass:"Incorrect email or password"});setLoading(false);return;}
@@ -651,7 +804,7 @@ const LoginScreen=({onLogin,onGoRegister})=>{
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,color:C.textDark}}>Welcome Back 👋</div>
         <div style={{fontSize:13,color:C.textLight,marginTop:4}}>Sign in to continue your healing journey</div>
       </div>
-      {[{label:"Email",key:"email",type:"email",val:email,set:setEmail,ph:"you@email.com",err:errors.email},
+      {[{label:"Username / Email",key:"email",type:"email",val:email,set:setEmail,ph:"you@email.com",err:errors.email},
         {label:"Password",key:"pass",type:"password",val:pass,set:setPass,ph:"••••••••",err:errors.pass}
       ].map(f=>(
         <div key={f.key} style={{marginBottom:14}}>
@@ -683,39 +836,22 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
     if(pass!==confirm) e.confirm="Passwords don't match";
     if(!agreed) e.agreed="Please accept the terms";
     if(Object.keys(e).length){setErrors(e);return;}
-    setLoading(true);
-    const code=Math.floor(100000+Math.random()*900000).toString();
-    // Try Firebase first
-    if(window._fbReady&&fbSignUp){
-      try{
-        const cred=await fbSignUp(fbAuth,email,pass);
-        const uid=cred.user.uid;
-        const userData={name:name.trim(),email,dob,gender,trialStart:Date.now(),plan:"trial",silhouette:0};
-        if(fbDb&&fbRef&&fbSet) await fbSet(fbRef(fbDb,`users/${uid}`),userData);
-        setLoading(false);
-        onRegistered({email,code,name:name.trim(),uid});
-        return;
-      }catch(err){
-        if(err.code==="auth/email-already-in-use"){setErrors({email:"Already registered"});setLoading(false);return;}
-        // Fall through to localStorage
-      }
-    }
-    // localStorage fallback
-    await new Promise(r=>setTimeout(r,900));
+    setLoading(true); await new Promise(r=>setTimeout(r,900));
     const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
     if(users.find(u=>u.email===email)){setErrors({email:"Already registered"});setLoading(false);return;}
+    const code=Math.floor(100000+Math.random()*900000).toString();
     const newUser={name:name.trim(),email,password:pass,dob,gender,verified:false,verifyCode:code,trialStart:Date.now(),plan:"trial",silhouette:1};
     users.push(newUser); localStorage.setItem("p2c_users",JSON.stringify(users));
     setLoading(false); onRegistered({email,code,name:name.trim()});
   };
   if(showTerms) return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
-      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:19,fontWeight:800,color:C.textDark,marginBottom:14}}>Terms & Conditions</div>
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:19,fontWeight:800,color:C.textDark,marginBottom:14}}>Terms &amp; Conditions</div>
       <div className="glass" style={{borderRadius:16,padding:18,maxHeight:"52vh",overflowY:"auto",marginBottom:18,fontSize:13,lineHeight:1.7,color:C.textMid}}>
         <p><strong>1. Acceptance</strong><br/>By using Pain2Care, you agree to these Terms.</p><br/>
         <p><strong>2. Not Medical Advice</strong><br/>Pain2Care is a self-tracking tool only — not a medical device or diagnosis tool. Always consult a qualified healthcare provider.</p><br/>
         <p><strong>3. Privacy</strong><br/>Your health data is stored securely. We never sell your personal data to third parties.</p><br/>
-        <p><strong>4. Free Trial</strong><br/>A 5-day free trial is provided. After the trial, a subscription is required to continue using the app.</p><br/>
+        <p><strong>4. Free Trial</strong><br/>A 7-day free trial is provided. After the trial, a subscription is required to continue using the app.</p><br/>
         <p><strong>5. Community</strong><br/>The community chat is anonymous and supportive. Harmful or abusive content is not permitted.</p><br/>
         <p><strong>6. Limitation of Liability</strong><br/>Pain2Care is not liable for any decisions made based on app data.</p><br/>
         <p><strong>7. Changes</strong><br/>We may update these terms with notice via the app.</p>
@@ -724,7 +860,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
         <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${agreed?C.blue:"rgba(26,111,160,0.28)"}`,background:agreed?C.blue:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.2s"}}>
           {agreed&&<span style={{color:"#fff",fontSize:13,fontWeight:900}}>✓</span>}
         </div>
-        <span style={{fontSize:13,color:C.textMid,fontWeight:600}}>I agree to the Terms & Conditions</span>
+        <span style={{fontSize:13,color:C.textMid,fontWeight:600}}>I agree to the Terms &amp; Conditions</span>
       </div>
       <button className="btn-blue" onClick={()=>setShowTerms(false)} disabled={!agreed}>Continue →</button>
     </div>
@@ -733,7 +869,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
     <div style={{animation:"fadeIn 0.5s ease both"}}>
       <div style={{marginBottom:18}}>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Create Account</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>Start your free 5-day trial</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>Start your free 7-day trial</div>
       </div>
       {[{label:"Full Name",key:"name",val:name,set:setName,type:"text",ph:"Your full name",err:errors.name},
         {label:"Email",key:"email",val:email,set:setEmail,type:"email",ph:"you@email.com",err:errors.email},
@@ -769,7 +905,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
         <div style={{width:20,height:20,borderRadius:5,border:`2px solid ${agreed?C.blue:"rgba(26,111,160,0.28)"}`,background:agreed?C.blue:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
           {agreed&&<span style={{color:"#fff",fontSize:11,fontWeight:900}}>✓</span>}
         </div>
-        <span style={{fontSize:12,color:C.textMid}}>I agree to the <span style={{color:C.blue,fontWeight:700}}>Terms & Conditions</span></span>
+        <span style={{fontSize:12,color:C.textMid}}>I agree to the <span style={{color:C.blue,fontWeight:700}}>Terms &amp; Conditions</span></span>
       </div>
       {errors.agreed&&<div style={{fontSize:11,color:C.red,marginBottom:10}}>⚠ {errors.agreed}</div>}
       <button className="btn-blue" onClick={doRegister} disabled={loading}>{loading?"Creating…":"Create Account →"}</button>
@@ -851,7 +987,7 @@ const WelcomeScreen=({user,onContinue})=>{
     <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
       <div style={{animation:"float 2s ease-in-out infinite"}}><Logo size={76}/></div>
       <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:26,fontWeight:800,color:C.blue,marginTop:18,textAlign:"center"}}>You're In! 🎉</div>
-      <div style={{fontSize:15,color:C.textMid,marginTop:10,textAlign:"center",lineHeight:1.7}}>Welcome, <strong>{user?.name}</strong>.<br/>Your 5-day free trial starts now.</div>
+      <div style={{fontSize:15,color:C.textMid,marginTop:10,textAlign:"center",lineHeight:1.7}}>Welcome, <strong>{user?.name}</strong>.<br/>Your 7-day free trial starts now.</div>
       <div style={{fontSize:13,color:C.textLight,marginTop:10}}>Taking you to your dashboard…</div>
       <div style={{marginTop:22,display:"flex",gap:6}}>
         {[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:i===0?C.blue:"rgba(26,111,160,0.2)",animation:`pulse 1.2s ease ${i*0.3}s infinite`}}/>)}
@@ -861,124 +997,15 @@ const WelcomeScreen=({user,onContinue})=>{
 };
 
 const PaywallScreen=({user,onSubscribe,onLogout})=>{
-  const [tier,setTier]=useState("normal");
-  const [billing,setBilling]=useState("monthly");
-  const [payStep,setPayStep]=useState("plans"); // plans | payment | processing | done
-  const [payMethod,setPayMethod]=useState(null);
-  const [cardNum,setCardNum]=useState(""); const [cardExp,setCardExp]=useState(""); const [cardCvv,setCardCvv]=useState("");
-  const [loading,setLoading]=useState(false);
-  const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
-
-  const PLANS={
-    normal:{
-      label:"Normal",color:C.blue,icon:"💙",
-      monthly:{price:"€3.99",id:"normal_monthly",perMonth:"€3.99/mo"},
-      annual:{price:"€39.90",id:"normal_annual",perMonth:"€3.33/mo",save:"Save 17%"},
-      features:["Unlimited pain check-ins","Body map with symptoms","Trends & history","Community chat","Trauma recovery exercises"],
-    },
-    premium:{
-      label:"Premium",color:C.purple,icon:"⭐",
-      monthly:{price:"€5.99",id:"premium_monthly",perMonth:"€5.99/mo"},
-      annual:{price:"€59.90",id:"premium_annual",perMonth:"€4.99/mo",save:"Save 17%"},
-      features:["Everything in Normal","AI health insights","Violence documentation","Secure photo storage","PDF health reports","Priority support"],
-    },
+  const [plan,setPlan]=useState("monthly"); const [loading,setLoading]=useState(false);
+  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
+  const doSub=async()=>{
+    setLoading(true); await new Promise(r=>setTimeout(r,1200));
+    const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
+    const idx=users.findIndex(u=>u.email===user.email);
+    if(idx>=0){users[idx].plan=plan;localStorage.setItem("p2c_users",JSON.stringify(users));}
+    onSubscribe(plan); setLoading(false);
   };
-
-  const PAY_METHODS=[
-    {id:"card",label:"Credit / Debit Card",icon:"💳"},
-    {id:"mobilepay",label:"MobilePay",icon:"📱"},
-    {id:"paypal",label:"PayPal",icon:"🅿️"},
-    {id:"applepay",label:"Apple Pay",icon:"🍎"},
-    {id:"googlepay",label:"Google Pay",icon:"🔵"},
-    {id:"klarna",label:"Klarna",icon:"🛍️"},
-    {id:"invoice",label:"Invoice / Bank Transfer",icon:"🏦"},
-  ];
-
-  const selectedPlan=PLANS[tier][billing];
-  const planId=selectedPlan.id;
-
-  const doSubscribe=async()=>{
-    setPayStep("processing");
-    await new Promise(r=>setTimeout(r,1800));
-    // Save plan
-    try{
-      const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
-      const idx=users.findIndex(u=>u.email===user?.email);
-      if(idx>=0){users[idx].plan=planId;localStorage.setItem("p2c_users",JSON.stringify(users));}
-    }catch(e){}
-    setPayStep("done");
-    setTimeout(()=>onSubscribe(planId),1200);
-  };
-
-  if(payStep==="processing") return(
-    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:18,padding:"0 24px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
-      <div style={{width:56,height:56,border:"4px solid rgba(26,111,160,0.15)",borderTop:`4px solid ${C.blue}`,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
-      <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:20,color:C.textDark}}>Processing…</div>
-      <div style={{fontSize:13,color:C.textLight}}>Securing your subscription</div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
-  );
-
-  if(payStep==="done") return(
-    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:14,padding:"0 24px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
-      <div style={{fontSize:62}}>🎉</div>
-      <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:C.green}}>Welcome!</div>
-      <div style={{fontSize:14,color:C.textMid,textAlign:"center",lineHeight:1.7}}>Your <strong>{PLANS[tier].label}</strong> subscription is active.<br/>Enjoy full access to Pain2Care!</div>
-    </div>
-  );
-
-  if(payStep==="payment") return(
-    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
-      <div style={{display:"flex",alignItems:"center",gap:12,padding:"max(18px,env(safe-area-inset-top)) 0 18px"}}>
-        <button onClick={()=>setPayStep("plans")} style={{background:"rgba(255,255,255,0.6)",border:"1px solid rgba(26,111,160,0.15)",borderRadius:12,padding:"7px 12px",fontSize:14,cursor:"pointer",color:C.textMid}}>← Back</button>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>Payment</div>
-      </div>
-
-      {/* Order summary */}
-      <div className="glass" style={{borderRadius:16,padding:"14px 16px",marginBottom:20}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div>
-            <div style={{fontWeight:800,fontSize:14,color:C.textDark}}>{PLANS[tier].icon} {PLANS[tier].label} {billing==="monthly"?"Monthly":"Annual"}</div>
-            <div style={{fontSize:12,color:C.textLight,marginTop:2}}>{selectedPlan.perMonth} · Cancel anytime</div>
-          </div>
-          <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:tier==="premium"?C.purple:C.blue}}>{selectedPlan.price}</div>
-        </div>
-      </div>
-
-      {/* Payment methods */}
-      <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:10}}>Choose Payment Method</div>
-      <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:20}}>
-        {PAY_METHODS.map(m=>(
-          <div key={m.id} onClick={()=>setPayMethod(m.id)}
-            style={{padding:"13px 16px",borderRadius:14,border:`2px solid ${payMethod===m.id?(tier==="premium"?C.purple:C.blue):"rgba(26,111,160,0.15)"}`,background:payMethod===m.id?"rgba(26,111,160,0.06)":"rgba(255,255,255,0.55)",cursor:"pointer",display:"flex",alignItems:"center",gap:12,transition:"all 0.15s"}}>
-            <span style={{fontSize:20}}>{m.icon}</span>
-            <span style={{fontWeight:700,fontSize:14,color:C.textDark}}>{m.label}</span>
-            {payMethod===m.id&&<span style={{marginLeft:"auto",color:tier==="premium"?C.purple:C.blue,fontWeight:900}}>✓</span>}
-          </div>
-        ))}
-      </div>
-
-      {/* Card fields if card selected */}
-      {payMethod==="card"&&(
-        <div className="glass" style={{borderRadius:16,padding:16,marginBottom:20}}>
-          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:12}}>Card Details</div>
-          <input className="field" placeholder="Card number" value={cardNum} onChange={e=>setCardNum(e.target.value)} style={{marginBottom:10}}/>
-          <div style={{display:"flex",gap:10}}>
-            <input className="field" placeholder="MM/YY" value={cardExp} onChange={e=>setCardExp(e.target.value)} style={{flex:1}}/>
-            <input className="field" placeholder="CVV" value={cardCvv} onChange={e=>setCardCvv(e.target.value)} style={{flex:1}}/>
-          </div>
-        </div>
-      )}
-
-      <button className="btn-blue" onClick={doSubscribe} disabled={!payMethod}
-        style={{background:tier==="premium"?`linear-gradient(135deg,${C.purple},#9b5cd4)`:`linear-gradient(135deg,${C.blue},#2296c4)`,animation:"glow 2.5s ease-in-out infinite"}}>
-        Pay {selectedPlan.price} →
-      </button>
-      <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginTop:10}}>🔒 Secure & encrypted · Cancel anytime</div>
-    </div>
-  );
-
-  // Plans page
   return(
     <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 0 0"}}>
@@ -987,91 +1014,56 @@ const PaywallScreen=({user,onSubscribe,onLogout})=>{
         </div>
         <button onClick={onLogout} style={{fontSize:11,fontWeight:700,color:C.textLight,background:"rgba(255,255,255,0.5)",border:"1px solid rgba(26,111,160,0.2)",borderRadius:18,padding:"5px 11px",cursor:"pointer"}}>Log Out</button>
       </div>
-
-      <div style={{textAlign:"center",padding:"20px 0 12px"}}>
-        <div style={{fontSize:40}}>✨</div>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:23,fontWeight:800,color:C.textDark,marginTop:8}}>Choose Your Plan</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:5}}>Start healing with full access</div>
+      <div style={{textAlign:"center",padding:"24px 0 14px"}}>
+        <div style={{fontSize:44}}>✨</div>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:24,fontWeight:800,color:C.textDark,marginTop:8}}>Unlock Full Access</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:6,lineHeight:1.6}}>Continue your healing journey.</div>
       </div>
-
-      {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"11px 15px",marginBottom:14,display:"flex",alignItems:"center",gap:12,border:"1px solid rgba(244,162,97,0.3)"}}>
+      {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
         <span style={{fontSize:18}}>⏳</span>
-        <div><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} day{daysLeft!==1?"s":""} left in free trial</div>
-        <div style={{fontSize:11,color:C.textLight}}>Subscribe before it ends</div></div>
+        <div><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} Days Left in Free Trial</div>
+        <div style={{fontSize:11,color:C.textLight}}>Your trial ends soon</div></div>
       </div>}
-
-      {/* Monthly / Annual toggle */}
-      <div className="glass" style={{borderRadius:50,padding:4,display:"flex",gap:4,marginBottom:16}}>
-        {[{id:"monthly",label:"Monthly"},{id:"annual",label:"Annual · Save 17%"}].map(b=>(
-          <button key={b.id} onClick={()=>setBilling(b.id)}
-            style={{flex:1,padding:"9px",borderRadius:46,border:"none",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:12,cursor:"pointer",background:billing===b.id?"rgba(26,111,160,0.85)":"transparent",color:billing===b.id?"#fff":"#6b95ad",transition:"all 0.2s"}}>
-            {b.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Plan cards */}
-      {Object.entries(PLANS).map(([id,p])=>{
-        const pricing=p[billing];
-        const selected=tier===id;
-        return(
-          <div key={id} onClick={()=>setTier(id)}
-            style={{borderRadius:20,padding:18,marginBottom:12,border:`2.5px solid ${selected?p.color:"rgba(26,111,160,0.13)"}`,background:selected?`${p.color}0d`:"rgba(255,255,255,0.5)",cursor:"pointer",transition:"all 0.2s",position:"relative"}}>
-            {id==="premium"&&<div style={{position:"absolute",top:-10,right:14,background:`linear-gradient(135deg,${C.purple},#9b5cd4)`,color:"#fff",fontSize:10,fontWeight:800,padding:"3px 10px",borderRadius:18}}>BEST VALUE</div>}
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
-              <div>
-                <div style={{display:"flex",alignItems:"center",gap:7}}>
-                  <span style={{fontSize:20}}>{p.icon}</span>
-                  <span style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:18,color:p.color}}>{p.label}</span>
-                  {selected&&<div style={{width:18,height:18,borderRadius:"50%",background:p.color,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{color:"#fff",fontSize:10,fontWeight:900}}>✓</span></div>}
-                </div>
-                <div style={{fontSize:11,color:C.textLight,marginTop:3}}>{pricing.perMonth}{billing==="annual"&&<span style={{color:C.green,fontWeight:700,marginLeft:6}}>{pricing.save}</span>}</div>
-              </div>
-              <div style={{textAlign:"right"}}>
-                <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:26,color:p.color}}>{pricing.price}</div>
-                <div style={{fontSize:10,color:C.textLight}}>{billing==="monthly"?"per month":"per year"}</div>
-              </div>
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:5}}>
-              {p.features.map(f=>(
-                <div key={f} style={{display:"flex",alignItems:"center",gap:8}}>
-                  <div style={{width:14,height:14,borderRadius:"50%",background:`${p.color}22`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-                    <span style={{color:p.color,fontSize:9,fontWeight:900}}>✓</span>
-                  </div>
-                  <span style={{fontSize:12,color:C.textMid}}>{f}</span>
-                </div>
-              ))}
+      <div style={{marginBottom:18}}>
+        {[["✅","Unlimited check-ins"],["📈","Trends & AI insights"],["🩺","Pain body heat map"],["💬","Community chat"],["📸","Secure documentation"],["📄","PDF health reports"]].map(([icon,text])=>(
+          <div key={text} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 0",borderBottom:"1px solid rgba(26,111,160,0.08)"}}>
+            <span style={{fontSize:15}}>{icon}</span>
+            <span style={{fontSize:13,fontWeight:600,color:C.textMid}}>{text}</span>
+            <div style={{marginLeft:"auto",width:17,height:17,borderRadius:"50%",background:C.green,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{color:"#fff",fontSize:10,fontWeight:900}}>✓</span>
             </div>
           </div>
-        );
-      })}
-
-      <button onClick={()=>setPayStep("payment")}
-        style={{width:"100%",padding:"16px",borderRadius:50,border:"none",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:15,cursor:"pointer",color:"#fff",background:tier==="premium"?`linear-gradient(135deg,${C.purple},#9b5cd4)`:`linear-gradient(135deg,${C.blue},#2296c4)`,boxShadow:`0 4px 18px ${tier==="premium"?"rgba(123,63,158,0.35)":"rgba(26,111,160,0.32)"}`,animation:"glow 2.5s ease-in-out infinite",marginBottom:10}}>
-        Continue with {PLANS[tier].label} {PLANS[tier][billing].price} →
-      </button>
-      <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginBottom:10}}>🔒 Secure payment · Cancel anytime · No hidden fees</div>
-      <div style={{display:"flex",justifyContent:"center",gap:8,flexWrap:"wrap",marginBottom:10}}>
-        {["💳","📱","🅿️","🍎","🔵","🛍️","🏦"].map((icon,i)=>(
-          <span key={i} style={{fontSize:20,opacity:0.7}}>{icon}</span>
         ))}
       </div>
-      {daysLeft>0&&<div style={{textAlign:"center",marginTop:8}}><span onClick={()=>onSubscribe("trial")} style={{fontSize:12,color:C.textLight,cursor:"pointer",textDecoration:"underline"}}>Continue free trial ({daysLeft} days left)</span></div>}
+      <div className="glass" style={{borderRadius:15,padding:5,display:"flex",gap:5,marginBottom:18}}>
+        {[{id:"monthly",label:"Monthly",price:"€4.99",sub:"/month"},{id:"annual",label:"Annual",price:"€49.99",sub:"/year · Save 17%"}].map(p=>(
+          <div key={p.id} onClick={()=>setPlan(p.id)}
+            style={{flex:1,padding:"13px 8px",borderRadius:11,textAlign:"center",cursor:"pointer",background:plan===p.id?"rgba(26,111,160,0.88)":"transparent",transition:"all 0.2s"}}>
+            <div style={{fontWeight:800,fontSize:12,color:plan===p.id?"#fff":C.textMid}}>{p.label}</div>
+            <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:plan===p.id?"#fff":C.textDark,marginTop:2}}>{p.price}</div>
+            <div style={{fontSize:10,color:plan===p.id?"rgba(255,255,255,0.7)":C.textLight,marginTop:2}}>{p.sub}</div>
+          </div>
+        ))}
+      </div>
+      <button className="btn-blue" onClick={doSub} disabled={loading} style={{animation:"glow 2.5s ease-in-out infinite"}}>
+        {loading?"Processing…":`Subscribe ${plan==="monthly"?"€4.99/mo":"€49.99/yr"} →`}
+      </button>
+      <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginTop:10}}>Cancel anytime · No hidden fees</div>
+      {daysLeft>0&&<div style={{textAlign:"center",marginTop:11}}><span onClick={()=>onSubscribe("trial")} style={{fontSize:12,color:C.textLight,cursor:"pointer",textDecoration:"underline"}}>Continue free trial ({daysLeft} days left)</span></div>}
     </div>
   );
 };
 
 /* ══ HOME TAB ══ */
 const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
-  const T=getLang(user);
-  const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
-  const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
+  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
+  const isPaid=user?.plan==="monthly"||user?.plan==="annual";
   const affIdx=Math.floor(Date.now()/86400000)%AFFIRMATIONS.length;
   const modules=[
-    {id:"pain",icon:"🩺",title:T.painModule,sub:T.chronicPain,color:C.red,border:"rgba(230,57,70,0.2)"},
-    {id:"violence",icon:"📸",title:T.violenceReport,sub:T.documentation,color:C.purple,border:"rgba(123,63,158,0.2)"},
-    {id:"community",icon:"💬",title:T.communityChat,sub:T.anonymous,color:C.teal,border:"rgba(26,140,122,0.2)"},
-    {id:"trauma",icon:"🧠",title:T.traumaRecovery,sub:T.selfGuided,color:C.blue,border:"rgba(26,111,160,0.2)"},
+    {id:"pain",icon:"🩺",title:"Pain Module",sub:"Chronic Pain",color:C.red,border:"rgba(230,57,70,0.2)"},
+    {id:"violence",icon:"📸",title:"Violence Report",sub:"Documentation",color:C.purple,border:"rgba(123,63,158,0.2)"},
+    {id:"community",icon:"💬",title:"Community Chat",sub:"Anonymous",color:C.teal,border:"rgba(26,140,122,0.2)"},
+    {id:"trauma",icon:"🧠",title:"Trauma Recovery",sub:"Self-Guided",color:C.blue,border:"rgba(26,111,160,0.2)"},
   ];
   return(
     <div style={{padding:"10px 0",animation:"fadeIn 0.4s ease both"}}>
@@ -1084,16 +1076,16 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
         </div>
       )}
       <div style={{padding:"0 22px",marginBottom:18}}>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>{T.hello}, {user?.name?.split(" ")[0]||"Friend"} 👋</div>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Hello, {user?.name?.split(" ")[0]||"Friend"} 👋</div>
         <div style={{fontSize:13,color:C.textLight,marginTop:3}}>How are you feeling today?</div>
       </div>
       <div className="glass" style={{margin:"0 18px 18px",borderRadius:17,padding:18,background:"rgba(26,111,160,0.07)",border:"1px solid rgba(26,111,160,0.15)"}}>
-        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>{T.todayReminder} 💙</div>
+        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Today's Reminder 💙</div>
         <div style={{fontSize:14,fontStyle:"italic",lineHeight:1.65,color:C.textMid}}>"{AFFIRMATIONS[affIdx]}"</div>
       </div>
       {history.length>0&&(
         <div style={{display:"flex",gap:10,padding:"0 18px",marginBottom:18,overflowX:"auto"}}>
-          {[{label:T.lastPain,value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:T.avgPain,value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.gold},{label:T.checkIns,value:history.length,color:C.green}].map(s=>(
+          {[{label:"Last Pain",value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Check-Ins",value:history.length,color:C.green}].map(s=>(
             <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 14px",flexShrink:0,minWidth:85}}>
               <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
               <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:21,color:s.color}}>{s.value}</div>
@@ -1113,22 +1105,13 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
             </div>
           ))}
         </div>
-        {history.length>0&&(
-          <div onClick={()=>onModuleSelect("trends")} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderRadius:16,background:"rgba(26,111,160,0.07)",border:"1px solid rgba(26,111,160,0.15)",cursor:"pointer",marginBottom:4}}>
-            <span style={{fontSize:26}}>📈</span>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:800,fontSize:13,color:C.blue}}>Pain History & Trends</div>
-              <div style={{fontSize:11,color:C.textLight,marginTop:2}}>{history.length} check-in{history.length!==1?"s":""} · tap to view your journey</div>
-            </div>
-            <span style={{color:C.blue,fontSize:16}}>›</span>
-          </div>
-        )}
       </div>
     </div>
   );
 };
 
 /* ══ PAIN MODULE ══ */
+
 const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
   const T=getLang(user);
   const [painTab,setPainTab]=useState("track"); // track | trends
@@ -1141,14 +1124,13 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
   const [isListening,setIsListening]=useState(false);
   const [voiceStatus,setVoiceStatus]=useState("");
   const [side,setSide]=useState("front");
-  const [popup,setPopup]=useState(null); // area object
   const recRef=useRef(null);
+  const activeAreaCount=Object.keys(areaSymptoms).filter(k=>areaSymptoms[k]&&areaSymptoms[k].maxIntensity>0).length;
   const bodyType=["slim","normal","large"][[1,2,3].indexOf(user?.silhouette||2)]||"normal";
   const painColor=painLevel<=3?C.green:painLevel<=6?C.gold:C.red;
   const painLabel=["None","Minimal","Minimal","Mild","Mild","Moderate","Moderate","Severe","Severe","Intense","Intense"][painLevel];
   const checkedCount=Object.values(traumaChecks).filter(Boolean).length;
   const selMood=MOODS.find(m=>m.value===mood);
-  const activeAreaCount=Object.keys(areaSymptoms).filter(k=>areaSymptoms[k]&&areaSymptoms[k].symptoms?.length>0).length;
 
   const startVoice=()=>{
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -1171,7 +1153,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
 
   const handleSubmit=()=>{
     const score=Math.min(30,Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3));
-    const areas=Object.entries(areaSymptoms).map(([id,data])=>({id,...data}));
+    const areas=Object.entries(areaSymptoms).filter(([,d])=>d?.maxIntensity>0).map(([id,data])=>({id,...data}));
     setHistory(prev=>[...prev.slice(-13),{id:Date.now(),date:new Date().toLocaleDateString("en-US",{weekday:"short"}),fullDate:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),painLevel,mood,checkedCount,areas,notes,score}]);
     setScreen("results");
   };
@@ -1180,7 +1162,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
   if(screen==="results"){
     const score=Math.min(30,Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3));
     const sc=score>=20?C.green:score>=12?C.gold:C.red;
-    const activeAreas=Object.entries(areaSymptoms).filter(([,v])=>v?.symptoms?.length>0);
+    const activeAreas=Object.entries(areaSymptoms).filter(([,v])=>v?.maxIntensity>0);
     return(
       <div style={{animation:"scaleIn 0.35s ease both"}}>
         <SectionTitle icon="✅" title="Today's Report" sub="Here's how you showed up today"/>
@@ -1202,13 +1184,25 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
           <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:12}}>🗺️ Pain Areas</div>
           {activeAreas.map(([id,data])=>{
             const areaInfo=[...FRONT_AREAS,...BACK_AREAS].find(a=>a.id===id);
+            const maxI=data.maxIntensity||0;
+            const col=maxI>=7?C.red:maxI>=4?C.gold:C.green;
+            const painAreas=Object.entries(data.subareas||{}).filter(([,v])=>v>0).map(([n,v])=>`${n} (${v}/10)`).join(', ');
             return(
-              <div key={id} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderBottom:"1px solid rgba(26,111,160,0.08)"}}>
-                <div style={{display:"flex",gap:4}}>
-                  {data.symptoms.map(s=>{const st=SYMPTOM_TYPES.find(t=>t.id===s.type);return<div key={s.type} style={{width:10,height:10,borderRadius:"50%",background:st?.color||"#e63946"}}/>;}) }
+              <div key={id} style={{padding:"10px 0",borderBottom:"1px solid rgba(26,111,160,0.08)"}}>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:3}}>
+                  <span style={{flex:1,fontSize:13,color:C.textMid,fontWeight:700}}>{data.label||areaInfo?.label||id}</span>
+                  <span style={{fontSize:12,fontWeight:800,color:col}}>{maxI}/10</span>
                 </div>
-                <span style={{flex:1,fontSize:13,color:C.textMid,fontWeight:600}}>{areaInfo?.label||id}</span>
-                <span style={{fontSize:12,fontWeight:800,color:painColor}}>{data.intensity}/10</span>
+                {painAreas&&<div style={{fontSize:11,color:C.textLight,lineHeight:1.5}}>📍 {painAreas}</div>}
+                <div style={{display:'flex',gap:6,marginTop:4,flexWrap:'wrap'}}>
+                  {[['Swelling',data.hasSwelling],['Numbness',data.hasNumbness]].map(([lbl,val])=>(
+                    <span key={lbl} style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:50,
+                      background:val?'rgba(25,118,210,0.12)':'rgba(107,149,173,0.08)',
+                      color:val?'#1565c0':'#90a4ae'}}>
+                      {lbl}: {val?'Yes':'No'}
+                    </span>
+                  ))}
+                </div>
               </div>
             );
           })}
@@ -1223,7 +1217,6 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
 
   return(
     <div>
-      {popup&&<AreaPopup area={popup} current={areaSymptoms[popup.id]} onSave={handleAreaSave} onClose={()=>setPopup(null)}/>}
       <SectionTitle icon="🩺" title="Pain Module" sub="Track & visualise your pain" onBack={onBack}/>
 
       {/* Tab bar */}
@@ -1277,13 +1270,32 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
                 <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:13}}>🗂 Check-In Log</div>
                 {[...history].reverse().map((entry,i)=>{
                   const sc=entry.score>=20?C.green:entry.score>=12?C.gold:C.red;
+                  const activeAreas=(entry.areas||[]).filter(a=>a.maxIntensity>0);
                   return(
-                    <div key={entry.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 0",borderBottom:i<history.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
-                      <div>
-                        <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{entry.fullDate}</div>
-                        <div style={{fontSize:11,color:C.textLight,marginTop:2}}>Pain {entry.painLevel}/10 · {MOODS.find(m=>m.value===entry.mood)?.emoji||"—"} · {entry.checkedCount} checks</div>
+                    <div key={entry.id} style={{padding:"11px 0",borderBottom:i<history.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
+                      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:activeAreas.length>0?6:0}}>
+                        <div>
+                          <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{entry.fullDate}</div>
+                          <div style={{fontSize:11,color:C.textLight,marginTop:2}}>Pain {entry.painLevel}/10 · {MOODS.find(m=>m.value===entry.mood)?.emoji||"—"} · {entry.checkedCount} checks</div>
+                        </div>
+                        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:sc}}>{entry.score}</div>
                       </div>
-                      <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:sc}}>{entry.score}</div>
+                      {activeAreas.length>0&&(
+                        <div style={{display:"flex",flexDirection:"column",gap:3,paddingLeft:4,borderLeft:`3px solid ${sc}`}}>
+                          {activeAreas.map(a=>{
+                            const painAreas=Object.entries(a.subareas||{}).filter(([,v])=>v>0).map(([n,v])=>`${n} (${v}/10)`).join(', ');
+                            const col=a.maxIntensity>=7?C.red:a.maxIntensity>=4?C.gold:'#b37a00';
+                            return(
+                              <div key={a.id} style={{paddingLeft:8}}>
+                                <span style={{fontSize:12,fontWeight:700,color:C.textMid}}>{a.label}</span>
+                                <span style={{fontSize:11,fontWeight:800,color:col,marginLeft:6}}>{a.maxIntensity}/10</span>
+                                {(a.hasSwelling||a.hasNumbness)&&<span style={{fontSize:10,color:C.blue,marginLeft:6}}>{a.hasSwelling?"Swelling":""}{a.hasSwelling&&a.hasNumbness?" · ":""}{a.hasNumbness?"Numbness":""}</span>}
+                                {painAreas&&<div style={{fontSize:10,color:C.textLight,marginTop:1}}>📍 {painAreas}</div>}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -1307,14 +1319,13 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack})=>{
 
       <GCard>
         <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:3}}>🗺️ Pain Body Map</div>
-        <div style={{fontSize:12,color:C.textLight,marginBottom:4}}>Tap any area to log symptoms. Rotate to see front or back.</div>
+        <div style={{fontSize:12,color:C.textLight,marginBottom:4}}>Tap any area to log symptoms and intensity.</div>
         {activeAreaCount>0&&<div style={{fontSize:12,fontWeight:700,color:C.red,marginBottom:12}}>{activeAreaCount} area{activeAreaCount!==1?"s":""} logged</div>}
-        <BodyMap
+        <BodyMapV2
+          user={user}
           bodyType={bodyType}
           areaSymptoms={areaSymptoms}
-          onAreaTap={area=>setPopup(area)}
-          side={side}
-          onFlip={setSide}
+          onSave={setAreaSymptoms}
         />
       </GCard>
       <GCard>
@@ -2162,13 +2173,33 @@ const TrendsTab=({history,onBack})=>{
       </GCard>
       <GCard>
         <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:13}}>🗂 Check-In Log</div>
-        {[...history].reverse().map((entry,i)=>{const sc=entry.score>=20?C.green:entry.score>=12?C.gold:C.red;return(
-          <div key={entry.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 0",borderBottom:i<history.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
-            <div>
-              <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{entry.fullDate}</div>
-              <div style={{fontSize:11,color:C.textLight,marginTop:2}}>Pain {entry.painLevel}/10 · {MOODS.find(m=>m.value===entry.mood)?.emoji||"—"} · {entry.checkedCount} checks</div>
+        {[...history].reverse().map((entry,i)=>{const sc=entry.score>=20?C.green:entry.score>=12?C.gold:C.red;
+          const activeAreas=(entry.areas||[]).filter(a=>a.maxIntensity>0);
+          return(
+          <div key={entry.id} style={{padding:"11px 0",borderBottom:i<history.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:activeAreas.length>0?6:0}}>
+              <div>
+                <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{entry.fullDate}</div>
+                <div style={{fontSize:11,color:C.textLight,marginTop:2}}>Pain {entry.painLevel}/10 · {MOODS.find(m=>m.value===entry.mood)?.emoji||"—"} · {entry.checkedCount} checks</div>
+              </div>
+              <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:sc}}>{entry.score}</div>
             </div>
-            <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:sc}}>{entry.score}</div>
+            {activeAreas.length>0&&(
+              <div style={{display:"flex",flexDirection:"column",gap:3,paddingLeft:4,borderLeft:`3px solid ${sc}`}}>
+                {activeAreas.map(a=>{
+                  const painAreas=Object.entries(a.subareas||{}).filter(([,v])=>v>0).map(([n,v])=>`${n} (${v}/10)`).join(', ');
+                  const col=a.maxIntensity>=7?C.red:a.maxIntensity>=4?C.gold:'#b37a00';
+                  return(
+                    <div key={a.id} style={{paddingLeft:8}}>
+                      <span style={{fontSize:12,fontWeight:700,color:C.textMid}}>{a.label}</span>
+                      <span style={{fontSize:11,fontWeight:800,color:col,marginLeft:6}}>{a.maxIntensity}/10</span>
+                      {(a.hasSwelling||a.hasNumbness)&&<span style={{fontSize:10,color:C.blue,marginLeft:6}}>{a.hasSwelling?"Swelling":""}{a.hasSwelling&&a.hasNumbness?" · ":""}{a.hasNumbness?"Numbness":""}</span>}
+                      {painAreas&&<div style={{fontSize:10,color:C.textLight,marginTop:1}}>📍 {painAreas}</div>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         );})}
       </GCard>
