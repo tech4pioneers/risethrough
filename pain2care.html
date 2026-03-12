@@ -351,260 +351,253 @@ const saveCustomV2 = (obj) => { try { localStorage.setItem(CUSTOM_KEY_V2, JSON.s
 
 // ── PEACH FIGURE SVG PARTS ───────────────────────────────────
 // Front-facing figure
-const FigureFront = ({ areas, areaSymptoms, onAreaClick }) => {
-  const getColor = (id) => {
-    const d = areaSymptoms[id];
-    if (!d || !d.maxIntensity) return '#F5CBA7';
-    if (d.maxIntensity >= 7) return '#e63946';
-    if (d.maxIntensity >= 4) return '#e65100';
-    return '#f9a825';
-  };
-  const getStroke = (id) => {
-    const d = areaSymptoms[id];
-    if (!d || !d.maxIntensity) return '#e8a87c';
-    if (d.maxIntensity >= 7) return '#b71c1c';
-    if (d.maxIntensity >= 4) return '#bf360c';
-    return '#e65100';
-  };
+// ── SHARED COLOR HELPERS ─────────────────────────────────────
+const mkColor = (areaSymptoms) => (id) => {
+  const d = areaSymptoms[id];
+  if (!d || !d.maxIntensity) return '#F5CBA7';
+  if (d.maxIntensity >= 7) return '#e63946';
+  if (d.maxIntensity >= 4) return '#e65100';
+  return '#f9a825';
+};
+const mkStroke = (areaSymptoms) => (id) => {
+  const d = areaSymptoms[id];
+  if (!d || !d.maxIntensity) return '#d4956a';
+  if (d.maxIntensity >= 7) return '#b71c1c';
+  if (d.maxIntensity >= 4) return '#bf360c';
+  return '#e65100';
+};
+
+// ── FRONT FIGURE ─────────────────────────────────────────────
+const FigureFront = ({ areaSymptoms, onAreaClick }) => {
+  const gc = mkColor(areaSymptoms);
+  const gs = mkStroke(areaSymptoms);
+  const sw = 1.5;
   const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
   return (
-    <svg viewBox="0 0 120 280" width="100%" style={{maxWidth:180,display:'block',margin:'0 auto'}}>
-      {/* Head */}
-      <ellipse cx="60" cy="22" rx="18" ry="20" fill={getColor('forehead')} stroke={getStroke('forehead')} strokeWidth="1.5" {...hit('forehead')}/>
+    <svg viewBox="0 0 160 340" width="100%" style={{maxWidth:200,display:'block',margin:'0 auto'}}>
+      {/* HEAD */}
+      <ellipse cx="80" cy="26" rx="22" ry="24" fill={gc('forehead')} stroke={gs('forehead')} strokeWidth={sw} {...hit('forehead')}/>
       {/* Face details */}
-      <circle cx="54" cy="20" r="2.5" fill="#c0846a" opacity="0.6"/>
-      <circle cx="66" cy="20" r="2.5" fill="#c0846a" opacity="0.6"/>
-      <path d="M54,28 Q60,32 66,28" fill="none" stroke="#c0846a" strokeWidth="1.5" strokeLinecap="round"/>
-      {/* Neck */}
-      <rect x="54" y="40" width="12" height="12" rx="4" fill={getColor('neck_f')} stroke={getStroke('neck_f')} strokeWidth="1.5" {...hit('neck_f')}/>
-      {/* Torso */}
-      <rect x="36" y="52" width="48" height="52" rx="10" fill={getColor('chest')} stroke={getStroke('chest')} strokeWidth="1.5" {...hit('chest')}/>
-      {/* Abdomen */}
-      <rect x="38" y="100" width="44" height="36" rx="8" fill={getColor('abdomen')} stroke={getStroke('abdomen')} strokeWidth="1.5" {...hit('abdomen')}/>
-      {/* Pelvis */}
-      <rect x="36" y="132" width="48" height="22" rx="8" fill={getColor('pelvis')} stroke={getStroke('pelvis')} strokeWidth="1.5" {...hit('pelvis')}/>
-      {/* Left shoulder (viewer's right = patient's left) */}
-      <ellipse cx="30" cy="62" rx="10" ry="10" fill={getColor('lshoulder')} stroke={getStroke('lshoulder')} strokeWidth="1.5" {...hit('lshoulder')}/>
-      {/* Right shoulder */}
-      <ellipse cx="90" cy="62" rx="10" ry="10" fill={getColor('rshoulder')} stroke={getStroke('rshoulder')} strokeWidth="1.5" {...hit('rshoulder')}/>
-      {/* Left upper arm */}
-      <rect x="20" y="70" width="14" height="36" rx="7" fill={getColor('luparm')} stroke={getStroke('luparm')} strokeWidth="1.5" {...hit('luparm')}/>
-      {/* Right upper arm */}
-      <rect x="86" y="70" width="14" height="36" rx="7" fill={getColor('ruparm')} stroke={getStroke('ruparm')} strokeWidth="1.5" {...hit('ruparm')}/>
-      {/* Left elbow */}
-      <ellipse cx="27" cy="108" rx="8" ry="7" fill={getColor('lelbow')} stroke={getStroke('lelbow')} strokeWidth="1.5" {...hit('lelbow')}/>
-      {/* Right elbow */}
-      <ellipse cx="93" cy="108" rx="8" ry="7" fill={getColor('relbow')} stroke={getStroke('relbow')} strokeWidth="1.5" {...hit('relbow')}/>
-      {/* Left forearm */}
-      <rect x="20" y="113" width="14" height="30" rx="7" fill={getColor('lfarm')} stroke={getStroke('lfarm')} strokeWidth="1.5" {...hit('lfarm')}/>
-      {/* Right forearm */}
-      <rect x="86" y="113" width="14" height="30" rx="7" fill={getColor('rfarm')} stroke={getStroke('rfarm')} strokeWidth="1.5" {...hit('rfarm')}/>
-      {/* Left wrist/hand */}
-      <ellipse cx="27" cy="150" rx="9" ry="8" fill={getColor('lwrist')} stroke={getStroke('lwrist')} strokeWidth="1.5" {...hit('lwrist')}/>
-      {/* Right wrist/hand */}
-      <ellipse cx="93" cy="150" rx="9" ry="8" fill={getColor('rwrist')} stroke={getStroke('rwrist')} strokeWidth="1.5" {...hit('rwrist')}/>
-      {/* Left hip */}
-      <ellipse cx="42" cy="158" rx="10" ry="8" fill={getColor('lhip')} stroke={getStroke('lhip')} strokeWidth="1.5" {...hit('lhip')}/>
-      {/* Right hip */}
-      <ellipse cx="78" cy="158" rx="10" ry="8" fill={getColor('rhip')} stroke={getStroke('rhip')} strokeWidth="1.5" {...hit('rhip')}/>
-      {/* Left thigh */}
-      <rect x="34" y="163" width="18" height="38" rx="9" fill={getColor('lthigh')} stroke={getStroke('lthigh')} strokeWidth="1.5" {...hit('lthigh')}/>
-      {/* Right thigh */}
-      <rect x="68" y="163" width="18" height="38" rx="9" fill={getColor('rthigh')} stroke={getStroke('rthigh')} strokeWidth="1.5" {...hit('rthigh')}/>
-      {/* Left knee */}
-      <ellipse cx="43" cy="203" rx="10" ry="8" fill={getColor('lknee')} stroke={getStroke('lknee')} strokeWidth="1.5" {...hit('lknee')}/>
-      {/* Right knee */}
-      <ellipse cx="77" cy="203" rx="10" ry="8" fill={getColor('rknee')} stroke={getStroke('rknee')} strokeWidth="1.5" {...hit('rknee')}/>
-      {/* Left shin */}
-      <rect x="34" y="209" width="17" height="34" rx="8" fill={getColor('lshin')} stroke={getStroke('lshin')} strokeWidth="1.5" {...hit('lshin')}/>
-      {/* Right shin */}
-      <rect x="69" y="209" width="17" height="34" rx="8" fill={getColor('rshin')} stroke={getStroke('rshin')} strokeWidth="1.5" {...hit('rshin')}/>
-      {/* Left ankle/foot */}
-      <ellipse cx="42" cy="248" rx="11" ry="8" fill={getColor('lankle')} stroke={getStroke('lankle')} strokeWidth="1.5" {...hit('lankle')}/>
-      {/* Right ankle/foot */}
-      <ellipse cx="78" cy="248" rx="11" ry="8" fill={getColor('rankle')} stroke={getStroke('rankle')} strokeWidth="1.5" {...hit('rankle')}/>
+      <circle cx="73" cy="24" r="3" fill="#c07850" opacity="0.6"/>
+      <circle cx="87" cy="24" r="3" fill="#c07850" opacity="0.6"/>
+      <path d="M73,33 Q80,38 87,33" fill="none" stroke="#c07850" strokeWidth="2" strokeLinecap="round"/>
+      {/* NECK */}
+      <rect x="72" y="48" width="16" height="14" rx="5" fill={gc('neck_f')} stroke={gs('neck_f')} strokeWidth={sw} {...hit('neck_f')}/>
+      {/* TORSO – chest */}
+      <rect x="50" y="62" width="60" height="58" rx="12" fill={gc('chest')} stroke={gs('chest')} strokeWidth={sw} {...hit('chest')}/>
+      {/* ABDOMEN */}
+      <rect x="52" y="116" width="56" height="38" rx="10" fill={gc('abdomen')} stroke={gs('abdomen')} strokeWidth={sw} {...hit('abdomen')}/>
+      {/* PELVIS */}
+      <rect x="50" y="150" width="60" height="26" rx="10" fill={gc('pelvis')} stroke={gs('pelvis')} strokeWidth={sw} {...hit('pelvis')}/>
+
+      {/* L SHOULDER (patient left = viewer right) */}
+      <ellipse cx="40" cy="74" rx="14" ry="14" fill={gc('lshoulder')} stroke={gs('lshoulder')} strokeWidth={sw} {...hit('lshoulder')}/>
+      {/* R SHOULDER */}
+      <ellipse cx="120" cy="74" rx="14" ry="14" fill={gc('rshoulder')} stroke={gs('rshoulder')} strokeWidth={sw} {...hit('rshoulder')}/>
+
+      {/* L UPPER ARM */}
+      <rect x="26" y="84" width="18" height="44" rx="9" fill={gc('luparm')} stroke={gs('luparm')} strokeWidth={sw} {...hit('luparm')}/>
+      {/* R UPPER ARM */}
+      <rect x="116" y="84" width="18" height="44" rx="9" fill={gc('ruparm')} stroke={gs('ruparm')} strokeWidth={sw} {...hit('ruparm')}/>
+
+      {/* L ELBOW */}
+      <ellipse cx="35" cy="132" rx="11" ry="10" fill={gc('lelbow')} stroke={gs('lelbow')} strokeWidth={sw} {...hit('lelbow')}/>
+      {/* R ELBOW */}
+      <ellipse cx="125" cy="132" rx="11" ry="10" fill={gc('relbow')} stroke={gs('relbow')} strokeWidth={sw} {...hit('relbow')}/>
+
+      {/* L FOREARM */}
+      <rect x="26" y="140" width="18" height="38" rx="9" fill={gc('lfarm')} stroke={gs('lfarm')} strokeWidth={sw} {...hit('lfarm')}/>
+      {/* R FOREARM */}
+      <rect x="116" y="140" width="18" height="38" rx="9" fill={gc('rfarm')} stroke={gs('rfarm')} strokeWidth={sw} {...hit('rfarm')}/>
+
+      {/* L WRIST/HAND */}
+      <ellipse cx="35" cy="184" rx="12" ry="10" fill={gc('lwrist')} stroke={gs('lwrist')} strokeWidth={sw} {...hit('lwrist')}/>
+      {/* R WRIST/HAND */}
+      <ellipse cx="125" cy="184" rx="12" ry="10" fill={gc('rwrist')} stroke={gs('rwrist')} strokeWidth={sw} {...hit('rwrist')}/>
+
+      {/* L HIP */}
+      <ellipse cx="58" cy="184" rx="12" ry="10" fill={gc('lhip')} stroke={gs('lhip')} strokeWidth={sw} {...hit('lhip')}/>
+      {/* R HIP */}
+      <ellipse cx="102" cy="184" rx="12" ry="10" fill={gc('rhip')} stroke={gs('rhip')} strokeWidth={sw} {...hit('rhip')}/>
+
+      {/* L THIGH */}
+      <rect x="46" y="192" width="24" height="48" rx="12" fill={gc('lthigh')} stroke={gs('lthigh')} strokeWidth={sw} {...hit('lthigh')}/>
+      {/* R THIGH */}
+      <rect x="90" y="192" width="24" height="48" rx="12" fill={gc('rthigh')} stroke={gs('rthigh')} strokeWidth={sw} {...hit('rthigh')}/>
+
+      {/* L KNEE */}
+      <ellipse cx="58" cy="244" rx="13" ry="11" fill={gc('lknee')} stroke={gs('lknee')} strokeWidth={sw} {...hit('lknee')}/>
+      {/* R KNEE */}
+      <ellipse cx="102" cy="244" rx="13" ry="11" fill={gc('rknee')} stroke={gs('rknee')} strokeWidth={sw} {...hit('rknee')}/>
+
+      {/* L SHIN */}
+      <rect x="46" y="253" width="24" height="44" rx="11" fill={gc('lshin')} stroke={gs('lshin')} strokeWidth={sw} {...hit('lshin')}/>
+      {/* R SHIN */}
+      <rect x="90" y="253" width="24" height="44" rx="11" fill={gc('rshin')} stroke={gs('rshin')} strokeWidth={sw} {...hit('rshin')}/>
+
+      {/* L ANKLE/FOOT */}
+      <ellipse cx="58" cy="302" rx="14" ry="9" fill={gc('lankle')} stroke={gs('lankle')} strokeWidth={sw} {...hit('lankle')}/>
+      {/* R ANKLE/FOOT */}
+      <ellipse cx="102" cy="302" rx="14" ry="9" fill={gc('rankle')} stroke={gs('rankle')} strokeWidth={sw} {...hit('rankle')}/>
     </svg>
   );
 };
 
-// Back-facing figure (patient's left = viewer's left from back)
+// ── BACK FIGURE ──────────────────────────────────────────────
 const FigureBack = ({ areaSymptoms, onAreaClick }) => {
-  const getColor = (id) => {
-    const d = areaSymptoms[id];
-    if (!d || !d.maxIntensity) return '#F5CBA7';
-    if (d.maxIntensity >= 7) return '#e63946';
-    if (d.maxIntensity >= 4) return '#e65100';
-    return '#f9a825';
-  };
-  const getStroke = (id) => {
-    const d = areaSymptoms[id];
-    if (!d || !d.maxIntensity) return '#e8a87c';
-    if (d.maxIntensity >= 7) return '#b71c1c';
-    if (d.maxIntensity >= 4) return '#bf360c';
-    return '#e65100';
-  };
+  const gc = mkColor(areaSymptoms);
+  const gs = mkStroke(areaSymptoms);
+  const sw = 1.5;
   const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
   return (
-    <svg viewBox="0 0 120 280" width="100%" style={{maxWidth:180,display:'block',margin:'0 auto'}}>
-      {/* Head back */}
-      <ellipse cx="60" cy="22" rx="18" ry="20" fill={getColor('skull')} stroke={getStroke('skull')} strokeWidth="1.5" {...hit('skull')}/>
-      {/* Neck back */}
-      <rect x="54" y="40" width="12" height="12" rx="4" fill={getColor('neck_b')} stroke={getStroke('neck_b')} strokeWidth="1.5" {...hit('neck_b')}/>
-      {/* Left trap */}
-      <ellipse cx="38" cy="58" rx="14" ry="10" fill={getColor('ltrap')} stroke={getStroke('ltrap')} strokeWidth="1.5" {...hit('ltrap')}/>
-      {/* Right trap */}
-      <ellipse cx="82" cy="58" rx="14" ry="10" fill={getColor('rtrap')} stroke={getStroke('rtrap')} strokeWidth="1.5" {...hit('rtrap')}/>
-      {/* Upper back */}
-      <rect x="36" y="52" width="22" height="48" rx="6" fill={getColor('lupback')} stroke={getStroke('lupback')} strokeWidth="1.5" {...hit('lupback')}/>
-      <rect x="62" y="52" width="22" height="48" rx="6" fill={getColor('rupback')} stroke={getStroke('rupback')} strokeWidth="1.5" {...hit('rupback')}/>
-      {/* Spine */}
-      <rect x="55" y="54" width="10" height="78" rx="4" fill={getColor('spine')} stroke={getStroke('spine')} strokeWidth="1.5" {...hit('spine')}/>
-      {/* Lower back */}
-      <rect x="36" y="96" width="22" height="36" rx="6" fill={getColor('llowback')} stroke={getStroke('llowback')} strokeWidth="1.5" {...hit('llowback')}/>
-      <rect x="62" y="96" width="22" height="36" rx="6" fill={getColor('rlowback')} stroke={getStroke('rlowback')} strokeWidth="1.5" {...hit('rlowback')}/>
-      {/* Kidneys */}
-      <ellipse cx="43" cy="100" rx="7" ry="6" fill={getColor('lkidney')} stroke={getStroke('lkidney')} strokeWidth="1.5" {...hit('lkidney')}/>
-      <ellipse cx="77" cy="100" rx="7" ry="6" fill={getColor('rkidney')} stroke={getStroke('rkidney')} strokeWidth="1.5" {...hit('rkidney')}/>
-      {/* Glutes */}
-      <ellipse cx="43" cy="140" rx="14" ry="14" fill={getColor('lglute')} stroke={getStroke('lglute')} strokeWidth="1.5" {...hit('lglute')}/>
-      <ellipse cx="77" cy="140" rx="14" ry="14" fill={getColor('rglute')} stroke={getStroke('rglute')} strokeWidth="1.5" {...hit('rglute')}/>
-      {/* Back arms */}
-      <rect x="20" y="70" width="14" height="36" rx="7" fill="#F5CBA7" stroke="#e8a87c" strokeWidth="1.5"/>
-      <rect x="86" y="70" width="14" height="36" rx="7" fill="#F5CBA7" stroke="#e8a87c" strokeWidth="1.5"/>
-      {/* Hamstrings */}
-      <rect x="34" y="163" width="18" height="38" rx="9" fill={getColor('lhamst')} stroke={getStroke('lhamst')} strokeWidth="1.5" {...hit('lhamst')}/>
-      <rect x="68" y="163" width="18" height="38" rx="9" fill={getColor('rhamst')} stroke={getStroke('rhamst')} strokeWidth="1.5" {...hit('rhamst')}/>
-      {/* Back knees */}
-      <ellipse cx="43" cy="203" rx="10" ry="8" fill={getColor('lkneeb')} stroke={getStroke('lkneeb')} strokeWidth="1.5" {...hit('lkneeb')}/>
-      <ellipse cx="77" cy="203" rx="10" ry="8" fill={getColor('rkneeb')} stroke={getStroke('rkneeb')} strokeWidth="1.5" {...hit('rkneeb')}/>
-      {/* Calves */}
-      <rect x="34" y="209" width="17" height="34" rx="8" fill={getColor('lcalf')} stroke={getStroke('lcalf')} strokeWidth="1.5" {...hit('lcalf')}/>
-      <rect x="69" y="209" width="17" height="34" rx="8" fill={getColor('rcalf')} stroke={getStroke('rcalf')} strokeWidth="1.5" {...hit('rcalf')}/>
-      {/* Heels */}
-      <ellipse cx="42" cy="248" rx="11" ry="8" fill={getColor('lheel')} stroke={getStroke('lheel')} strokeWidth="1.5" {...hit('lheel')}/>
-      <ellipse cx="78" cy="248" rx="11" ry="8" fill={getColor('rheel')} stroke={getStroke('rheel')} strokeWidth="1.5" {...hit('rheel')}/>
+    <svg viewBox="0 0 160 340" width="100%" style={{maxWidth:200,display:'block',margin:'0 auto'}}>
+      {/* HEAD back */}
+      <ellipse cx="80" cy="26" rx="22" ry="24" fill={gc('skull')} stroke={gs('skull')} strokeWidth={sw} {...hit('skull')}/>
+      {/* NECK back */}
+      <rect x="72" y="48" width="16" height="14" rx="5" fill={gc('neck_b')} stroke={gs('neck_b')} strokeWidth={sw} {...hit('neck_b')}/>
+      {/* L TRAPEZIUS */}
+      <ellipse cx="56" cy="72" rx="18" ry="12" fill={gc('ltrap')} stroke={gs('ltrap')} strokeWidth={sw} {...hit('ltrap')}/>
+      {/* R TRAPEZIUS */}
+      <ellipse cx="104" cy="72" rx="18" ry="12" fill={gc('rtrap')} stroke={gs('rtrap')} strokeWidth={sw} {...hit('rtrap')}/>
+      {/* L UPPER BACK */}
+      <rect x="50" y="62" width="28" height="56" rx="8" fill={gc('lupback')} stroke={gs('lupback')} strokeWidth={sw} {...hit('lupback')}/>
+      {/* R UPPER BACK */}
+      <rect x="82" y="62" width="28" height="56" rx="8" fill={gc('rupback')} stroke={gs('rupback')} strokeWidth={sw} {...hit('rupback')}/>
+      {/* SPINE */}
+      <rect x="72" y="64" width="16" height="92" rx="6" fill={gc('spine')} stroke={gs('spine')} strokeWidth={sw} {...hit('spine')}/>
+      {/* L LOWER BACK */}
+      <rect x="50" y="114" width="22" height="42" rx="8" fill={gc('llowback')} stroke={gs('llowback')} strokeWidth={sw} {...hit('llowback')}/>
+      {/* R LOWER BACK */}
+      <rect x="88" y="114" width="22" height="42" rx="8" fill={gc('rlowback')} stroke={gs('rlowback')} strokeWidth={sw} {...hit('rlowback')}/>
+      {/* L KIDNEY */}
+      <ellipse cx="57" cy="122" rx="9" ry="7" fill={gc('lkidney')} stroke={gs('lkidney')} strokeWidth={sw} {...hit('lkidney')}/>
+      {/* R KIDNEY */}
+      <ellipse cx="103" cy="122" rx="9" ry="7" fill={gc('rkidney')} stroke={gs('rkidney')} strokeWidth={sw} {...hit('rkidney')}/>
+      {/* L GLUTE */}
+      <ellipse cx="62" cy="168" rx="18" ry="18" fill={gc('lglute')} stroke={gs('lglute')} strokeWidth={sw} {...hit('lglute')}/>
+      {/* R GLUTE */}
+      <ellipse cx="98" cy="168" rx="18" ry="18" fill={gc('rglute')} stroke={gs('rglute')} strokeWidth={sw} {...hit('rglute')}/>
+      {/* Back arms (not clickable, just visual) */}
+      <ellipse cx="40" cy="74" rx="14" ry="14" fill="#F5CBA7" stroke="#d4956a" strokeWidth={sw}/>
+      <rect x="26" y="84" width="18" height="44" rx="9" fill="#F5CBA7" stroke="#d4956a" strokeWidth={sw}/>
+      <ellipse cx="120" cy="74" rx="14" ry="14" fill="#F5CBA7" stroke="#d4956a" strokeWidth={sw}/>
+      <rect x="116" y="84" width="18" height="44" rx="9" fill="#F5CBA7" stroke="#d4956a" strokeWidth={sw}/>
+      {/* L HAMSTRING */}
+      <rect x="46" y="192" width="24" height="48" rx="12" fill={gc('lhamst')} stroke={gs('lhamst')} strokeWidth={sw} {...hit('lhamst')}/>
+      {/* R HAMSTRING */}
+      <rect x="90" y="192" width="24" height="48" rx="12" fill={gc('rhamst')} stroke={gs('rhamst')} strokeWidth={sw} {...hit('rhamst')}/>
+      {/* L KNEE BACK */}
+      <ellipse cx="58" cy="244" rx="13" ry="11" fill={gc('lkneeb')} stroke={gs('lkneeb')} strokeWidth={sw} {...hit('lkneeb')}/>
+      {/* R KNEE BACK */}
+      <ellipse cx="102" cy="244" rx="13" ry="11" fill={gc('rkneeb')} stroke={gs('rkneeb')} strokeWidth={sw} {...hit('rkneeb')}/>
+      {/* L CALF */}
+      <rect x="46" y="253" width="24" height="44" rx="11" fill={gc('lcalf')} stroke={gs('lcalf')} strokeWidth={sw} {...hit('lcalf')}/>
+      {/* R CALF */}
+      <rect x="90" y="253" width="24" height="44" rx="11" fill={gc('rcalf')} stroke={gs('rcalf')} strokeWidth={sw} {...hit('rcalf')}/>
+      {/* L HEEL */}
+      <ellipse cx="58" cy="302" rx="14" ry="9" fill={gc('lheel')} stroke={gs('lheel')} strokeWidth={sw} {...hit('lheel')}/>
+      {/* R HEEL */}
+      <ellipse cx="102" cy="302" rx="14" ry="9" fill={gc('rheel')} stroke={gs('rheel')} strokeWidth={sw} {...hit('rheel')}/>
     </svg>
   );
 };
 
-// Left lateral figure (facing right, showing patient's left side)
+// ── LEFT LATERAL FIGURE (patient faces right → viewer sees left side) ──
 const FigureLeft = ({ areaSymptoms, onAreaClick }) => {
-  const getColor = (id) => {
-    const d = areaSymptoms[id];
-    if (!d || !d.maxIntensity) return '#F5CBA7';
-    if (d.maxIntensity >= 7) return '#e63946';
-    if (d.maxIntensity >= 4) return '#e65100';
-    return '#f9a825';
-  };
-  const getStroke = (id) => {
-    const d = areaSymptoms[id];
-    if (!d || !d.maxIntensity) return '#e8a87c';
-    if (d.maxIntensity >= 7) return '#b71c1c';
-    if (d.maxIntensity >= 4) return '#bf360c';
-    return '#e65100';
-  };
+  const gc = mkColor(areaSymptoms);
+  const gs = mkStroke(areaSymptoms);
+  const sw = 1.5;
   const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
   return (
-    <svg viewBox="0 0 100 280" width="100%" style={{maxWidth:140,display:'block',margin:'0 auto'}}>
-      {/* Head */}
-      <ellipse cx="52" cy="22" rx="16" ry="19" fill={getColor('head_l')} stroke={getStroke('head_l')} strokeWidth="1.5" {...hit('head_l')}/>
-      {/* Face profile */}
-      <ellipse cx="62" cy="22" rx="8" ry="14" fill={getColor('face')} stroke={getStroke('face')} strokeWidth="1" {...hit('face')}/>
+    <svg viewBox="0 0 120 340" width="100%" style={{maxWidth:160,display:'block',margin:'0 auto'}}>
+      {/* HEAD — profile facing right */}
+      <ellipse cx="65" cy="26" rx="18" ry="22" fill={gc('head_l')} stroke={gs('head_l')} strokeWidth={sw} {...hit('head_l')}/>
+      {/* Nose bump */}
+      <ellipse cx="80" cy="26" rx="7" ry="5" fill={gc('face')} stroke={gs('face')} strokeWidth="1" {...hit('face')}/>
       {/* Eye */}
-      <circle cx="64" cy="18" r="2" fill="#c0846a" opacity="0.7"/>
-      {/* Neck */}
-      <rect x="46" y="40" width="12" height="12" rx="4" fill={getColor('neck_l')} stroke={getStroke('neck_l')} strokeWidth="1.5" {...hit('neck_l')}/>
-      {/* Shoulder */}
-      <ellipse cx="44" cy="56" rx="12" ry="10" fill={getColor('lshoulder_l')} stroke={getStroke('lshoulder_l')} strokeWidth="1.5" {...hit('lshoulder_l')}/>
-      {/* Chest front */}
-      <rect x="46" y="52" width="20" height="48" rx="6" fill={getColor('chest_l')} stroke={getStroke('chest_l')} strokeWidth="1.5" {...hit('chest_l')}/>
-      {/* Upper back */}
-      <rect x="28" y="52" width="20" height="48" rx="6" fill={getColor('lupback_l')} stroke={getStroke('lupback_l')} strokeWidth="1.5" {...hit('lupback_l')}/>
-      {/* Abdomen */}
-      <rect x="46" y="96" width="20" height="34" rx="6" fill={getColor('abdomen_l')} stroke={getStroke('abdomen_l')} strokeWidth="1.5" {...hit('abdomen_l')}/>
-      {/* Lower back */}
-      <rect x="28" y="96" width="20" height="34" rx="6" fill={getColor('llowback_l')} stroke={getStroke('llowback_l')} strokeWidth="1.5" {...hit('llowback_l')}/>
-      {/* Arm */}
-      <rect x="22" y="62" width="14" height="60" rx="7" fill={getColor('larm_l')} stroke={getStroke('larm_l')} strokeWidth="1.5" {...hit('larm_l')}/>
-      {/* Elbow */}
-      <ellipse cx="29" cy="124" rx="8" ry="7" fill={getColor('lelbow_l')} stroke={getStroke('lelbow_l')} strokeWidth="1.5" {...hit('lelbow_l')}/>
-      {/* Forearm */}
-      <rect x="22" y="129" width="14" height="26" rx="7" fill={getColor('lfarm_l')} stroke={getStroke('lfarm_l')} strokeWidth="1.5" {...hit('lfarm_l')}/>
-      {/* Wrist/hand */}
-      <ellipse cx="29" cy="160" rx="9" ry="8" fill={getColor('lwrist_l')} stroke={getStroke('lwrist_l')} strokeWidth="1.5" {...hit('lwrist_l')}/>
-      {/* Hip */}
-      <ellipse cx="44" cy="138" rx="12" ry="10" fill={getColor('lhip_l')} stroke={getStroke('lhip_l')} strokeWidth="1.5" {...hit('lhip_l')}/>
-      {/* Glute */}
-      <ellipse cx="30" cy="142" rx="12" ry="12" fill={getColor('lglute_l')} stroke={getStroke('lglute_l')} strokeWidth="1.5" {...hit('lglute_l')}/>
-      {/* Thigh */}
-      <rect x="36" y="150" width="18" height="42" rx="9" fill={getColor('lthigh_l')} stroke={getStroke('lthigh_l')} strokeWidth="1.5" {...hit('lthigh_l')}/>
-      {/* Knee */}
-      <ellipse cx="45" cy="194" rx="11" ry="9" fill={getColor('lknee_l')} stroke={getStroke('lknee_l')} strokeWidth="1.5" {...hit('lknee_l')}/>
-      {/* Shin/Calf */}
-      <rect x="36" y="201" width="18" height="36" rx="8" fill={getColor('lshin_l')} stroke={getStroke('lshin_l')} strokeWidth="1.5" {...hit('lshin_l')}/>
-      {/* Ankle/foot */}
-      <ellipse cx="50" cy="244" rx="14" ry="8" fill={getColor('lankle_l')} stroke={getStroke('lankle_l')} strokeWidth="1.5" {...hit('lankle_l')}/>
+      <circle cx="76" cy="21" r="2.5" fill="#c07850" opacity="0.7"/>
+      {/* NECK */}
+      <rect x="58" y="46" width="14" height="14" rx="5" fill={gc('neck_l')} stroke={gs('neck_l')} strokeWidth={sw} {...hit('neck_l')}/>
+      {/* SHOULDER */}
+      <ellipse cx="55" cy="68" rx="16" ry="14" fill={gc('lshoulder_l')} stroke={gs('lshoulder_l')} strokeWidth={sw} {...hit('lshoulder_l')}/>
+      {/* CHEST (front of torso) */}
+      <rect x="56" y="60" width="26" height="60" rx="10" fill={gc('chest_l')} stroke={gs('chest_l')} strokeWidth={sw} {...hit('chest_l')}/>
+      {/* UPPER BACK */}
+      <rect x="34" y="60" width="26" height="60" rx="10" fill={gc('lupback_l')} stroke={gs('lupback_l')} strokeWidth={sw} {...hit('lupback_l')}/>
+      {/* ABDOMEN */}
+      <rect x="56" y="116" width="26" height="40" rx="8" fill={gc('abdomen_l')} stroke={gs('abdomen_l')} strokeWidth={sw} {...hit('abdomen_l')}/>
+      {/* LOWER BACK */}
+      <rect x="34" y="116" width="26" height="40" rx="8" fill={gc('llowback_l')} stroke={gs('llowback_l')} strokeWidth={sw} {...hit('llowback_l')}/>
+      {/* ARM */}
+      <rect x="28" y="76" width="18" height="72" rx="9" fill={gc('larm_l')} stroke={gs('larm_l')} strokeWidth={sw} {...hit('larm_l')}/>
+      {/* ELBOW */}
+      <ellipse cx="37" cy="152" rx="12" ry="10" fill={gc('lelbow_l')} stroke={gs('lelbow_l')} strokeWidth={sw} {...hit('lelbow_l')}/>
+      {/* FOREARM */}
+      <rect x="28" y="160" width="18" height="34" rx="9" fill={gc('lfarm_l')} stroke={gs('lfarm_l')} strokeWidth={sw} {...hit('lfarm_l')}/>
+      {/* WRIST/HAND */}
+      <ellipse cx="37" cy="200" rx="12" ry="9" fill={gc('lwrist_l')} stroke={gs('lwrist_l')} strokeWidth={sw} {...hit('lwrist_l')}/>
+      {/* HIP (front) */}
+      <ellipse cx="62" cy="164" rx="14" ry="12" fill={gc('lhip_l')} stroke={gs('lhip_l')} strokeWidth={sw} {...hit('lhip_l')}/>
+      {/* GLUTE */}
+      <ellipse cx="42" cy="168" rx="16" ry="16" fill={gc('lglute_l')} stroke={gs('lglute_l')} strokeWidth={sw} {...hit('lglute_l')}/>
+      {/* THIGH */}
+      <rect x="48" y="180" width="22" height="52" rx="11" fill={gc('lthigh_l')} stroke={gs('lthigh_l')} strokeWidth={sw} {...hit('lthigh_l')}/>
+      {/* KNEE */}
+      <ellipse cx="59" cy="236" rx="14" ry="12" fill={gc('lknee_l')} stroke={gs('lknee_l')} strokeWidth={sw} {...hit('lknee_l')}/>
+      {/* SHIN/CALF */}
+      <rect x="48" y="246" width="22" height="46" rx="10" fill={gc('lshin_l')} stroke={gs('lshin_l')} strokeWidth={sw} {...hit('lshin_l')}/>
+      {/* ANKLE/FOOT */}
+      <ellipse cx="64" cy="298" rx="18" ry="10" fill={gc('lankle_l')} stroke={gs('lankle_l')} strokeWidth={sw} {...hit('lankle_l')}/>
     </svg>
   );
 };
 
-// Right lateral figure (facing left, showing patient's right side)
+// ── RIGHT LATERAL FIGURE (patient faces left → viewer sees right side) ──
 const FigureRight = ({ areaSymptoms, onAreaClick }) => {
-  const getColor = (id) => {
-    const d = areaSymptoms[id];
-    if (!d || !d.maxIntensity) return '#F5CBA7';
-    if (d.maxIntensity >= 7) return '#e63946';
-    if (d.maxIntensity >= 4) return '#e65100';
-    return '#f9a825';
-  };
-  const getStroke = (id) => {
-    const d = areaSymptoms[id];
-    if (!d || !d.maxIntensity) return '#e8a87c';
-    if (d.maxIntensity >= 7) return '#b71c1c';
-    if (d.maxIntensity >= 4) return '#bf360c';
-    return '#e65100';
-  };
+  const gc = mkColor(areaSymptoms);
+  const gs = mkStroke(areaSymptoms);
+  const sw = 1.5;
   const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
   return (
-    <svg viewBox="0 0 100 280" width="100%" style={{maxWidth:140,display:'block',margin:'0 auto'}}>
-      {/* Head */}
-      <ellipse cx="48" cy="22" rx="16" ry="19" fill={getColor('head_r')} stroke={getStroke('head_r')} strokeWidth="1.5" {...hit('head_r')}/>
-      {/* Face profile (facing left) */}
-      <ellipse cx="38" cy="22" rx="8" ry="14" fill={getColor('face')} stroke={getStroke('face')} strokeWidth="1" {...hit('face')}/>
+    <svg viewBox="0 0 120 340" width="100%" style={{maxWidth:160,display:'block',margin:'0 auto'}}>
+      {/* HEAD — profile facing left */}
+      <ellipse cx="55" cy="26" rx="18" ry="22" fill={gc('head_r')} stroke={gs('head_r')} strokeWidth={sw} {...hit('head_r')}/>
+      {/* Nose bump (left-facing) */}
+      <ellipse cx="40" cy="26" rx="7" ry="5" fill={gc('face')} stroke={gs('face')} strokeWidth="1" {...hit('face')}/>
       {/* Eye */}
-      <circle cx="36" cy="18" r="2" fill="#c0846a" opacity="0.7"/>
-      {/* Neck */}
-      <rect x="42" y="40" width="12" height="12" rx="4" fill={getColor('neck_r')} stroke={getStroke('neck_r')} strokeWidth="1.5" {...hit('neck_r')}/>
-      {/* Shoulder */}
-      <ellipse cx="56" cy="56" rx="12" ry="10" fill={getColor('rshoulder_r')} stroke={getStroke('rshoulder_r')} strokeWidth="1.5" {...hit('rshoulder_r')}/>
-      {/* Chest front */}
-      <rect x="34" y="52" width="20" height="48" rx="6" fill={getColor('chest_r')} stroke={getStroke('chest_r')} strokeWidth="1.5" {...hit('chest_r')}/>
-      {/* Upper back */}
-      <rect x="52" y="52" width="20" height="48" rx="6" fill={getColor('rupback_r')} stroke={getStroke('rupback_r')} strokeWidth="1.5" {...hit('rupback_r')}/>
-      {/* Abdomen */}
-      <rect x="34" y="96" width="20" height="34" rx="6" fill={getColor('abdomen_r')} stroke={getStroke('abdomen_r')} strokeWidth="1.5" {...hit('abdomen_r')}/>
-      {/* Lower back */}
-      <rect x="52" y="96" width="20" height="34" rx="6" fill={getColor('rlowback_r')} stroke={getStroke('rlowback_r')} strokeWidth="1.5" {...hit('rlowback_r')}/>
-      {/* Arm */}
-      <rect x="64" y="62" width="14" height="60" rx="7" fill={getColor('rarm_r')} stroke={getStroke('rarm_r')} strokeWidth="1.5" {...hit('rarm_r')}/>
-      {/* Elbow */}
-      <ellipse cx="71" cy="124" rx="8" ry="7" fill={getColor('relbow_r')} stroke={getStroke('relbow_r')} strokeWidth="1.5" {...hit('relbow_r')}/>
-      {/* Forearm */}
-      <rect x="64" y="129" width="14" height="26" rx="7" fill={getColor('rfarm_r')} stroke={getStroke('rfarm_r')} strokeWidth="1.5" {...hit('rfarm_r')}/>
-      {/* Wrist/hand */}
-      <ellipse cx="71" cy="160" rx="9" ry="8" fill={getColor('rwrist_r')} stroke={getStroke('rwrist_r')} strokeWidth="1.5" {...hit('rwrist_r')}/>
-      {/* Hip */}
-      <ellipse cx="56" cy="138" rx="12" ry="10" fill={getColor('rhip_r')} stroke={getStroke('rhip_r')} strokeWidth="1.5" {...hit('rhip_r')}/>
-      {/* Glute */}
-      <ellipse cx="70" cy="142" rx="12" ry="12" fill={getColor('rglute_r')} stroke={getStroke('rglute_r')} strokeWidth="1.5" {...hit('rglute_r')}/>
-      {/* Thigh */}
-      <rect x="46" y="150" width="18" height="42" rx="9" fill={getColor('rthigh_r')} stroke={getStroke('rthigh_r')} strokeWidth="1.5" {...hit('rthigh_r')}/>
-      {/* Knee */}
-      <ellipse cx="55" cy="194" rx="11" ry="9" fill={getColor('rknee_r')} stroke={getStroke('rknee_r')} strokeWidth="1.5" {...hit('rknee_r')}/>
-      {/* Shin/Calf */}
-      <rect x="46" y="201" width="18" height="36" rx="8" fill={getColor('rshin_r')} stroke={getStroke('rshin_r')} strokeWidth="1.5" {...hit('rshin_r')}/>
-      {/* Ankle/foot */}
-      <ellipse cx="50" cy="244" rx="14" ry="8" fill={getColor('rankle_r')} stroke={getStroke('rankle_r')} strokeWidth="1.5" {...hit('rankle_r')}/>
+      <circle cx="44" cy="21" r="2.5" fill="#c07850" opacity="0.7"/>
+      {/* NECK */}
+      <rect x="48" y="46" width="14" height="14" rx="5" fill={gc('neck_r')} stroke={gs('neck_r')} strokeWidth={sw} {...hit('neck_r')}/>
+      {/* SHOULDER */}
+      <ellipse cx="65" cy="68" rx="16" ry="14" fill={gc('rshoulder_r')} stroke={gs('rshoulder_r')} strokeWidth={sw} {...hit('rshoulder_r')}/>
+      {/* CHEST (front of torso) */}
+      <rect x="38" y="60" width="26" height="60" rx="10" fill={gc('chest_r')} stroke={gs('chest_r')} strokeWidth={sw} {...hit('chest_r')}/>
+      {/* UPPER BACK */}
+      <rect x="60" y="60" width="26" height="60" rx="10" fill={gc('rupback_r')} stroke={gs('rupback_r')} strokeWidth={sw} {...hit('rupback_r')}/>
+      {/* ABDOMEN */}
+      <rect x="38" y="116" width="26" height="40" rx="8" fill={gc('abdomen_r')} stroke={gs('abdomen_r')} strokeWidth={sw} {...hit('abdomen_r')}/>
+      {/* LOWER BACK */}
+      <rect x="60" y="116" width="26" height="40" rx="8" fill={gc('rlowback_r')} stroke={gs('rlowback_r')} strokeWidth={sw} {...hit('rlowback_r')}/>
+      {/* ARM */}
+      <rect x="74" y="76" width="18" height="72" rx="9" fill={gc('rarm_r')} stroke={gs('rarm_r')} strokeWidth={sw} {...hit('rarm_r')}/>
+      {/* ELBOW */}
+      <ellipse cx="83" cy="152" rx="12" ry="10" fill={gc('relbow_r')} stroke={gs('relbow_r')} strokeWidth={sw} {...hit('relbow_r')}/>
+      {/* FOREARM */}
+      <rect x="74" y="160" width="18" height="34" rx="9" fill={gc('rfarm_r')} stroke={gs('rfarm_r')} strokeWidth={sw} {...hit('rfarm_r')}/>
+      {/* WRIST/HAND */}
+      <ellipse cx="83" cy="200" rx="12" ry="9" fill={gc('rwrist_r')} stroke={gs('rwrist_r')} strokeWidth={sw} {...hit('rwrist_r')}/>
+      {/* HIP (front) */}
+      <ellipse cx="58" cy="164" rx="14" ry="12" fill={gc('rhip_r')} stroke={gs('rhip_r')} strokeWidth={sw} {...hit('rhip_r')}/>
+      {/* GLUTE */}
+      <ellipse cx="78" cy="168" rx="16" ry="16" fill={gc('rglute_r')} stroke={gs('rglute_r')} strokeWidth={sw} {...hit('rglute_r')}/>
+      {/* THIGH */}
+      <rect x="50" y="180" width="22" height="52" rx="11" fill={gc('rthigh_r')} stroke={gs('rthigh_r')} strokeWidth={sw} {...hit('rthigh_r')}/>
+      {/* KNEE */}
+      <ellipse cx="61" cy="236" rx="14" ry="12" fill={gc('rknee_r')} stroke={gs('rknee_r')} strokeWidth={sw} {...hit('rknee_r')}/>
+      {/* SHIN/CALF */}
+      <rect x="50" y="246" width="22" height="46" rx="10" fill={gc('rshin_r')} stroke={gs('rshin_r')} strokeWidth={sw} {...hit('rshin_r')}/>
+      {/* ANKLE/FOOT */}
+      <ellipse cx="56" cy="298" rx="18" ry="10" fill={gc('rankle_r')} stroke={gs('rankle_r')} strokeWidth={sw} {...hit('rankle_r')}/>
     </svg>
   );
 };
@@ -930,6 +923,464 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
 };
 
 /* ══ PAIN MODULE ══ */
+
+/* ══ PAIN MODULE ══ */
+
+const MOODS=[
+  {emoji:"😤",label:"Struggling",value:1,color:"#e63946"},
+  {emoji:"😔",label:"Low",value:2,color:"#f4a261"},
+  {emoji:"😐",label:"Neutral",value:3,color:"#f4c261"},
+  {emoji:"🙂",label:"Okay",value:4,color:"#5bb8e8"},
+  {emoji:"💪",label:"Strong",value:5,color:"#2d9a6e"},
+];
+const TRAUMA_CHECKS=[
+  {id:"sleep",label:"Sleep felt disrupted or restless",icon:"🌙"},
+  {id:"anxiety",label:"I felt anxious or on-edge today",icon:"⚡"},
+  {id:"trigger",label:"Something triggered a stress response",icon:"🔴"},
+  {id:"safe",label:"I felt safe in my body today",icon:"🛡️"},
+  {id:"grounded",label:"I felt grounded and present",icon:"🌱"},
+  {id:"support",label:"I reached out to someone for support",icon:"🤝"},
+];
+const AFFIRMATIONS=[
+  "Your pain is real. Your healing is possible.",
+  "Every small step forward is still forward.",
+  "You are more than your diagnosis.",
+  "Rest is not giving up. Rest is rebuilding.",
+  "Your body is doing its best. So are you.",
+];
+const SEED_CHAT=[
+  {id:1,user:"Maya R.",avatar:"🌸",text:"Anyone else notice their pain spikes mid-week? Wednesday always gets me.",time:"2h ago",mine:false},
+  {id:2,user:"Jordan K.",avatar:"🌊",text:"Yes! Short noon rest really helps me manage that.",time:"1h ago",mine:false},
+  {id:3,user:"Sam T.",avatar:"🌿",text:"Gentle reminder: rest is not failure 💚",time:"45m ago",mine:false},
+  {id:4,user:"Alex P.",avatar:"💙",text:"Does anyone use heat therapy? Just got a heating pad for back pain.",time:"20m ago",mine:false},
+];
+const EXERCISES=[
+  {id:"anxiety",icon:"🧘",title:"Anxiety Management",desc:"Breathing & grounding",steps:["Find a comfortable position and close your eyes.","Breathe in slowly for 4 counts.","Hold for 4 counts.","Exhale slowly for 6 counts.","Repeat 5 times, focusing only on your breath.","Name 5 things you can see around you."]},
+  {id:"goals",icon:"🎯",title:"Goal Setting",desc:"Small steps toward healing",steps:["Write one thing you'd like to improve this week.","Break it into 3 small daily actions.","Celebrate every small win — they all count.","Review each evening: did you take one step today?"]},
+  {id:"selfcare",icon:"💆",title:"Self-Care",desc:"Nurture your body & mind",steps:["Drink a full glass of water right now.","Step outside for 5 minutes of fresh air.","Put your hand on your heart and breathe deeply.","Do one kind thing for your body today."]},
+  {id:"grounding",icon:"🌍",title:"Grounding",desc:"Connect with the present",steps:["Feel your feet firmly on the floor.","Name 5 things you can see.","Name 4 things you can touch.","Name 3 things you can hear.","Name 2 things you can smell.","Name 1 thing you can taste."]},
+  {id:"mindfulness",icon:"🌸",title:"Mindfulness",desc:"Awareness without judgment",steps:["Sit comfortably and gently close your eyes.","Bring attention to your breathing — don't control it.","Notice thoughts without judging them.","Gently return focus to your breath each time.","Continue for 5–10 minutes."]},
+  {id:"emotions",icon:"💡",title:"Understanding Emotions",desc:"Identify & process feelings",steps:["Name what you are feeling right now.","Ask: where do I feel this in my body?","Is this feeling familiar?","What does this feeling need from me?","Write it down or speak it aloud."]},
+];
+const seedHistory=()=>Array.from({length:7},(_,i)=>{
+  const pain=Math.floor(Math.random()*5)+3,mood=Math.floor(Math.random()*3)+2,checks=Math.floor(Math.random()*4)+1;
+  return{id:i,date:DAYS[i],fullDate:new Date(Date.now()-(6-i)*86400000).toLocaleDateString("en-US",{month:"short",day:"numeric"}),
+    painLevel:pain,mood,checkedCount:checks,areas:[],notes:"",score:Math.round(((10-pain)*3+mood*4+checks*5)/3)};
+});
+
+/* ── Logo SVG ── */
+const Logo=({size=56})=>(
+  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
+    <defs>
+      <radialGradient id="bgrad" cx="35%" cy="35%"><stop offset="0%" stopColor="#5bb8e8"/><stop offset="100%" stopColor="#1a6fa0"/></radialGradient>
+      <radialGradient id="rgrad" cx="50%" cy="40%"><stop offset="0%" stopColor="#ff8a8a"/><stop offset="100%" stopColor="#c0392b"/></radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="47" fill="url(#bgrad)" stroke="rgba(255,255,255,0.5)" strokeWidth="2"/>
+    <ellipse cx="50" cy="30" rx="9" ry="10" fill="url(#rgrad)"/>
+    <path d="M33 68 Q39 46 50 44 Q61 46 67 68Z" fill="url(#rgrad)"/>
+    <circle cx="50" cy="52" r="7" fill="rgba(255,140,100,0.55)"/>
+    <path d="M17 56 Q24 36 37 49 Q29 55 27 66 Q18 69 17 56Z" fill="#2196c4" opacity="0.9"/>
+    <path d="M19 53 Q27 45 35 51" stroke="#7dd4f5" strokeWidth="2" fill="none"/>
+    <path d="M20 58 Q28 50 36 55" stroke="#7dd4f5" strokeWidth="1.5" fill="none"/>
+    <path d="M83 56 Q76 36 63 49 Q71 55 73 66 Q82 69 83 56Z" fill="#2d9a6e" opacity="0.9"/>
+    <path d="M81 53 Q73 45 65 51" stroke="#5cd4a0" strokeWidth="2" fill="none"/>
+    <path d="M80 58 Q72 50 64 55" stroke="#5cd4a0" strokeWidth="1.5" fill="none"/>
+    <ellipse cx="38" cy="22" rx="11" ry="7" fill="rgba(255,255,255,0.22)" transform="rotate(-22 38 22)"/>
+  </svg>
+);
+
+/* ── Primitives ── */
+const GCard=({children,style={}})=>(
+  <div className="glass" style={{borderRadius:20,padding:22,margin:"0 18px 16px",...style}}>{children}</div>
+);
+const SectionTitle=({icon,title,sub})=>(
+  <div style={{padding:"18px 22px 4px",animation:"fadeIn 0.4s ease both"}}>
+    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:2}}>
+      {icon&&<span style={{fontSize:22}}>{icon}</span>}
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark,letterSpacing:"-0.01em"}}>{title}</div>
+    </div>
+    {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:icon?32:0,marginTop:3}}>{sub}</div>}
+  </div>
+);
+const BottomNav=({tab,setTab})=>{
+  const items=[{id:"home",icon:"🏠",label:"Home"},{id:"pain",icon:"🩺",label:"Pain"},{id:"trauma",icon:"🧠",label:"Recovery"},{id:"community",icon:"💬",label:"Community"},{id:"profile",icon:"👤",label:"Profile"}];
+  return(
+    <div className="glass" style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,display:"flex",justifyContent:"space-around",padding:"8px 0 max(10px,env(safe-area-inset-bottom))",zIndex:100,borderRadius:"20px 20px 0 0",borderBottom:"none",boxShadow:"0 -4px 20px rgba(26,80,130,0.1)"}}>
+      {items.map(t=>(
+        <button key={t.id} onClick={()=>setTab(t.id)}
+          style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,cursor:"pointer",color:tab===t.id?C.blue:C.textLight,fontSize:9,fontWeight:tab===t.id?800:600,textTransform:"uppercase",letterSpacing:"0.04em",border:"none",background:"transparent",padding:"4px 8px",transition:"color 0.2s",minWidth:0}}>
+          <span style={{fontSize:tab===t.id?22:19,transition:"font-size 0.2s"}}>{t.icon}</span>
+          {t.label}
+          {tab===t.id&&<div style={{width:4,height:4,borderRadius:"50%",background:C.blue}}/>}
+        </button>
+      ))}
+    </div>
+  );
+};
+const AppShell=({children,tab,setTab,user,onLogout})=>(
+  <div style={{background:"transparent",minHeight:"100vh",maxWidth:430,margin:"0 auto",color:C.textDark,overflowX:"hidden"}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 18px 8px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8}}>
+        <Logo size={30}/>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:15}}>
+          <span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span>
+        </div>
+      </div>
+      <div style={{display:"flex",gap:6,alignItems:"center"}}>
+        <div className="glass-soft" style={{borderRadius:18,padding:"4px 11px",fontSize:12,fontWeight:700,color:C.textMid}}>
+          {user?.name?.split(" ")[0]||"You"}
+        </div>
+        <button onClick={onLogout} className="glass-soft" style={{borderRadius:18,padding:"4px 11px",fontSize:11,fontWeight:700,color:C.textLight,border:"none",cursor:"pointer"}}>Out</button>
+      </div>
+    </div>
+    <div style={{overflowY:"auto",maxHeight:"100vh",paddingBottom:88}}>{children}</div>
+    <BottomNav tab={tab} setTab={setTab}/>
+  </div>
+);
+
+/* ══ AUTH ══ */
+const AuthShell=({children})=>(
+  <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",background:"linear-gradient(160deg,#daf0ff 0%,#b4dcf5 30%,#c6e8f8 65%,#dbf0ff 100%)",overflowX:"hidden",position:"relative"}}>
+    <div style={{position:"fixed",top:-90,right:-90,width:260,height:260,borderRadius:"50%",background:"radial-gradient(circle,rgba(26,111,160,0.18),transparent 70%)",pointerEvents:"none"}}/>
+    <div style={{position:"fixed",bottom:-70,left:-70,width:210,height:210,borderRadius:"50%",background:"radial-gradient(circle,rgba(45,154,110,0.13),transparent 70%)",pointerEvents:"none"}}/>
+    <div style={{overflowY:"auto",maxHeight:"100vh",padding:"0 24px 48px"}}>
+      <div style={{textAlign:"center",padding:"44px 0 14px",animation:"fadeIn 0.5s ease both"}}>
+        <div style={{display:"inline-block",animation:"float 3s ease-in-out infinite"}}><Logo size={70}/></div>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:27,fontWeight:800,marginTop:12}}>
+          <span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span>
+        </div>
+        <div style={{fontSize:11,color:C.textLight,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:4}}>Chronic Pain &amp; Trauma Recovery</div>
+      </div>
+      {children}
+    </div>
+  </div>
+);
+
+const LoginScreen=({onLogin,onGoRegister})=>{
+  const [email,setEmail]=useState(""); const [pass,setPass]=useState("");
+  const [errors,setErrors]=useState({}); const [loading,setLoading]=useState(false);
+  const doLogin=async()=>{
+    const e={};
+    if(!email.includes("@")) e.email="Enter a valid email";
+    if(pass.length<6) e.pass="Min 6 characters";
+    if(Object.keys(e).length){setErrors(e);return;}
+    setLoading(true); await new Promise(r=>setTimeout(r,800));
+    const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
+    const user=users.find(u=>u.email===email&&u.password===pass);
+    if(!user){setErrors({pass:"Incorrect email or password"});setLoading(false);return;}
+    onLogin(user); setLoading(false);
+  };
+  return(
+    <div style={{animation:"fadeIn 0.5s ease both"}}>
+      <div style={{marginBottom:24}}>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,color:C.textDark}}>Welcome Back 👋</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:4}}>Sign in to continue your healing journey</div>
+      </div>
+      {[{label:"Username / Email",key:"email",type:"email",val:email,set:setEmail,ph:"you@email.com",err:errors.email},
+        {label:"Password",key:"pass",type:"password",val:pass,set:setPass,ph:"••••••••",err:errors.pass}
+      ].map(f=>(
+        <div key={f.key} style={{marginBottom:14}}>
+          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.09em",marginBottom:5}}>{f.label}</div>
+          <input className="field" type={f.type} value={f.val} onChange={e=>f.set(e.target.value)} placeholder={f.ph}/>
+          {f.err&&<div style={{fontSize:11,color:C.red,marginTop:3}}>⚠ {f.err}</div>}
+        </div>
+      ))}
+      <div style={{textAlign:"right",marginBottom:22}}><span style={{fontSize:12,color:C.blue,fontWeight:700,cursor:"pointer"}}>Forgot Password?</span></div>
+      <button className="btn-blue" onClick={doLogin} disabled={loading}>{loading?"Signing in…":"Sign In →"}</button>
+      <div style={{textAlign:"center",marginTop:18,fontSize:13,color:C.textLight}}>
+        Don't have an account?{" "}<span onClick={onGoRegister} style={{color:C.blue,fontWeight:800,cursor:"pointer"}}>Register</span>
+      </div>
+    </div>
+  );
+};
+
+const RegisterScreen=({onGoLogin,onRegistered})=>{
+  const [name,setName]=useState(""); const [email,setEmail]=useState("");
+  const [pass,setPass]=useState(""); const [confirm,setConfirm]=useState("");
+  const [dob,setDob]=useState(""); const [gender,setGender]=useState("");
+  const [agreed,setAgreed]=useState(false); const [errors,setErrors]=useState({});
+  const [loading,setLoading]=useState(false); const [showTerms,setShowTerms]=useState(false);
+  const doRegister=async()=>{
+    const e={};
+    if(name.trim().length<2) e.name="Enter your full name";
+    if(!email.includes("@")) e.email="Enter a valid email";
+    if(pass.length<6) e.pass="Min 6 characters";
+    if(pass!==confirm) e.confirm="Passwords don't match";
+    if(!agreed) e.agreed="Please accept the terms";
+    if(Object.keys(e).length){setErrors(e);return;}
+    setLoading(true); await new Promise(r=>setTimeout(r,900));
+    const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
+    if(users.find(u=>u.email===email)){setErrors({email:"Already registered"});setLoading(false);return;}
+    const code=Math.floor(100000+Math.random()*900000).toString();
+    const newUser={name:name.trim(),email,password:pass,dob,gender,verified:false,verifyCode:code,trialStart:Date.now(),plan:"trial",silhouette:1};
+    users.push(newUser); localStorage.setItem("p2c_users",JSON.stringify(users));
+    setLoading(false); onRegistered({email,code,name:name.trim()});
+  };
+  if(showTerms) return(
+    <div style={{animation:"fadeIn 0.3s ease both"}}>
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:19,fontWeight:800,color:C.textDark,marginBottom:14}}>Terms &amp; Conditions</div>
+      <div className="glass" style={{borderRadius:16,padding:18,maxHeight:"52vh",overflowY:"auto",marginBottom:18,fontSize:13,lineHeight:1.7,color:C.textMid}}>
+        <p><strong>1. Acceptance</strong><br/>By using Pain2Care, you agree to these Terms.</p><br/>
+        <p><strong>2. Not Medical Advice</strong><br/>Pain2Care is a self-tracking tool only — not a medical device or diagnosis tool. Always consult a qualified healthcare provider.</p><br/>
+        <p><strong>3. Privacy</strong><br/>Your health data is stored securely. We never sell your personal data to third parties.</p><br/>
+        <p><strong>4. Free Trial</strong><br/>A 7-day free trial is provided. After the trial, a subscription is required to continue using the app.</p><br/>
+        <p><strong>5. Community</strong><br/>The community chat is anonymous and supportive. Harmful or abusive content is not permitted.</p><br/>
+        <p><strong>6. Limitation of Liability</strong><br/>Pain2Care is not liable for any decisions made based on app data.</p><br/>
+        <p><strong>7. Changes</strong><br/>We may update these terms with notice via the app.</p>
+      </div>
+      <div onClick={()=>setAgreed(!agreed)} style={{display:"flex",alignItems:"center",gap:12,marginBottom:18,padding:"12px 14px",background:"rgba(26,111,160,0.07)",borderRadius:13,cursor:"pointer"}}>
+        <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${agreed?C.blue:"rgba(26,111,160,0.28)"}`,background:agreed?C.blue:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.2s"}}>
+          {agreed&&<span style={{color:"#fff",fontSize:13,fontWeight:900}}>✓</span>}
+        </div>
+        <span style={{fontSize:13,color:C.textMid,fontWeight:600}}>I agree to the Terms &amp; Conditions</span>
+      </div>
+      <button className="btn-blue" onClick={()=>setShowTerms(false)} disabled={!agreed}>Continue →</button>
+    </div>
+  );
+  return(
+    <div style={{animation:"fadeIn 0.5s ease both"}}>
+      <div style={{marginBottom:18}}>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Create Account</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>Start your free 7-day trial</div>
+      </div>
+      {[{label:"Full Name",key:"name",val:name,set:setName,type:"text",ph:"Your full name",err:errors.name},
+        {label:"Email",key:"email",val:email,set:setEmail,type:"email",ph:"you@email.com",err:errors.email},
+        {label:"Date of Birth",key:"dob",val:dob,set:setDob,type:"date",ph:"",err:null},
+      ].map(f=>(
+        <div key={f.key} style={{marginBottom:13}}>
+          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5}}>{f.label}</div>
+          <input className="field" type={f.type} value={f.val} onChange={e=>f.set(e.target.value)} placeholder={f.ph}/>
+          {f.err&&<div style={{fontSize:11,color:C.red,marginTop:3}}>⚠ {f.err}</div>}
+        </div>
+      ))}
+      <div style={{marginBottom:13}}>
+        <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5}}>Gender</div>
+        <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+          {["Female","Male","Other","Prefer not to say"].map(g=>(
+            <div key={g} onClick={()=>setGender(g)}
+              style={{flex:"1 0 40%",padding:"9px 6px",borderRadius:11,border:`1.5px solid ${gender===g?C.blue:"rgba(26,111,160,0.18)"}`,background:gender===g?"rgba(26,111,160,0.1)":"rgba(255,255,255,0.5)",cursor:"pointer",textAlign:"center",fontSize:12,fontWeight:700,color:gender===g?C.blue:C.textLight,transition:"all 0.15s"}}>
+              {g}
+            </div>
+          ))}
+        </div>
+      </div>
+      {[{label:"Password",key:"pass",val:pass,set:setPass,err:errors.pass},
+        {label:"Confirm Password",key:"confirm",val:confirm,set:setConfirm,err:errors.confirm}
+      ].map(f=>(
+        <div key={f.key} style={{marginBottom:13}}>
+          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5}}>{f.label}</div>
+          <input className="field" type="password" value={f.val} onChange={e=>f.set(e.target.value)} placeholder="••••••••"/>
+          {f.err&&<div style={{fontSize:11,color:C.red,marginTop:3}}>⚠ {f.err}</div>}
+        </div>
+      ))}
+      <div onClick={()=>setShowTerms(true)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,cursor:"pointer",padding:"11px 13px",background:"rgba(26,111,160,0.06)",borderRadius:11}}>
+        <div style={{width:20,height:20,borderRadius:5,border:`2px solid ${agreed?C.blue:"rgba(26,111,160,0.28)"}`,background:agreed?C.blue:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          {agreed&&<span style={{color:"#fff",fontSize:11,fontWeight:900}}>✓</span>}
+        </div>
+        <span style={{fontSize:12,color:C.textMid}}>I agree to the <span style={{color:C.blue,fontWeight:700}}>Terms &amp; Conditions</span></span>
+      </div>
+      {errors.agreed&&<div style={{fontSize:11,color:C.red,marginBottom:10}}>⚠ {errors.agreed}</div>}
+      <button className="btn-blue" onClick={doRegister} disabled={loading}>{loading?"Creating…":"Create Account →"}</button>
+      <div style={{textAlign:"center",marginTop:14,fontSize:13,color:C.textLight}}>
+        Already have an account?{" "}<span onClick={onGoLogin} style={{color:C.blue,fontWeight:800,cursor:"pointer"}}>Sign In</span>
+      </div>
+    </div>
+  );
+};
+
+const VerifyScreen=({email,code,onVerified,onBack})=>{
+  const [input,setInput]=useState(["","","","","",""]);
+  const [error,setError]=useState(""); const [loading,setLoading]=useState(false);
+  const refs=useRef([]);
+  const handleInput=(i,v)=>{if(!/^\d?$/.test(v))return;const n=[...input];n[i]=v;setInput(n);if(v&&i<5)refs.current[i+1]?.focus();};
+  const handleKey=(i,e)=>{if(e.key==="Backspace"&&!input[i]&&i>0)refs.current[i-1]?.focus();};
+  const verify=async()=>{
+    const entered=input.join("");if(entered.length<6){setError("Enter all 6 digits");return;}
+    setLoading(true); await new Promise(r=>setTimeout(r,700));
+    if(entered===code){
+      const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
+      const idx=users.findIndex(u=>u.email===email);
+      if(idx>=0){users[idx].verified=true;localStorage.setItem("p2c_users",JSON.stringify(users));}
+      onVerified();
+    } else {setError("Incorrect code. Try again.");}
+    setLoading(false);
+  };
+  return(
+    <div style={{animation:"fadeIn 0.5s ease both"}}>
+      <div style={{marginBottom:18}}>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:20,fontWeight:800,color:C.textDark}}>Verify Your Email ✉️</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:5,lineHeight:1.6}}>We sent a 6-digit code to <strong style={{color:C.textDark}}>{email}</strong></div>
+      </div>
+      <div className="glass-soft" style={{borderRadius:13,padding:"11px 15px",marginBottom:18,fontSize:12,color:C.blue,fontWeight:700}}>
+        💡 Demo mode — your code is: <strong>{code}</strong>
+      </div>
+      <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:18}}>
+        {input.map((v,i)=>(
+          <input key={i} ref={el=>refs.current[i]=el} value={v} maxLength={1}
+            onChange={e=>handleInput(i,e.target.value)} onKeyDown={e=>handleKey(i,e)}
+            style={{width:42,height:54,textAlign:"center",background:"rgba(255,255,255,0.7)",border:`2px solid ${v?C.blue:"rgba(26,111,160,0.2)"}`,borderRadius:13,color:C.textDark,fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,outline:"none"}}/>
+        ))}
+      </div>
+      {error&&<div style={{fontSize:12,color:C.red,textAlign:"center",marginBottom:11}}>⚠ {error}</div>}
+      <button className="btn-blue" onClick={verify} disabled={loading}>{loading?"Verifying…":"Verify & Continue →"}</button>
+      <div style={{textAlign:"center",marginTop:12}}><span onClick={onBack} style={{fontSize:12,color:C.textLight,cursor:"pointer"}}>← Back</span></div>
+    </div>
+  );
+};
+
+const SilhouetteScreen=({onContinue})=>{
+  const [sel,setSel]=useState(2);
+  const opts=[{id:1,icon:"🧍‍♀️",label:"Slim",desc:"Slender build"},{id:2,icon:"🧍‍♂️",label:"Average",desc:"Average build"},{id:3,icon:"🧍",label:"Large",desc:"Larger build"}];
+  return(
+    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 24px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
+      <div style={{textAlign:"center",padding:"36px 0 20px"}}><Logo size={56}/>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:19,fontWeight:800,color:C.textDark,marginTop:12}}>Choose Your Silhouette</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:5}}>For accurate pain body mapping</div>
+      </div>
+      <div style={{display:"flex",gap:12,marginBottom:28}}>
+        {opts.map(o=>(
+          <div key={o.id} onClick={()=>setSel(o.id)}
+            className={sel===o.id?"glass":"glass-soft"}
+            style={{flex:1,padding:"18px 10px",borderRadius:18,textAlign:"center",cursor:"pointer",border:`2px solid ${sel===o.id?C.blue:"transparent"}`,transition:"all 0.2s"}}>
+            <div style={{fontSize:42,marginBottom:8}}>{o.icon}</div>
+            <div style={{fontWeight:800,fontSize:13,color:sel===o.id?C.blue:C.textMid}}>{o.label}</div>
+            <div style={{fontSize:11,color:C.textLight,marginTop:2}}>{o.desc}</div>
+          </div>
+        ))}
+      </div>
+      <button className="btn-blue" onClick={()=>onContinue(sel)}>Continue →</button>
+    </div>
+  );
+};
+
+const WelcomeScreen=({user,onContinue})=>{
+  useEffect(()=>{const t=setTimeout(onContinue,3000);return()=>clearTimeout(t);},[]);
+  return(
+    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
+      <div style={{animation:"float 2s ease-in-out infinite"}}><Logo size={76}/></div>
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:26,fontWeight:800,color:C.blue,marginTop:18,textAlign:"center"}}>You're In! 🎉</div>
+      <div style={{fontSize:15,color:C.textMid,marginTop:10,textAlign:"center",lineHeight:1.7}}>Welcome, <strong>{user?.name}</strong>.<br/>Your 7-day free trial starts now.</div>
+      <div style={{fontSize:13,color:C.textLight,marginTop:10}}>Taking you to your dashboard…</div>
+      <div style={{marginTop:22,display:"flex",gap:6}}>
+        {[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:i===0?C.blue:"rgba(26,111,160,0.2)",animation:`pulse 1.2s ease ${i*0.3}s infinite`}}/>)}
+      </div>
+    </div>
+  );
+};
+
+const PaywallScreen=({user,onSubscribe,onLogout})=>{
+  const [plan,setPlan]=useState("monthly"); const [loading,setLoading]=useState(false);
+  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
+  const doSub=async()=>{
+    setLoading(true); await new Promise(r=>setTimeout(r,1200));
+    const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
+    const idx=users.findIndex(u=>u.email===user.email);
+    if(idx>=0){users[idx].plan=plan;localStorage.setItem("p2c_users",JSON.stringify(users));}
+    onSubscribe(plan); setLoading(false);
+  };
+  return(
+    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 0 0"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}><Logo size={26}/>
+          <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:14}}><span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span></div>
+        </div>
+        <button onClick={onLogout} style={{fontSize:11,fontWeight:700,color:C.textLight,background:"rgba(255,255,255,0.5)",border:"1px solid rgba(26,111,160,0.2)",borderRadius:18,padding:"5px 11px",cursor:"pointer"}}>Log Out</button>
+      </div>
+      <div style={{textAlign:"center",padding:"24px 0 14px"}}>
+        <div style={{fontSize:44}}>✨</div>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:24,fontWeight:800,color:C.textDark,marginTop:8}}>Unlock Full Access</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:6,lineHeight:1.6}}>Continue your healing journey.</div>
+      </div>
+      {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
+        <span style={{fontSize:18}}>⏳</span>
+        <div><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} Days Left in Free Trial</div>
+        <div style={{fontSize:11,color:C.textLight}}>Your trial ends soon</div></div>
+      </div>}
+      <div style={{marginBottom:18}}>
+        {[["✅","Unlimited check-ins"],["📈","Trends & AI insights"],["🩺","Pain body heat map"],["💬","Community chat"],["📸","Secure documentation"],["📄","PDF health reports"]].map(([icon,text])=>(
+          <div key={text} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 0",borderBottom:"1px solid rgba(26,111,160,0.08)"}}>
+            <span style={{fontSize:15}}>{icon}</span>
+            <span style={{fontSize:13,fontWeight:600,color:C.textMid}}>{text}</span>
+            <div style={{marginLeft:"auto",width:17,height:17,borderRadius:"50%",background:C.green,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{color:"#fff",fontSize:10,fontWeight:900}}>✓</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="glass" style={{borderRadius:15,padding:5,display:"flex",gap:5,marginBottom:18}}>
+        {[{id:"monthly",label:"Monthly",price:"€4.99",sub:"/month"},{id:"annual",label:"Annual",price:"€49.99",sub:"/year · Save 17%"}].map(p=>(
+          <div key={p.id} onClick={()=>setPlan(p.id)}
+            style={{flex:1,padding:"13px 8px",borderRadius:11,textAlign:"center",cursor:"pointer",background:plan===p.id?"rgba(26,111,160,0.88)":"transparent",transition:"all 0.2s"}}>
+            <div style={{fontWeight:800,fontSize:12,color:plan===p.id?"#fff":C.textMid}}>{p.label}</div>
+            <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:plan===p.id?"#fff":C.textDark,marginTop:2}}>{p.price}</div>
+            <div style={{fontSize:10,color:plan===p.id?"rgba(255,255,255,0.7)":C.textLight,marginTop:2}}>{p.sub}</div>
+          </div>
+        ))}
+      </div>
+      <button className="btn-blue" onClick={doSub} disabled={loading} style={{animation:"glow 2.5s ease-in-out infinite"}}>
+        {loading?"Processing…":`Subscribe ${plan==="monthly"?"€4.99/mo":"€49.99/yr"} →`}
+      </button>
+      <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginTop:10}}>Cancel anytime · No hidden fees</div>
+      {daysLeft>0&&<div style={{textAlign:"center",marginTop:11}}><span onClick={()=>onSubscribe("trial")} style={{fontSize:12,color:C.textLight,cursor:"pointer",textDecoration:"underline"}}>Continue free trial ({daysLeft} days left)</span></div>}
+    </div>
+  );
+};
+
+/* ══ HOME TAB ══ */
+const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
+  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
+  const isPaid=user?.plan==="monthly"||user?.plan==="annual";
+  const affIdx=Math.floor(Date.now()/86400000)%AFFIRMATIONS.length;
+  const modules=[
+    {id:"pain",icon:"🩺",title:"Pain Module",sub:"Chronic Pain",color:C.red,border:"rgba(230,57,70,0.2)"},
+    {id:"violence",icon:"📸",title:"Violence Report",sub:"Documentation",color:C.purple,border:"rgba(123,63,158,0.2)"},
+    {id:"community",icon:"💬",title:"Community Chat",sub:"Anonymous",color:C.teal,border:"rgba(26,140,122,0.2)"},
+    {id:"trauma",icon:"🧠",title:"Trauma Recovery",sub:"Self-Guided",color:C.blue,border:"rgba(26,111,160,0.2)"},
+  ];
+  return(
+    <div style={{padding:"10px 0",animation:"fadeIn 0.4s ease both"}}>
+      {!isPaid&&daysLeft>0&&(
+        <div onClick={onShowPaywall} className="glass" style={{margin:"0 18px 14px",borderRadius:13,padding:"11px 14px",display:"flex",alignItems:"center",gap:11,cursor:"pointer",border:"1px solid rgba(244,162,97,0.35)"}}>
+          <span style={{fontSize:17}}>⏳</span>
+          <div style={{flex:1}}><div style={{fontWeight:800,fontSize:12,color:C.gold}}>{daysLeft} days left in free trial</div>
+          <div style={{fontSize:11,color:C.textLight}}>Tap to upgrade</div></div>
+          <span style={{color:C.gold,fontSize:14}}>→</span>
+        </div>
+      )}
+      <div style={{padding:"0 22px",marginBottom:18}}>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Hello, {user?.name?.split(" ")[0]||"Friend"} 👋</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>How are you feeling today?</div>
+      </div>
+      <div className="glass" style={{margin:"0 18px 18px",borderRadius:17,padding:18,background:"rgba(26,111,160,0.07)",border:"1px solid rgba(26,111,160,0.15)"}}>
+        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Today's Reminder 💙</div>
+        <div style={{fontSize:14,fontStyle:"italic",lineHeight:1.65,color:C.textMid}}>"{AFFIRMATIONS[affIdx]}"</div>
+      </div>
+      {history.length>0&&(
+        <div style={{display:"flex",gap:10,padding:"0 18px",marginBottom:18,overflowX:"auto"}}>
+          {[{label:"Last Pain",value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Check-Ins",value:history.length,color:C.green}].map(s=>(
+            <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 14px",flexShrink:0,minWidth:85}}>
+              <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
+              <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:21,color:s.color}}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      <div style={{padding:"0 18px"}}>
+        <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:12}}>Your Modules</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+          {modules.map(m=>(
+            <div key={m.id} onClick={()=>onModuleSelect(m.id)} className="glass"
+              style={{borderRadius:18,padding:18,cursor:"pointer",border:`1px solid ${m.border}`,transition:"transform 0.15s",background:`rgba(255,255,255,0.4)`}}>
+              <div style={{fontSize:30,marginBottom:9}}>{m.icon}</div>
+              <div style={{fontWeight:800,fontSize:13,color:m.color,lineHeight:1.2}}>{m.title}</div>
+              <div style={{fontSize:11,color:C.textLight,marginTop:3}}>{m.sub}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 /* ══ PAIN MODULE ══ */
 
