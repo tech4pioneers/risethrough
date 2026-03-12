@@ -962,6 +962,27 @@ const EXERCISES=[
   {id:"mindfulness",icon:"🌸",title:"Mindfulness",desc:"Awareness without judgment",steps:["Sit comfortably and gently close your eyes.","Bring attention to your breathing — don't control it.","Notice thoughts without judging them.","Gently return focus to your breath each time.","Continue for 5–10 minutes."]},
   {id:"emotions",icon:"💡",title:"Understanding Emotions",desc:"Identify & process feelings",steps:["Name what you are feeling right now.","Ask: where do I feel this in my body?","Is this feeling familiar?","What does this feeling need from me?","Write it down or speak it aloud."]},
 ];
+const CHANNELS=[
+  {id:"pain",icon:"🩺",label:"Chronic Pain",desc:"Share experiences & tips about living with chronic pain",color:"#e63946",seed:[
+    {id:1,user:"Maya R.",avatar:"🌸",text:"Anyone else notice their pain spikes mid-week? Wednesday always gets me.",time:"2h ago",mine:false},
+    {id:2,user:"Jordan K.",avatar:"🌊",text:"Yes! A short noon rest really helps me manage that.",time:"1h ago",mine:false},
+    {id:3,user:"Alex P.",avatar:"💙",text:"Does anyone use heat therapy? Just got a heating pad for back pain.",time:"20m ago",mine:false},
+  ]},
+  {id:"recovery",icon:"🧠",label:"Trauma Recovery",desc:"A safe space for healing and recovery journeys",color:"#5bb8e8",seed:[
+    {id:1,user:"Sam T.",avatar:"🌿",text:"Gentle reminder: rest is not failure 💚",time:"45m ago",mine:false},
+    {id:2,user:"River M.",avatar:"🦋",text:"Journaling every morning has helped me so much. Anyone else?",time:"30m ago",mine:false},
+    {id:3,user:"Casey L.",avatar:"🌸",text:"Small steps still count. Proud of everyone here.",time:"10m ago",mine:false},
+  ]},
+  {id:"safety",icon:"🛡️",label:"Safety & Support",desc:"Resources and peer support for those seeking safety",color:"#2d9a6e",seed:[
+    {id:1,user:"Morgan A.",avatar:"💚",text:"Remember: you are not alone. This community is here for you.",time:"1h ago",mine:false},
+    {id:2,user:"Taylor B.",avatar:"🌊",text:"The documentation feature in this app really helped me. Stay strong 💙",time:"25m ago",mine:false},
+  ]},
+  {id:"crisis",icon:"🆘",label:"Crisis Support",desc:"Immediate support — if in danger call 112",color:"#f4a261",seed:[
+    {id:1,user:"Support Bot",avatar:"🤖",text:"This is a peer support channel. For immediate help: 09 2525 0111 (Finland) or call 112.",time:"pinned",mine:false},
+    {id:2,user:"Jamie K.",avatar:"💙",text:"Checking in on everyone today. How are you holding up? 💙",time:"3h ago",mine:false},
+  ]},
+];
+
 const seedHistory=()=>Array.from({length:7},(_,i)=>{
   const pain=Math.floor(Math.random()*5)+3,mood=Math.floor(Math.random()*3)+2,checks=Math.floor(Math.random()*4)+1;
   return{id:i,date:DAYS[i],fullDate:new Date(Date.now()-(6-i)*86400000).toLocaleDateString("en-US",{month:"short",day:"numeric"}),
@@ -1356,13 +1377,25 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
         <div style={{fontSize:14,fontStyle:"italic",lineHeight:1.65,color:C.textMid}}>"{AFFIRMATIONS[affIdx]}"</div>
       </div>
       {history.length>0&&(
-        <div style={{display:"flex",gap:10,padding:"0 18px",marginBottom:18,overflowX:"auto"}}>
-          {[{label:"Last Pain",value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Check-Ins",value:history.length,color:C.green}].map(s=>(
+        <div style={{display:"flex",gap:10,padding:"0 18px",marginBottom:18,overflowX:"auto",alignItems:"center"}}>
+          {[
+            {label:"Last Pain",value:`${history[history.length-1]?.painLevel}/10`,color:C.red},
+            {label:"Avg Pain",value:`${(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1)}/10`,color:C.blue},
+            {label:"Check-Ins",value:history.length,color:C.green}
+          ].map(s=>(
             <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 14px",flexShrink:0,minWidth:85}}>
               <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
               <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:21,color:s.color}}>{s.value}</div>
             </div>
           ))}
+          <div onClick={()=>onModuleSelect("trends")}
+            className="glass"
+            style={{borderRadius:13,padding:"11px 14px",flexShrink:0,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minWidth:52,transition:"opacity 0.15s"}}
+            onMouseEnter={e=>e.currentTarget.style.opacity="0.75"}
+            onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+            <span style={{fontSize:22}}>📈</span>
+            <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginTop:3}}>History</div>
+          </div>
         </div>
       )}
       <div style={{padding:"0 18px"}}>
