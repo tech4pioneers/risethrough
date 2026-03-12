@@ -236,100 +236,11 @@ const SYMPTOM_TYPES=[
   {id:"radiate",label:"Radiating",color:"#9b59b6",icon:"🟣"},
 ];
 
-// Front body areas with sub-areas
-const FRONT_AREAS=[
-  {id:"forehead",label:"Forehead",cx:65,cy:18,rx:14,ry:8,shape:"ellipse",parent:"Head"},
-  {id:"face",label:"Face/Jaw",cx:65,cy:30,rx:12,ry:10,shape:"ellipse",parent:"Head"},
-  {id:"neck_f",label:"Neck",cx:65,cy:47,rx:8,ry:7,shape:"ellipse",parent:"Neck"},
-  {id:"lshoulder",label:"L. Shoulder",cx:38,cy:62,rx:12,ry:9,shape:"ellipse",parent:"Shoulders"},
-  {id:"rshoulder",label:"R. Shoulder",cx:92,cy:62,rx:12,ry:9,shape:"ellipse",parent:"Shoulders"},
-  {id:"chest",label:"Chest",cx:65,cy:72,rx:18,ry:14,shape:"ellipse",parent:"Chest"},
-  {id:"luparm",label:"L. Upper Arm",cx:32,cy:78,rx:8,ry:13,shape:"ellipse",parent:"Arms"},
-  {id:"ruparm",label:"R. Upper Arm",cx:98,cy:78,rx:8,ry:13,shape:"ellipse",parent:"Arms"},
-  {id:"lelbow",label:"L. Elbow",cx:26,cy:96,rx:7,ry:6,shape:"ellipse",parent:"Arms"},
-  {id:"relbow",label:"R. Elbow",cx:104,cy:96,rx:7,ry:6,shape:"ellipse",parent:"Arms"},
-  {id:"lfarm",label:"L. Forearm",cx:22,cy:110,rx:6,ry:10,shape:"ellipse",parent:"Arms"},
-  {id:"rfarm",label:"R. Forearm",cx:108,cy:110,rx:6,ry:10,shape:"ellipse",parent:"Arms"},
-  {id:"lwrist",label:"L. Wrist/Hand",cx:18,cy:124,rx:7,ry:7,shape:"ellipse",parent:"Arms"},
-  {id:"rwrist",label:"R. Wrist/Hand",cx:112,cy:124,rx:7,ry:7,shape:"ellipse",parent:"Arms"},
-  {id:"abdomen",label:"Abdomen",cx:65,cy:95,rx:16,ry:13,shape:"ellipse",parent:"Abdomen"},
-  {id:"liver",label:"Liver Area",cx:75,cy:108,rx:10,ry:7,shape:"ellipse",parent:"Abdomen"},
-  {id:"stomach",label:"Stomach",cx:60,cy:108,rx:9,ry:7,shape:"ellipse",parent:"Abdomen"},
-  {id:"pelvis",label:"Pelvis/Groin",cx:65,cy:122,rx:15,ry:9,shape:"ellipse",parent:"Hips"},
-  {id:"lhip",label:"L. Hip",cx:50,cy:133,rx:10,ry:9,shape:"ellipse",parent:"Hips"},
-  {id:"rhip",label:"R. Hip",cx:80,cy:133,rx:10,ry:9,shape:"ellipse",parent:"Hips"},
-  {id:"lthigh",label:"L. Thigh",cx:53,cy:152,rx:11,ry:14,shape:"ellipse",parent:"Legs"},
-  {id:"rthigh",label:"R. Thigh",cx:77,cy:152,rx:11,ry:14,shape:"ellipse",parent:"Legs"},
-  {id:"lknee",label:"L. Knee",cx:53,cy:172,rx:9,ry:8,shape:"ellipse",parent:"Legs"},
-  {id:"rknee",label:"R. Knee",cx:77,cy:172,rx:9,ry:8,shape:"ellipse",parent:"Legs"},
-  {id:"lshin",label:"L. Shin",cx:52,cy:188,rx:7,ry:10,shape:"ellipse",parent:"Legs"},
-  {id:"rshin",label:"R. Shin",cx:78,cy:188,rx:7,ry:10,shape:"ellipse",parent:"Legs"},
-  {id:"lankle",label:"L. Ankle/Foot",cx:50,cy:204,rx:8,ry:7,shape:"ellipse",parent:"Feet"},
-  {id:"rankle",label:"R. Ankle/Foot",cx:80,cy:204,rx:8,ry:7,shape:"ellipse",parent:"Feet"},
-];
-
-const BACK_AREAS=[
-  {id:"skull",label:"Back of Head",cx:65,cy:18,rx:14,ry:10,shape:"ellipse",parent:"Head"},
-  {id:"neck_b",label:"Neck (back)",cx:65,cy:32,rx:8,ry:7,shape:"ellipse",parent:"Neck"},
-  {id:"ltrap",label:"L. Trapezius",cx:44,cy:52,rx:13,ry:9,shape:"ellipse",parent:"Shoulders"},
-  {id:"rtrap",label:"R. Trapezius",cx:86,cy:52,rx:13,ry:9,shape:"ellipse",parent:"Shoulders"},
-  {id:"lupback",label:"L. Upper Back",cx:52,cy:70,rx:12,ry:13,shape:"ellipse",parent:"Upper Back"},
-  {id:"rupback",label:"R. Upper Back",cx:78,cy:70,rx:12,ry:13,shape:"ellipse",parent:"Upper Back"},
-  {id:"spine",label:"Spine",cx:65,cy:80,rx:5,ry:20,shape:"ellipse",parent:"Upper Back"},
-  {id:"llowback",label:"L. Lower Back",cx:53,cy:102,rx:11,ry:11,shape:"ellipse",parent:"Lower Back"},
-  {id:"rlowback",label:"R. Lower Back",cx:77,cy:102,rx:11,ry:11,shape:"ellipse",parent:"Lower Back"},
-  {id:"lkidney",label:"L. Kidney",cx:50,cy:93,rx:8,ry:7,shape:"ellipse",parent:"Lower Back"},
-  {id:"rkidney",label:"R. Kidney",cx:80,cy:93,rx:8,ry:7,shape:"ellipse",parent:"Lower Back"},
-  {id:"lglute",label:"L. Glute",cx:52,cy:122,rx:13,ry:12,shape:"ellipse",parent:"Hips"},
-  {id:"rglute",label:"R. Glute",cx:78,cy:122,rx:13,ry:12,shape:"ellipse",parent:"Hips"},
-  {id:"lhamst",label:"L. Hamstring",cx:52,cy:148,rx:11,ry:14,shape:"ellipse",parent:"Legs"},
-  {id:"rhamst",label:"R. Hamstring",cx:78,cy:148,rx:11,ry:14,shape:"ellipse",parent:"Legs"},
-  {id:"lkneeb",label:"L. Knee (back)",cx:52,cy:170,rx:9,ry:8,shape:"ellipse",parent:"Legs"},
-  {id:"rkneeb",label:"R. Knee (back)",cx:78,cy:170,rx:9,ry:8,shape:"ellipse",parent:"Legs"},
-  {id:"lcalf",label:"L. Calf",cx:51,cy:187,rx:8,ry:11,shape:"ellipse",parent:"Legs"},
-  {id:"rcalf",label:"R. Calf",cx:79,cy:187,rx:8,ry:11,shape:"ellipse",parent:"Legs"},
-  {id:"lheel",label:"L. Heel",cx:50,cy:204,rx:8,ry:7,shape:"ellipse",parent:"Feet"},
-  {id:"rheel",label:"R. Heel",cx:80,cy:204,rx:8,ry:7,shape:"ellipse",parent:"Feet"},
-];
-
-// Body silhouette paths for 3 body types (front)
-const BODY_SILHOUETTES={
-  slim:{
-    head:{cx:65,cy:16,rx:12,ry:13},
-    neck:{x:60,y:28,w:10,h:10},
-    torso:"M52,38 Q40,42 36,55 L34,130 Q48,134 65,135 Q82,134 96,130 L94,55 Q90,42 78,38 Z",
-    larm:"M52,42 Q42,48 36,60 L30,100 Q34,106 38,100 L42,60 Q46,52 54,46 Z",
-    rarm:"M78,42 Q88,48 94,60 L100,100 Q96,106 92,100 L88,60 Q84,52 76,46 Z",
-    lleg:"M46,132 Q40,145 38,175 L40,210 Q46,213 52,210 L54,175 Q56,145 56,132 Z",
-    rleg:"M74,132 Q74,145 76,175 L78,210 Q84,213 90,210 L92,175 Q90,145 84,132 Z",
-  },
-  normal:{
-    head:{cx:65,cy:16,rx:14,ry:14},
-    neck:{x:58,y:29,w:14,h:11},
-    torso:"M50,40 Q36,44 32,58 L30,132 Q46,138 65,140 Q84,138 100,132 L98,58 Q94,44 80,40 Z",
-    larm:"M50,44 Q38,50 32,64 L26,106 Q30,112 36,106 L40,66 Q44,54 52,48 Z",
-    rarm:"M80,44 Q92,50 98,64 L104,106 Q100,112 94,106 L90,66 Q86,54 78,48 Z",
-    lleg:"M42,138 Q36,152 34,182 L36,214 Q44,218 52,214 L54,182 Q56,152 58,138 Z",
-    rleg:"M72,138 Q74,152 76,182 L78,214 Q86,218 94,214 L96,182 Q94,152 88,138 Z",
-  },
-  large:{
-    head:{cx:65,cy:15,rx:16,ry:15},
-    neck:{x:56,y:29,w:18,h:12},
-    torso:"M48,41 Q30,46 26,62 L24,134 Q44,142 65,145 Q86,142 106,134 L104,62 Q100,46 82,41 Z",
-    larm:"M48,45 Q34,52 28,68 L22,110 Q26,118 34,110 L38,70 Q42,56 50,50 Z",
-    rarm:"M82,45 Q96,52 102,68 L108,110 Q104,118 96,110 L92,70 Q88,56 80,50 Z",
-    lleg:"M38,140 Q30,156 28,186 L30,218 Q40,222 52,218 L54,186 Q56,156 60,140 Z",
-    rleg:"M70,140 Q74,156 76,186 L78,218 Q90,222 100,218 L102,186 Q100,156 94,140 Z",
-  }
-};
-
-/* ── BODY MAP V2 ── gender-aware, two-phase, sub-area detail */
+/* ══ BODY MAP V2 — peach figure, 4 views, gender-aware ══ */
 
 // ── GENDER FILTER ────────────────────────────────────────────
 const filterByGender = (items, gender) => {
-  // male-only terms
   const maleOnly = ['penis','scrotum','testicle','testis','prostate','epididymis'];
-  // female-only terms  
   const femaleOnly = ['vulva','vagina','clitoris','labia','uterus','ovary','ovaries','cervix','fallopian'];
   const g = (gender||'').toLowerCase();
   return items.filter(item => {
@@ -342,7 +253,7 @@ const filterByGender = (items, gender) => {
   });
 };
 
-// ── COMPLETE SUBAREAS ────────────────────────────────────────
+// ── SUBAREAS (complete anatomical list) ─────────────────────
 const SUBAREAS_V2 = {
   // FRONT
   forehead:['Forehead (centre)','Forehead (left)','Forehead (right)','Left temple','Right temple'],
@@ -362,7 +273,7 @@ const SUBAREAS_V2 = {
   abdomen:['Upper abdomen (centre)','Upper abdomen (left)','Upper abdomen (right)','Lower abdomen (centre)','Lower abdomen (left)','Lower abdomen (right)','Navel area','Stomach area','Liver area (right upper)','Gallbladder area','Spleen area (left upper)','Pancreas area','Left kidney (front)','Right kidney (front)','Left colon','Right colon','Small intestine area','Left flank','Right flank','Left lymph nodes (groin)','Right lymph nodes (groin)'],
   liver:['Liver (upper right)','Gallbladder','Right rib (lower front)','Right side abdomen (upper)'],
   stomach:['Stomach / gastric area','Pancreas area','Left rib (lower front)','Left side abdomen (upper)','Spleen area'],
-  pelvis:['Pubic bone','Left groin','Right groin','Left hip (front)','Right hip (front)','Left inguinal area','Right inguinal area','Urethra','Bladder area','Penis','Scrotum / testicles','Left testicle','Right testicle','Vulva','Vagina (external)','Clitoris','Labia (left)','Labia (right)','Uterus area','Ovary (left)','Ovary (right)','Prostate area','Perineum'],
+  pelvis:['Pubic bone','Left groin','Right groin','Left hip (front)','Right hip (front)','Left inguinal area','Right inguinal area','Urethra','Bladder area','Penis','Scrotum / testicles','Left testicle','Right testicle','Vulva','Vagina (external)','Clitoris','Labia (left)','Labia (right)','Uterus area','Ovary (left)','Ovary (right)','Prostate area','Perineum','Anal area','Rectum area'],
   lhip:['Left hip (front)','Left hip bone (iliac crest)','Left hip flexor','Left groin (inner)','Left inguinal lymph nodes'],
   rhip:['Right hip (front)','Right hip bone (iliac crest)','Right hip flexor','Right groin (inner)','Right inguinal lymph nodes'],
   lthigh:['Left thigh (front, centre)','Left thigh (front, inner)','Left thigh (front, outer)','Left quadriceps'],
@@ -395,6 +306,42 @@ const SUBAREAS_V2 = {
   rcalf:['Right calf (inner / gastrocnemius)','Right calf (outer / soleus)','Right Achilles tendon','Right ankle (back)'],
   lheel:['Left heel (centre)','Left heel (inner)','Left heel (outer)','Left heel (bottom)','Left sole','Left plantar fascia'],
   rheel:['Right heel (centre)','Right heel (inner)','Right heel (outer)','Right heel (bottom)','Right sole','Right plantar fascia'],
+  // LEFT LATERAL
+  head_l:['Left temple','Left ear','Left side of head','Left forehead (side)','Left jaw (side)','Left cheekbone','Left eye (outer)'],
+  neck_l:['Left side of neck','Left sternocleidomastoid','Left lymph nodes (neck)','Left carotid area','Left scalene muscles'],
+  lshoulder_l:['Left shoulder top','Left shoulder joint','Left AC joint','Left deltoid (outer)','Left rotator cuff','Left supraspinatus','Left axilla (armpit)'],
+  chest_l:['Left ribs (front, upper)','Left ribs (front, lower)','Left breast / pectoral','Left lung area','Left heart area','Left flank (front)'],
+  lupback_l:['Left upper back','Left shoulder blade (scapula)','Left trapezius','Left rhomboid','Left rib (back, upper)','Left lat (upper)'],
+  larm_l:['Left upper arm (outer)','Left deltoid (outer)','Left bicep (outer)','Left tricep'],
+  lelbow_l:['Left elbow (outer)','Left elbow joint','Left lateral epicondyle','Left olecranon'],
+  lfarm_l:['Left forearm (outer)','Left forearm (inner)','Left extensor muscles','Left flexor muscles'],
+  lwrist_l:['Left wrist (outer)','Left wrist (inner)','Left ulna head','Left radial styloid','Left back of hand','Left palm'],
+  abdomen_l:['Left flank (front)','Left side abdomen','Left rib (lower front)','Left hip flexor area','Left psoas area'],
+  llowback_l:['Left lower back','Left lumbar muscles','Left SI joint','Left flank (back)','Left kidney area','Left QL muscle'],
+  lhip_l:['Left hip (side)','Left greater trochanter','Left hip joint (lateral)','Left IT band (hip)','Left TFL muscle'],
+  lglute_l:['Left glute (upper)','Left glute (middle)','Left piriformis','Left glute (lower)','Left sit bone'],
+  lthigh_l:['Left IT band (thigh)','Left thigh (outer)','Left thigh (side)','Left quadriceps (outer)','Left hamstring (outer)'],
+  lknee_l:['Left knee (outer)','Left lateral meniscus','Left IT band (knee)','Left fibular head','Left lateral collateral ligament'],
+  lshin_l:['Left shin (outer)','Left calf (outer / soleus)','Left peroneal muscles','Left fibula area'],
+  lankle_l:['Left ankle (outer)','Left lateral malleolus','Left peroneal tendons','Left foot (outer side)','Left 5th metatarsal'],
+  // RIGHT LATERAL
+  head_r:['Right temple','Right ear','Right side of head','Right forehead (side)','Right jaw (side)','Right cheekbone','Right eye (outer)'],
+  neck_r:['Right side of neck','Right sternocleidomastoid','Right lymph nodes (neck)','Right carotid area','Right scalene muscles'],
+  rshoulder_r:['Right shoulder top','Right shoulder joint','Right AC joint','Right deltoid (outer)','Right rotator cuff','Right supraspinatus','Right axilla (armpit)'],
+  chest_r:['Right ribs (front, upper)','Right ribs (front, lower)','Right breast / pectoral','Right lung area','Right flank (front)'],
+  rupback_r:['Right upper back','Right shoulder blade (scapula)','Right trapezius','Right rhomboid','Right rib (back, upper)','Right lat (upper)'],
+  rarm_r:['Right upper arm (outer)','Right deltoid (outer)','Right bicep (outer)','Right tricep'],
+  relbow_r:['Right elbow (outer)','Right elbow joint','Right lateral epicondyle','Right olecranon'],
+  rfarm_r:['Right forearm (outer)','Right forearm (inner)','Right extensor muscles','Right flexor muscles'],
+  rwrist_r:['Right wrist (outer)','Right wrist (inner)','Right ulna head','Right radial styloid','Right back of hand','Right palm'],
+  abdomen_r:['Right flank (front)','Right side abdomen','Right rib (lower front)','Right hip flexor area','Right psoas area'],
+  rlowback_r:['Right lower back','Right lumbar muscles','Right SI joint','Right flank (back)','Right kidney area','Right QL muscle'],
+  rhip_r:['Right hip (side)','Right greater trochanter','Right hip joint (lateral)','Right IT band (hip)','Right TFL muscle'],
+  rglute_r:['Right glute (upper)','Right glute (middle)','Right piriformis','Right glute (lower)','Right sit bone'],
+  rthigh_r:['Right IT band (thigh)','Right thigh (outer)','Right thigh (side)','Right quadriceps (outer)','Right hamstring (outer)'],
+  rknee_r:['Right knee (outer)','Right lateral meniscus','Right IT band (knee)','Right fibular head','Right lateral collateral ligament'],
+  rshin_r:['Right shin (outer)','Right calf (outer / soleus)','Right peroneal muscles','Right fibula area'],
+  rankle_r:['Right ankle (outer)','Right lateral malleolus','Right peroneal tendons','Right foot (outer side)','Right 5th metatarsal'],
 };
 
 // Custom areas localStorage
@@ -402,59 +349,365 @@ const CUSTOM_KEY_V2 = 'p2c_custom_areas_v2';
 const loadCustomV2 = () => { try { return JSON.parse(localStorage.getItem(CUSTOM_KEY_V2)||'{}'); } catch { return {}; } };
 const saveCustomV2 = (obj) => { try { localStorage.setItem(CUSTOM_KEY_V2, JSON.stringify(obj)); } catch {} };
 
+// ── PEACH FIGURE SVG PARTS ───────────────────────────────────
+// Front-facing figure
+const FigureFront = ({ areas, areaSymptoms, onAreaClick }) => {
+  const getColor = (id) => {
+    const d = areaSymptoms[id];
+    if (!d || !d.maxIntensity) return '#F5CBA7';
+    if (d.maxIntensity >= 7) return '#e63946';
+    if (d.maxIntensity >= 4) return '#e65100';
+    return '#f9a825';
+  };
+  const getStroke = (id) => {
+    const d = areaSymptoms[id];
+    if (!d || !d.maxIntensity) return '#e8a87c';
+    if (d.maxIntensity >= 7) return '#b71c1c';
+    if (d.maxIntensity >= 4) return '#bf360c';
+    return '#e65100';
+  };
+  const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
+  return (
+    <svg viewBox="0 0 120 280" width="100%" style={{maxWidth:180,display:'block',margin:'0 auto'}}>
+      {/* Head */}
+      <ellipse cx="60" cy="22" rx="18" ry="20" fill={getColor('forehead')} stroke={getStroke('forehead')} strokeWidth="1.5" {...hit('forehead')}/>
+      {/* Face details */}
+      <circle cx="54" cy="20" r="2.5" fill="#c0846a" opacity="0.6"/>
+      <circle cx="66" cy="20" r="2.5" fill="#c0846a" opacity="0.6"/>
+      <path d="M54,28 Q60,32 66,28" fill="none" stroke="#c0846a" strokeWidth="1.5" strokeLinecap="round"/>
+      {/* Neck */}
+      <rect x="54" y="40" width="12" height="12" rx="4" fill={getColor('neck_f')} stroke={getStroke('neck_f')} strokeWidth="1.5" {...hit('neck_f')}/>
+      {/* Torso */}
+      <rect x="36" y="52" width="48" height="52" rx="10" fill={getColor('chest')} stroke={getStroke('chest')} strokeWidth="1.5" {...hit('chest')}/>
+      {/* Abdomen */}
+      <rect x="38" y="100" width="44" height="36" rx="8" fill={getColor('abdomen')} stroke={getStroke('abdomen')} strokeWidth="1.5" {...hit('abdomen')}/>
+      {/* Pelvis */}
+      <rect x="36" y="132" width="48" height="22" rx="8" fill={getColor('pelvis')} stroke={getStroke('pelvis')} strokeWidth="1.5" {...hit('pelvis')}/>
+      {/* Left shoulder (viewer's right = patient's left) */}
+      <ellipse cx="30" cy="62" rx="10" ry="10" fill={getColor('lshoulder')} stroke={getStroke('lshoulder')} strokeWidth="1.5" {...hit('lshoulder')}/>
+      {/* Right shoulder */}
+      <ellipse cx="90" cy="62" rx="10" ry="10" fill={getColor('rshoulder')} stroke={getStroke('rshoulder')} strokeWidth="1.5" {...hit('rshoulder')}/>
+      {/* Left upper arm */}
+      <rect x="20" y="70" width="14" height="36" rx="7" fill={getColor('luparm')} stroke={getStroke('luparm')} strokeWidth="1.5" {...hit('luparm')}/>
+      {/* Right upper arm */}
+      <rect x="86" y="70" width="14" height="36" rx="7" fill={getColor('ruparm')} stroke={getStroke('ruparm')} strokeWidth="1.5" {...hit('ruparm')}/>
+      {/* Left elbow */}
+      <ellipse cx="27" cy="108" rx="8" ry="7" fill={getColor('lelbow')} stroke={getStroke('lelbow')} strokeWidth="1.5" {...hit('lelbow')}/>
+      {/* Right elbow */}
+      <ellipse cx="93" cy="108" rx="8" ry="7" fill={getColor('relbow')} stroke={getStroke('relbow')} strokeWidth="1.5" {...hit('relbow')}/>
+      {/* Left forearm */}
+      <rect x="20" y="113" width="14" height="30" rx="7" fill={getColor('lfarm')} stroke={getStroke('lfarm')} strokeWidth="1.5" {...hit('lfarm')}/>
+      {/* Right forearm */}
+      <rect x="86" y="113" width="14" height="30" rx="7" fill={getColor('rfarm')} stroke={getStroke('rfarm')} strokeWidth="1.5" {...hit('rfarm')}/>
+      {/* Left wrist/hand */}
+      <ellipse cx="27" cy="150" rx="9" ry="8" fill={getColor('lwrist')} stroke={getStroke('lwrist')} strokeWidth="1.5" {...hit('lwrist')}/>
+      {/* Right wrist/hand */}
+      <ellipse cx="93" cy="150" rx="9" ry="8" fill={getColor('rwrist')} stroke={getStroke('rwrist')} strokeWidth="1.5" {...hit('rwrist')}/>
+      {/* Left hip */}
+      <ellipse cx="42" cy="158" rx="10" ry="8" fill={getColor('lhip')} stroke={getStroke('lhip')} strokeWidth="1.5" {...hit('lhip')}/>
+      {/* Right hip */}
+      <ellipse cx="78" cy="158" rx="10" ry="8" fill={getColor('rhip')} stroke={getStroke('rhip')} strokeWidth="1.5" {...hit('rhip')}/>
+      {/* Left thigh */}
+      <rect x="34" y="163" width="18" height="38" rx="9" fill={getColor('lthigh')} stroke={getStroke('lthigh')} strokeWidth="1.5" {...hit('lthigh')}/>
+      {/* Right thigh */}
+      <rect x="68" y="163" width="18" height="38" rx="9" fill={getColor('rthigh')} stroke={getStroke('rthigh')} strokeWidth="1.5" {...hit('rthigh')}/>
+      {/* Left knee */}
+      <ellipse cx="43" cy="203" rx="10" ry="8" fill={getColor('lknee')} stroke={getStroke('lknee')} strokeWidth="1.5" {...hit('lknee')}/>
+      {/* Right knee */}
+      <ellipse cx="77" cy="203" rx="10" ry="8" fill={getColor('rknee')} stroke={getStroke('rknee')} strokeWidth="1.5" {...hit('rknee')}/>
+      {/* Left shin */}
+      <rect x="34" y="209" width="17" height="34" rx="8" fill={getColor('lshin')} stroke={getStroke('lshin')} strokeWidth="1.5" {...hit('lshin')}/>
+      {/* Right shin */}
+      <rect x="69" y="209" width="17" height="34" rx="8" fill={getColor('rshin')} stroke={getStroke('rshin')} strokeWidth="1.5" {...hit('rshin')}/>
+      {/* Left ankle/foot */}
+      <ellipse cx="42" cy="248" rx="11" ry="8" fill={getColor('lankle')} stroke={getStroke('lankle')} strokeWidth="1.5" {...hit('lankle')}/>
+      {/* Right ankle/foot */}
+      <ellipse cx="78" cy="248" rx="11" ry="8" fill={getColor('rankle')} stroke={getStroke('rankle')} strokeWidth="1.5" {...hit('rankle')}/>
+    </svg>
+  );
+};
+
+// Back-facing figure (patient's left = viewer's left from back)
+const FigureBack = ({ areaSymptoms, onAreaClick }) => {
+  const getColor = (id) => {
+    const d = areaSymptoms[id];
+    if (!d || !d.maxIntensity) return '#F5CBA7';
+    if (d.maxIntensity >= 7) return '#e63946';
+    if (d.maxIntensity >= 4) return '#e65100';
+    return '#f9a825';
+  };
+  const getStroke = (id) => {
+    const d = areaSymptoms[id];
+    if (!d || !d.maxIntensity) return '#e8a87c';
+    if (d.maxIntensity >= 7) return '#b71c1c';
+    if (d.maxIntensity >= 4) return '#bf360c';
+    return '#e65100';
+  };
+  const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
+  return (
+    <svg viewBox="0 0 120 280" width="100%" style={{maxWidth:180,display:'block',margin:'0 auto'}}>
+      {/* Head back */}
+      <ellipse cx="60" cy="22" rx="18" ry="20" fill={getColor('skull')} stroke={getStroke('skull')} strokeWidth="1.5" {...hit('skull')}/>
+      {/* Neck back */}
+      <rect x="54" y="40" width="12" height="12" rx="4" fill={getColor('neck_b')} stroke={getStroke('neck_b')} strokeWidth="1.5" {...hit('neck_b')}/>
+      {/* Left trap */}
+      <ellipse cx="38" cy="58" rx="14" ry="10" fill={getColor('ltrap')} stroke={getStroke('ltrap')} strokeWidth="1.5" {...hit('ltrap')}/>
+      {/* Right trap */}
+      <ellipse cx="82" cy="58" rx="14" ry="10" fill={getColor('rtrap')} stroke={getStroke('rtrap')} strokeWidth="1.5" {...hit('rtrap')}/>
+      {/* Upper back */}
+      <rect x="36" y="52" width="22" height="48" rx="6" fill={getColor('lupback')} stroke={getStroke('lupback')} strokeWidth="1.5" {...hit('lupback')}/>
+      <rect x="62" y="52" width="22" height="48" rx="6" fill={getColor('rupback')} stroke={getStroke('rupback')} strokeWidth="1.5" {...hit('rupback')}/>
+      {/* Spine */}
+      <rect x="55" y="54" width="10" height="78" rx="4" fill={getColor('spine')} stroke={getStroke('spine')} strokeWidth="1.5" {...hit('spine')}/>
+      {/* Lower back */}
+      <rect x="36" y="96" width="22" height="36" rx="6" fill={getColor('llowback')} stroke={getStroke('llowback')} strokeWidth="1.5" {...hit('llowback')}/>
+      <rect x="62" y="96" width="22" height="36" rx="6" fill={getColor('rlowback')} stroke={getStroke('rlowback')} strokeWidth="1.5" {...hit('rlowback')}/>
+      {/* Kidneys */}
+      <ellipse cx="43" cy="100" rx="7" ry="6" fill={getColor('lkidney')} stroke={getStroke('lkidney')} strokeWidth="1.5" {...hit('lkidney')}/>
+      <ellipse cx="77" cy="100" rx="7" ry="6" fill={getColor('rkidney')} stroke={getStroke('rkidney')} strokeWidth="1.5" {...hit('rkidney')}/>
+      {/* Glutes */}
+      <ellipse cx="43" cy="140" rx="14" ry="14" fill={getColor('lglute')} stroke={getStroke('lglute')} strokeWidth="1.5" {...hit('lglute')}/>
+      <ellipse cx="77" cy="140" rx="14" ry="14" fill={getColor('rglute')} stroke={getStroke('rglute')} strokeWidth="1.5" {...hit('rglute')}/>
+      {/* Back arms */}
+      <rect x="20" y="70" width="14" height="36" rx="7" fill="#F5CBA7" stroke="#e8a87c" strokeWidth="1.5"/>
+      <rect x="86" y="70" width="14" height="36" rx="7" fill="#F5CBA7" stroke="#e8a87c" strokeWidth="1.5"/>
+      {/* Hamstrings */}
+      <rect x="34" y="163" width="18" height="38" rx="9" fill={getColor('lhamst')} stroke={getStroke('lhamst')} strokeWidth="1.5" {...hit('lhamst')}/>
+      <rect x="68" y="163" width="18" height="38" rx="9" fill={getColor('rhamst')} stroke={getStroke('rhamst')} strokeWidth="1.5" {...hit('rhamst')}/>
+      {/* Back knees */}
+      <ellipse cx="43" cy="203" rx="10" ry="8" fill={getColor('lkneeb')} stroke={getStroke('lkneeb')} strokeWidth="1.5" {...hit('lkneeb')}/>
+      <ellipse cx="77" cy="203" rx="10" ry="8" fill={getColor('rkneeb')} stroke={getStroke('rkneeb')} strokeWidth="1.5" {...hit('rkneeb')}/>
+      {/* Calves */}
+      <rect x="34" y="209" width="17" height="34" rx="8" fill={getColor('lcalf')} stroke={getStroke('lcalf')} strokeWidth="1.5" {...hit('lcalf')}/>
+      <rect x="69" y="209" width="17" height="34" rx="8" fill={getColor('rcalf')} stroke={getStroke('rcalf')} strokeWidth="1.5" {...hit('rcalf')}/>
+      {/* Heels */}
+      <ellipse cx="42" cy="248" rx="11" ry="8" fill={getColor('lheel')} stroke={getStroke('lheel')} strokeWidth="1.5" {...hit('lheel')}/>
+      <ellipse cx="78" cy="248" rx="11" ry="8" fill={getColor('rheel')} stroke={getStroke('rheel')} strokeWidth="1.5" {...hit('rheel')}/>
+    </svg>
+  );
+};
+
+// Left lateral figure (facing right, showing patient's left side)
+const FigureLeft = ({ areaSymptoms, onAreaClick }) => {
+  const getColor = (id) => {
+    const d = areaSymptoms[id];
+    if (!d || !d.maxIntensity) return '#F5CBA7';
+    if (d.maxIntensity >= 7) return '#e63946';
+    if (d.maxIntensity >= 4) return '#e65100';
+    return '#f9a825';
+  };
+  const getStroke = (id) => {
+    const d = areaSymptoms[id];
+    if (!d || !d.maxIntensity) return '#e8a87c';
+    if (d.maxIntensity >= 7) return '#b71c1c';
+    if (d.maxIntensity >= 4) return '#bf360c';
+    return '#e65100';
+  };
+  const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
+  return (
+    <svg viewBox="0 0 100 280" width="100%" style={{maxWidth:140,display:'block',margin:'0 auto'}}>
+      {/* Head */}
+      <ellipse cx="52" cy="22" rx="16" ry="19" fill={getColor('head_l')} stroke={getStroke('head_l')} strokeWidth="1.5" {...hit('head_l')}/>
+      {/* Face profile */}
+      <ellipse cx="62" cy="22" rx="8" ry="14" fill={getColor('face')} stroke={getStroke('face')} strokeWidth="1" {...hit('face')}/>
+      {/* Eye */}
+      <circle cx="64" cy="18" r="2" fill="#c0846a" opacity="0.7"/>
+      {/* Neck */}
+      <rect x="46" y="40" width="12" height="12" rx="4" fill={getColor('neck_l')} stroke={getStroke('neck_l')} strokeWidth="1.5" {...hit('neck_l')}/>
+      {/* Shoulder */}
+      <ellipse cx="44" cy="56" rx="12" ry="10" fill={getColor('lshoulder_l')} stroke={getStroke('lshoulder_l')} strokeWidth="1.5" {...hit('lshoulder_l')}/>
+      {/* Chest front */}
+      <rect x="46" y="52" width="20" height="48" rx="6" fill={getColor('chest_l')} stroke={getStroke('chest_l')} strokeWidth="1.5" {...hit('chest_l')}/>
+      {/* Upper back */}
+      <rect x="28" y="52" width="20" height="48" rx="6" fill={getColor('lupback_l')} stroke={getStroke('lupback_l')} strokeWidth="1.5" {...hit('lupback_l')}/>
+      {/* Abdomen */}
+      <rect x="46" y="96" width="20" height="34" rx="6" fill={getColor('abdomen_l')} stroke={getStroke('abdomen_l')} strokeWidth="1.5" {...hit('abdomen_l')}/>
+      {/* Lower back */}
+      <rect x="28" y="96" width="20" height="34" rx="6" fill={getColor('llowback_l')} stroke={getStroke('llowback_l')} strokeWidth="1.5" {...hit('llowback_l')}/>
+      {/* Arm */}
+      <rect x="22" y="62" width="14" height="60" rx="7" fill={getColor('larm_l')} stroke={getStroke('larm_l')} strokeWidth="1.5" {...hit('larm_l')}/>
+      {/* Elbow */}
+      <ellipse cx="29" cy="124" rx="8" ry="7" fill={getColor('lelbow_l')} stroke={getStroke('lelbow_l')} strokeWidth="1.5" {...hit('lelbow_l')}/>
+      {/* Forearm */}
+      <rect x="22" y="129" width="14" height="26" rx="7" fill={getColor('lfarm_l')} stroke={getStroke('lfarm_l')} strokeWidth="1.5" {...hit('lfarm_l')}/>
+      {/* Wrist/hand */}
+      <ellipse cx="29" cy="160" rx="9" ry="8" fill={getColor('lwrist_l')} stroke={getStroke('lwrist_l')} strokeWidth="1.5" {...hit('lwrist_l')}/>
+      {/* Hip */}
+      <ellipse cx="44" cy="138" rx="12" ry="10" fill={getColor('lhip_l')} stroke={getStroke('lhip_l')} strokeWidth="1.5" {...hit('lhip_l')}/>
+      {/* Glute */}
+      <ellipse cx="30" cy="142" rx="12" ry="12" fill={getColor('lglute_l')} stroke={getStroke('lglute_l')} strokeWidth="1.5" {...hit('lglute_l')}/>
+      {/* Thigh */}
+      <rect x="36" y="150" width="18" height="42" rx="9" fill={getColor('lthigh_l')} stroke={getStroke('lthigh_l')} strokeWidth="1.5" {...hit('lthigh_l')}/>
+      {/* Knee */}
+      <ellipse cx="45" cy="194" rx="11" ry="9" fill={getColor('lknee_l')} stroke={getStroke('lknee_l')} strokeWidth="1.5" {...hit('lknee_l')}/>
+      {/* Shin/Calf */}
+      <rect x="36" y="201" width="18" height="36" rx="8" fill={getColor('lshin_l')} stroke={getStroke('lshin_l')} strokeWidth="1.5" {...hit('lshin_l')}/>
+      {/* Ankle/foot */}
+      <ellipse cx="50" cy="244" rx="14" ry="8" fill={getColor('lankle_l')} stroke={getStroke('lankle_l')} strokeWidth="1.5" {...hit('lankle_l')}/>
+    </svg>
+  );
+};
+
+// Right lateral figure (facing left, showing patient's right side)
+const FigureRight = ({ areaSymptoms, onAreaClick }) => {
+  const getColor = (id) => {
+    const d = areaSymptoms[id];
+    if (!d || !d.maxIntensity) return '#F5CBA7';
+    if (d.maxIntensity >= 7) return '#e63946';
+    if (d.maxIntensity >= 4) return '#e65100';
+    return '#f9a825';
+  };
+  const getStroke = (id) => {
+    const d = areaSymptoms[id];
+    if (!d || !d.maxIntensity) return '#e8a87c';
+    if (d.maxIntensity >= 7) return '#b71c1c';
+    if (d.maxIntensity >= 4) return '#bf360c';
+    return '#e65100';
+  };
+  const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
+  return (
+    <svg viewBox="0 0 100 280" width="100%" style={{maxWidth:140,display:'block',margin:'0 auto'}}>
+      {/* Head */}
+      <ellipse cx="48" cy="22" rx="16" ry="19" fill={getColor('head_r')} stroke={getStroke('head_r')} strokeWidth="1.5" {...hit('head_r')}/>
+      {/* Face profile (facing left) */}
+      <ellipse cx="38" cy="22" rx="8" ry="14" fill={getColor('face')} stroke={getStroke('face')} strokeWidth="1" {...hit('face')}/>
+      {/* Eye */}
+      <circle cx="36" cy="18" r="2" fill="#c0846a" opacity="0.7"/>
+      {/* Neck */}
+      <rect x="42" y="40" width="12" height="12" rx="4" fill={getColor('neck_r')} stroke={getStroke('neck_r')} strokeWidth="1.5" {...hit('neck_r')}/>
+      {/* Shoulder */}
+      <ellipse cx="56" cy="56" rx="12" ry="10" fill={getColor('rshoulder_r')} stroke={getStroke('rshoulder_r')} strokeWidth="1.5" {...hit('rshoulder_r')}/>
+      {/* Chest front */}
+      <rect x="34" y="52" width="20" height="48" rx="6" fill={getColor('chest_r')} stroke={getStroke('chest_r')} strokeWidth="1.5" {...hit('chest_r')}/>
+      {/* Upper back */}
+      <rect x="52" y="52" width="20" height="48" rx="6" fill={getColor('rupback_r')} stroke={getStroke('rupback_r')} strokeWidth="1.5" {...hit('rupback_r')}/>
+      {/* Abdomen */}
+      <rect x="34" y="96" width="20" height="34" rx="6" fill={getColor('abdomen_r')} stroke={getStroke('abdomen_r')} strokeWidth="1.5" {...hit('abdomen_r')}/>
+      {/* Lower back */}
+      <rect x="52" y="96" width="20" height="34" rx="6" fill={getColor('rlowback_r')} stroke={getStroke('rlowback_r')} strokeWidth="1.5" {...hit('rlowback_r')}/>
+      {/* Arm */}
+      <rect x="64" y="62" width="14" height="60" rx="7" fill={getColor('rarm_r')} stroke={getStroke('rarm_r')} strokeWidth="1.5" {...hit('rarm_r')}/>
+      {/* Elbow */}
+      <ellipse cx="71" cy="124" rx="8" ry="7" fill={getColor('relbow_r')} stroke={getStroke('relbow_r')} strokeWidth="1.5" {...hit('relbow_r')}/>
+      {/* Forearm */}
+      <rect x="64" y="129" width="14" height="26" rx="7" fill={getColor('rfarm_r')} stroke={getStroke('rfarm_r')} strokeWidth="1.5" {...hit('rfarm_r')}/>
+      {/* Wrist/hand */}
+      <ellipse cx="71" cy="160" rx="9" ry="8" fill={getColor('rwrist_r')} stroke={getStroke('rwrist_r')} strokeWidth="1.5" {...hit('rwrist_r')}/>
+      {/* Hip */}
+      <ellipse cx="56" cy="138" rx="12" ry="10" fill={getColor('rhip_r')} stroke={getStroke('rhip_r')} strokeWidth="1.5" {...hit('rhip_r')}/>
+      {/* Glute */}
+      <ellipse cx="70" cy="142" rx="12" ry="12" fill={getColor('rglute_r')} stroke={getStroke('rglute_r')} strokeWidth="1.5" {...hit('rglute_r')}/>
+      {/* Thigh */}
+      <rect x="46" y="150" width="18" height="42" rx="9" fill={getColor('rthigh_r')} stroke={getStroke('rthigh_r')} strokeWidth="1.5" {...hit('rthigh_r')}/>
+      {/* Knee */}
+      <ellipse cx="55" cy="194" rx="11" ry="9" fill={getColor('rknee_r')} stroke={getStroke('rknee_r')} strokeWidth="1.5" {...hit('rknee_r')}/>
+      {/* Shin/Calf */}
+      <rect x="46" y="201" width="18" height="36" rx="8" fill={getColor('rshin_r')} stroke={getStroke('rshin_r')} strokeWidth="1.5" {...hit('rshin_r')}/>
+      {/* Ankle/foot */}
+      <ellipse cx="50" cy="244" rx="14" ry="8" fill={getColor('rankle_r')} stroke={getStroke('rankle_r')} strokeWidth="1.5" {...hit('rankle_r')}/>
+    </svg>
+  );
+};
+
+// All clickable areas per view
+const AREAS_BY_SIDE = {
+  front: [
+    {id:'forehead',label:'Head'},{id:'face',label:'Face'},{id:'neck_f',label:'Neck'},
+    {id:'lshoulder',label:'L. Shoulder'},{id:'rshoulder',label:'R. Shoulder'},
+    {id:'chest',label:'Chest'},{id:'luparm',label:'L. Upper Arm'},{id:'ruparm',label:'R. Upper Arm'},
+    {id:'lelbow',label:'L. Elbow'},{id:'relbow',label:'R. Elbow'},
+    {id:'lfarm',label:'L. Forearm'},{id:'rfarm',label:'R. Forearm'},
+    {id:'lwrist',label:'L. Wrist/Hand'},{id:'rwrist',label:'R. Wrist/Hand'},
+    {id:'abdomen',label:'Abdomen'},{id:'liver',label:'Liver area'},{id:'stomach',label:'Stomach area'},
+    {id:'pelvis',label:'Pelvis/Groin'},{id:'lhip',label:'L. Hip'},{id:'rhip',label:'R. Hip'},
+    {id:'lthigh',label:'L. Thigh'},{id:'rthigh',label:'R. Thigh'},
+    {id:'lknee',label:'L. Knee'},{id:'rknee',label:'R. Knee'},
+    {id:'lshin',label:'L. Shin'},{id:'rshin',label:'R. Shin'},
+    {id:'lankle',label:'L. Ankle/Foot'},{id:'rankle',label:'R. Ankle/Foot'},
+  ],
+  back: [
+    {id:'skull',label:'Back of Head'},{id:'neck_b',label:'Neck (back)'},
+    {id:'ltrap',label:'L. Trapezius'},{id:'rtrap',label:'R. Trapezius'},
+    {id:'lupback',label:'L. Upper Back'},{id:'rupback',label:'R. Upper Back'},
+    {id:'spine',label:'Spine'},{id:'llowback',label:'L. Lower Back'},{id:'rlowback',label:'R. Lower Back'},
+    {id:'lkidney',label:'L. Kidney'},{id:'rkidney',label:'R. Kidney'},
+    {id:'lglute',label:'L. Glute'},{id:'rglute',label:'R. Glute'},
+    {id:'lhamst',label:'L. Hamstring'},{id:'rhamst',label:'R. Hamstring'},
+    {id:'lkneeb',label:'L. Knee (back)'},{id:'rkneeb',label:'R. Knee (back)'},
+    {id:'lcalf',label:'L. Calf'},{id:'rcalf',label:'R. Calf'},
+    {id:'lheel',label:'L. Heel'},{id:'rheel',label:'R. Heel'},
+  ],
+  left: [
+    {id:'head_l',label:'Head (left)'},{id:'face',label:'Face (left)'},{id:'neck_l',label:'Neck (left)'},
+    {id:'lshoulder_l',label:'L. Shoulder'},{id:'chest_l',label:'Chest (left)'},
+    {id:'lupback_l',label:'Upper Back (left)'},{id:'larm_l',label:'L. Upper Arm'},
+    {id:'lelbow_l',label:'L. Elbow'},{id:'lfarm_l',label:'L. Forearm'},{id:'lwrist_l',label:'L. Wrist/Hand'},
+    {id:'abdomen_l',label:'Abdomen (left)'},{id:'llowback_l',label:'L. Lower Back'},
+    {id:'lhip_l',label:'L. Hip'},{id:'lglute_l',label:'L. Glute'},
+    {id:'lthigh_l',label:'L. Thigh'},{id:'lknee_l',label:'L. Knee'},
+    {id:'lshin_l',label:'L. Shin/Calf'},{id:'lankle_l',label:'L. Ankle/Foot'},
+  ],
+  right: [
+    {id:'head_r',label:'Head (right)'},{id:'face',label:'Face (right)'},{id:'neck_r',label:'Neck (right)'},
+    {id:'rshoulder_r',label:'R. Shoulder'},{id:'chest_r',label:'Chest (right)'},
+    {id:'rupback_r',label:'Upper Back (right)'},{id:'rarm_r',label:'R. Upper Arm'},
+    {id:'relbow_r',label:'R. Elbow'},{id:'rfarm_r',label:'R. Forearm'},{id:'rwrist_r',label:'R. Wrist/Hand'},
+    {id:'abdomen_r',label:'Abdomen (right)'},{id:'rlowback_r',label:'R. Lower Back'},
+    {id:'rhip_r',label:'R. Hip'},{id:'rglute_r',label:'R. Glute'},
+    {id:'rthigh_r',label:'R. Thigh'},{id:'rknee_r',label:'R. Knee'},
+    {id:'rshin_r',label:'R. Shin/Calf'},{id:'rankle_r',label:'R. Ankle/Foot'},
+  ],
+};
+
+const ALL_AREAS = [...AREAS_BY_SIDE.front,...AREAS_BY_SIDE.back,...AREAS_BY_SIDE.left,...AREAS_BY_SIDE.right];
+
 const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
   const gender = user?.gender || '';
-  const sil = BODY_SILHOUETTES[bodyType] || BODY_SILHOUETTES.normal;
   const [side, setSide] = React.useState('front');
+  const [mainTab, setMainTab] = React.useState('map'); // 'map' | 'list'
   const [phase, setPhase] = React.useState(1); // 1=map, 2=detail
   const [activeArea, setActiveArea] = React.useState(null);
-  const [tempSubs, setTempSubs] = React.useState({}); // name->intensity
-  const [tempSwell, setTempSwell] = React.useState({}); // name->'yes'|'no'
-  const [tempNumb, setTempNumb] = React.useState({}); // name->'yes'|'no'
+  const [tempSubs, setTempSubs] = React.useState({});
+  const [tempSwell, setTempSwell] = React.useState({});
+  const [tempNumb, setTempNumb] = React.useState({});
   const [customAreas, setCustomAreas] = React.useState(loadCustomV2);
   const [customInput, setCustomInput] = React.useState('');
 
-  const areas = side === 'front' ? FRONT_AREAS : BACK_AREAS;
-
-  const getAreaColor = (areaId) => {
-    const d = areaSymptoms[areaId];
-    if (!d || Object.keys(d.subareas||{}).length === 0) return { fill:'rgba(26,111,160,0.08)', stroke:'rgba(26,111,160,0.18)' };
-    const max = d.maxIntensity || 0;
-    if (max >= 7) return { fill:'rgba(240,60,50,0.3)', stroke:'#e63946' };
-    if (max >= 4) return { fill:'rgba(255,140,0,0.3)', stroke:'#e65100' };
-    return { fill:'rgba(249,168,37,0.25)', stroke:'#f9a825' };
+  const getSubareas = (areaId) => {
+    const base = filterByGender(SUBAREAS_V2[areaId] || [], gender);
+    const custom = customAreas[areaId] || [];
+    return [...base, ...custom];
   };
 
-  const openArea = (area) => {
-    const saved = areaSymptoms[area.id] || {};
-    setTempSubs({ ...(saved.subareas || {}) });
-    setTempSwell({ ...(saved.swelling || {}) });
-    setTempNumb({ ...(saved.numbness || {}) });
-    setActiveArea(area);
+  const openArea = (areaId) => {
+    const areaInfo = ALL_AREAS.find(a => a.id === areaId) || {id: areaId, label: areaId};
+    const saved = areaSymptoms[areaId] || {};
+    setTempSubs({...(saved.subareas||{})});
+    setTempSwell({...(saved.swelling||{})});
+    setTempNumb({...(saved.numbness||{})});
+    setActiveArea(areaInfo);
     setPhase(2);
   };
 
   const saveArea = () => {
     const hasSubs = Object.keys(tempSubs).some(k => tempSubs[k] > 0);
     if (!hasSubs) {
-      const next = { ...areaSymptoms };
+      const next = {...areaSymptoms};
       delete next[activeArea.id];
       onSave(next);
     } else {
       const vals = Object.values(tempSubs).filter(v => v > 0);
       const maxI = vals.length ? Math.max(...vals) : 0;
       const col = maxI >= 7 ? 3 : maxI >= 4 ? 2 : maxI > 0 ? 1 : 0;
-      const hasSwelling = Object.values(tempSwell).some(v => v === 'yes');
-      const hasNumbness = Object.values(tempNumb).some(v => v === 'yes');
-      onSave({ ...areaSymptoms, [activeArea.id]: {
+      onSave({...areaSymptoms, [activeArea.id]: {
         label: activeArea.label,
-        subareas: { ...tempSubs },
-        swelling: { ...tempSwell },
-        numbness: { ...tempNumb },
+        subareas: {...tempSubs},
+        swelling: {...tempSwell},
+        numbness: {...tempNumb},
         maxIntensity: maxI,
         colorLevel: col,
-        hasSwelling,
-        hasNumbness,
+        hasSwelling: Object.values(tempSwell).some(v => v === 'yes'),
+        hasNumbness: Object.values(tempNumb).some(v => v === 'yes'),
       }});
     }
     setPhase(1);
@@ -465,32 +718,24 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
     const val = customInput.trim();
     if (!val || !activeArea) return;
     const rid = activeArea.id;
-    const updated = { ...customAreas, [rid]: [...(customAreas[rid]||[]).filter(x=>x!==val), val] };
+    const updated = {...customAreas, [rid]: [...(customAreas[rid]||[]).filter(x=>x!==val), val]};
     setCustomAreas(updated);
     saveCustomV2(updated);
     setCustomInput('');
   };
 
-  const getSubareas = (areaId) => {
-    const base = filterByGender(SUBAREAS_V2[areaId] || [], gender);
-    const custom = customAreas[areaId] || [];
-    return [...base, ...custom];
-  };
-
-  // ── PHASE 2: DETAIL ──────────────────────────────────────
+  // ── PHASE 2: DETAIL VIEW ─────────────────────────────────
   if (phase === 2 && activeArea) {
     const subs = getSubareas(activeArea.id);
     const activeSubs = Object.keys(tempSubs).filter(k => tempSubs[k] > 0);
     return (
-      <div style={{animation:'fadeIn 0.25s ease both'}}>
-        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
+      <div style={{animation:'fadeIn 0.2s ease both'}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:16}}>
           <button onClick={()=>{setPhase(1);setActiveArea(null);}}
-            style={{background:'rgba(26,111,160,0.1)',border:'none',borderRadius:50,width:34,height:34,fontSize:18,cursor:'pointer',color:C.blue,display:'flex',alignItems:'center',justifyContent:'center'}}>
-            ←
-          </button>
+            style={{background:'rgba(26,111,160,0.1)',border:'none',borderRadius:50,width:36,height:36,fontSize:18,cursor:'pointer',color:C.blue,display:'flex',alignItems:'center',justifyContent:'center'}}>←</button>
           <div>
             <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:16,color:C.textDark}}>{activeArea.label}</div>
-            <div style={{fontSize:11,color:C.textLight}}>Select sub-areas and set intensity</div>
+            <div style={{fontSize:11,color:C.textLight}}>Set intensity · swelling · numbness per sub-area</div>
           </div>
         </div>
 
@@ -507,9 +752,9 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
               intensity <= 3 ? '#f9a825' : intensity <= 6 ? '#e65100' : '#b71c1c';
             return (
               <div key={name} style={{background:bgColor,border:`2px solid ${borderColor}`,borderRadius:14,padding:'12px 14px',transition:'all 0.2s'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:intensity>0?10:0}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:intensity>0?8:0}}>
                   <span style={{fontSize:13,fontWeight:700,color:C.textDark}}>
-                    {name}{isCustom && <span style={{fontSize:10,color:C.blue,marginLeft:5,fontWeight:600}}>(custom)</span>}
+                    {name}{isCustom && <span style={{fontSize:10,color:C.blue,marginLeft:5}}>(custom)</span>}
                   </span>
                   <span style={{fontSize:11,color:C.textLight,minWidth:58,textAlign:'right'}}>
                     {intensity===0?'':intensity<=3?'Mild':intensity<=6?'Moderate':intensity<=8?'Severe':'Worst'}
@@ -518,7 +763,7 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
                 <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:intensity>0?10:0}}>
                   <span style={{fontSize:12}}>😌</span>
                   <input type="range" min={0} max={10} value={intensity}
-                    onChange={e=>{const v=Number(e.target.value);setTempSubs(p=>v===0?{...p,[name]:0}:{...p,[name]:v});}}
+                    onChange={e=>{const v=Number(e.target.value);setTempSubs(p=>({...p,[name]:v}));}}
                     style={{flex:1,accentColor:intensity<=3?'#f9a825':intensity<=6?'#e65100':'#b71c1c'}}/>
                   <span style={{fontSize:12}}>😭</span>
                   <span style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:16,color:C.textDark,minWidth:20}}>{intensity}</span>
@@ -553,562 +798,138 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
         <div style={{display:'flex',gap:8,alignItems:'center',padding:'11px 13px',background:'rgba(26,111,160,0.04)',border:'2px dashed rgba(26,111,160,0.2)',borderRadius:14,marginBottom:16}}>
           <input value={customInput} onChange={e=>setCustomInput(e.target.value)}
             onKeyDown={e=>e.key==='Enter'&&addCustom()}
-            placeholder="Add custom area..."
+            placeholder="Add custom sub-area..."
             style={{flex:1,border:'none',background:'transparent',fontFamily:"'Nunito',sans-serif",fontSize:13,fontWeight:600,color:C.textDark,outline:'none'}}/>
           <button onClick={addCustom}
-            style={{background:C.blue,color:'white',border:'none',padding:'7px 13px',borderRadius:50,fontFamily:"'Nunito',sans-serif",fontSize:12,fontWeight:800,cursor:'pointer',whiteSpace:'nowrap'}}>
+            style={{background:C.blue,color:'white',border:'none',padding:'7px 13px',borderRadius:50,fontFamily:"'Nunito',sans-serif",fontSize:12,fontWeight:800,cursor:'pointer'}}>
             + Add
           </button>
         </div>
 
-        {/* Save button */}
         <button onClick={saveArea}
           style={{width:'100%',background:`linear-gradient(135deg,${C.blue},#0e4f78)`,color:'white',border:'none',padding:'15px',borderRadius:50,fontFamily:"'Nunito',sans-serif",fontSize:16,fontWeight:800,cursor:'pointer',boxShadow:'0 6px 20px rgba(26,111,160,0.3)'}}>
-          {activeSubs.length > 0 ? `Save ${activeSubs.length} area${activeSubs.length!==1?'s':''}` : 'Clear & Close'}
+          {activeSubs.length > 0 ? `Save ${activeSubs.length} sub-area${activeSubs.length!==1?'s':''}` : 'Clear & Close'}
         </button>
       </div>
     );
   }
 
-  // ── PHASE 1: MAP ──────────────────────────────────────────
+  // ── PHASE 1: MAIN VIEW ───────────────────────────────────
   const activeAreaCount = Object.keys(areaSymptoms).filter(k => areaSymptoms[k]?.maxIntensity > 0).length;
+  const currentAreas = AREAS_BY_SIDE[side] || AREAS_BY_SIDE.front;
 
   return (
     <div>
-      {/* View tabs */}
-      <div style={{display:'flex',gap:0,marginBottom:10,background:'rgba(26,111,160,0.08)',borderRadius:50,padding:3}}>
-        {[['front','⬤ Front'],['back','⬤ Back']].map(([s,lbl])=>(
-          <button key={s} onClick={()=>setSide(s)}
-            style={{flex:1,padding:'7px 0',borderRadius:50,border:'none',fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:12,cursor:'pointer',
-              background:side===s?'rgba(26,111,160,0.9)':'transparent',
-              color:side===s?'#fff':'#6b95ad',transition:'all 0.2s'}}>
+      {/* Header */}
+      <div style={{textAlign:'center',marginBottom:14}}>
+        <div style={{fontSize:20,fontFamily:"'Montserrat',sans-serif",fontWeight:800,color:C.textDark}}>
+          🩺 Where does it hurt?
+        </div>
+        <div style={{fontSize:12,color:C.textLight,marginTop:2}}>
+          {mainTab==='map' ? 'Tap a body area to specify it' : 'Select an area from the list'}
+        </div>
+      </div>
+
+      {/* Select area / Specify location tabs */}
+      <div style={{display:'flex',gap:0,marginBottom:14,background:'rgba(26,111,160,0.08)',borderRadius:50,padding:3}}>
+        {[['map','① Select area'],['list','② Specify location']].map(([t,lbl])=>(
+          <button key={t} onClick={()=>setMainTab(t)}
+            style={{flex:1,padding:'8px 0',borderRadius:50,border:'none',fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:12,cursor:'pointer',
+              background:mainTab===t?'rgba(26,111,160,0.9)':'transparent',
+              color:mainTab===t?'#fff':'#6b95ad',transition:'all 0.2s'}}>
             {lbl}
           </button>
         ))}
       </div>
 
-      {/* SVG body */}
-      <div style={{display:'flex',justifyContent:'center',position:'relative'}}>
-        <svg viewBox="0 0 130 230" width={160} height={230} style={{overflow:'visible'}}>
-          <ellipse cx={sil.head.cx} cy={sil.head.cy} rx={sil.head.rx} ry={sil.head.ry} fill="rgba(200,220,240,0.4)" stroke="rgba(26,111,160,0.3)" strokeWidth="1"/>
-          <rect x={sil.neck.x} y={sil.neck.y} width={sil.neck.w} height={sil.neck.h} fill="rgba(200,220,240,0.4)" stroke="rgba(26,111,160,0.3)" strokeWidth="1"/>
-          <path d={sil.torso} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
-          <path d={sil.larm} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
-          <path d={sil.rarm} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
-          <path d={sil.lleg} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
-          <path d={sil.rleg} fill="rgba(200,220,240,0.35)" stroke="rgba(26,111,160,0.25)" strokeWidth="1"/>
-          {areas.map(area => {
-            const {fill,stroke} = getAreaColor(area.id);
-            const d = areaSymptoms[area.id];
-            const active = d && d.maxIntensity > 0;
-            return (
-              <ellipse key={area.id} cx={area.cx} cy={area.cy} rx={area.rx} ry={area.ry}
-                fill={fill} stroke={stroke} strokeWidth={active?2:1}
-                style={{cursor:'pointer',transition:'all 0.2s'}}
-                onClick={()=>openArea(area)}/>
-            );
-          })}
-        </svg>
-      </div>
+      {mainTab === 'map' && (
+        <>
+          {/* 4-view toggle with arrows */}
+          <div style={{display:'flex',alignItems:'center',gap:4,marginBottom:12,background:'rgba(26,111,160,0.06)',borderRadius:50,padding:'4px 6px'}}>
+            {[['front','● Front',null],['left','◄ Left',null],['back','● Back',null],['right','Right ►',null]].map(([s,lbl])=>(
+              <button key={s} onClick={()=>setSide(s)}
+                style={{flex:1,padding:'7px 4px',borderRadius:50,border:'none',fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:11,cursor:'pointer',
+                  background:side===s?'rgba(26,111,160,0.9)':'transparent',
+                  color:side===s?'#fff':'#6b95ad',transition:'all 0.2s',whiteSpace:'nowrap'}}>
+                {lbl}
+              </button>
+            ))}
+          </div>
 
-      {/* Active area chips */}
-      {activeAreaCount > 0 && (
-        <div style={{marginTop:12,display:'flex',flexDirection:'column',gap:8}}>
-          {Object.entries(areaSymptoms).filter(([,d])=>d?.maxIntensity>0).map(([rid,d])=>{
-            const colorCls = d.colorLevel>=3?C.red:d.colorLevel>=2?'#e65100':d.colorLevel>=1?'#b37a00':C.textLight;
-            const bgCls = d.colorLevel>=3?'rgba(240,60,50,0.12)':d.colorLevel>=2?'rgba(255,140,0,0.12)':'rgba(255,230,50,0.2)';
-            const borderCls = d.colorLevel>=3?'rgba(183,28,28,0.3)':d.colorLevel>=2?'rgba(230,81,0,0.3)':'rgba(249,168,37,0.4)';
-            const painAreas = Object.entries(d.subareas||{}).filter(([,v])=>v>0).map(([n,v])=>`${n} (${v}/10)`).join(', ');
-            const swellingYes = Object.entries(d.swelling||{}).filter(([,v])=>v==='yes').map(([n])=>n).join(', ');
-            const numbnessYes = Object.entries(d.numbness||{}).filter(([,v])=>v==='yes').map(([n])=>n).join(', ');
-            const areaInfo=[...FRONT_AREAS,...BACK_AREAS].find(a=>a.id===rid);
-            return (
-              <div key={rid} onClick={()=>openArea(areaInfo||{id:rid,label:d.label})}
-                style={{background:bgCls,border:`1.5px solid ${borderCls}`,borderRadius:14,padding:'11px 13px',cursor:'pointer',transition:'opacity 0.2s'}}
-                onMouseEnter={e=>e.currentTarget.style.opacity='0.8'}
-                onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}}>
-                  <span style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:13,color:C.textDark}}>{d.label}</span>
-                  <div style={{display:'flex',alignItems:'center',gap:8}}>
-                    <span style={{fontSize:12,fontWeight:700,color:colorCls}}>Max {d.maxIntensity}/10</span>
-                    <button onClick={e=>{e.stopPropagation();const n={...areaSymptoms};delete n[rid];onSave(n);}}
-                      style={{background:'none',border:'none',fontSize:14,cursor:'pointer',color:'#6b95ad',padding:'0 2px'}}>✕</button>
+          {/* Figure */}
+          <div style={{background:'rgba(255,255,255,0.4)',borderRadius:18,padding:'16px 8px',marginBottom:10,minHeight:200}}>
+            <div style={{fontSize:11,color:C.textLight,textAlign:'center',marginBottom:8}}>Tap to select · Colors show saved pain</div>
+            {side==='front' && <FigureFront areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
+            {side==='back' && <FigureBack areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
+            {side==='left' && <FigureLeft areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
+            {side==='right' && <FigureRight areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
+          </div>
+        </>
+      )}
+
+      {mainTab === 'list' && (
+        <div style={{display:'flex',flexDirection:'column',gap:6,marginBottom:10}}>
+          <div style={{fontSize:12,color:C.textLight,marginBottom:4}}>Current view: <strong>{side}</strong> — or tap any area:</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+            {currentAreas.map(area => {
+              const d = areaSymptoms[area.id];
+              const active = d?.maxIntensity > 0;
+              const col = active ? (d.colorLevel>=3?C.red:d.colorLevel>=2?'#e65100':'#b37a00') : C.blue;
+              const bg = active ? (d.colorLevel>=3?'rgba(230,57,70,0.12)':d.colorLevel>=2?'rgba(230,81,0,0.12)':'rgba(249,168,37,0.15)') : 'rgba(26,111,160,0.06)';
+              return (
+                <button key={area.id} onClick={()=>openArea(area.id)}
+                  style={{padding:'7px 12px',borderRadius:50,border:`1.5px solid ${active?col:'rgba(26,111,160,0.2)'}`,background:bg,fontFamily:"'Nunito',sans-serif",fontWeight:700,fontSize:12,color:col,cursor:'pointer',transition:'all 0.15s'}}>
+                  {area.label}{active ? ` ${d.maxIntensity}/10` : ''}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Pain locations summary */}
+      <div style={{background:'rgba(255,255,255,0.5)',borderRadius:14,padding:'12px 14px'}}>
+        <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:activeAreaCount>0?10:0}}>
+          📍 Pain locations:{activeAreaCount===0 && <span style={{fontWeight:500,color:C.textLight,marginLeft:6,fontSize:12}}>None yet — tap body area above</span>}
+        </div>
+        {activeAreaCount > 0 && (
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {Object.entries(areaSymptoms).filter(([,d])=>d?.maxIntensity>0).map(([rid,d])=>{
+              const colorCls = d.colorLevel>=3?C.red:d.colorLevel>=2?'#e65100':d.colorLevel>=1?'#b37a00':C.textLight;
+              const bgCls = d.colorLevel>=3?'rgba(240,60,50,0.09)':d.colorLevel>=2?'rgba(255,140,0,0.09)':'rgba(255,230,50,0.15)';
+              const borderCls = d.colorLevel>=3?'rgba(183,28,28,0.25)':d.colorLevel>=2?'rgba(230,81,0,0.25)':'rgba(249,168,37,0.35)';
+              const painAreas = Object.entries(d.subareas||{}).filter(([,v])=>v>0).map(([n,v])=>`${n} (${v}/10)`).join(', ');
+              return (
+                <div key={rid} onClick={()=>openArea(rid)}
+                  style={{background:bgCls,border:`1.5px solid ${borderCls}`,borderRadius:12,padding:'10px 12px',cursor:'pointer',borderLeft:`4px solid ${colorCls}`}}>
+                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}}>
+                    <span style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:13,color:C.textDark}}>{d.label}</span>
+                    <div style={{display:'flex',alignItems:'center',gap:8}}>
+                      <span style={{fontSize:12,fontWeight:700,color:colorCls}}>Max {d.maxIntensity}/10</span>
+                      <button onClick={e=>{e.stopPropagation();const n={...areaSymptoms};delete n[rid];onSave(n);}}
+                        style={{background:'none',border:'none',fontSize:14,cursor:'pointer',color:'#6b95ad',padding:'0 2px'}}>✕</button>
+                    </div>
+                  </div>
+                  {painAreas && <div style={{fontSize:11,color:'#4a6a80',fontWeight:600,marginBottom:6,lineHeight:1.5}}>📍 {painAreas}</div>}
+                  <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+                    <span style={{fontSize:11,fontWeight:700,color:d.hasSwelling?'#1976d2':C.textLight}}>
+                      Swelling: <span style={{color:d.hasSwelling?'#1976d2':'#999'}}>{d.hasSwelling?'Yes':'No'}</span>
+                    </span>
+                    <span style={{fontSize:11,fontWeight:700,color:d.hasNumbness?'#7b1fa2':C.textLight}}>
+                      Numbness: <span style={{color:d.hasNumbness?'#7b1fa2':'#999'}}>{d.hasNumbness?'Yes':'No'}</span>
+                    </span>
                   </div>
                 </div>
-                {painAreas && <div style={{fontSize:11,color:'#4a6a80',fontWeight:600,marginBottom:4,lineHeight:1.5}}>📍 {painAreas}</div>}
-                <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-                  {[['Swelling',swellingYes],['Numbness',numbnessYes]].map(([lbl,val])=>(
-                    <span key={lbl} style={{fontSize:11,fontWeight:700,padding:'3px 10px',borderRadius:50,
-                      background:val?'rgba(25,118,210,0.15)':'rgba(107,149,173,0.1)',
-                      color:val?'#1565c0':'#546e7a'}}>
-                      {lbl}: {val || 'No'}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const MOODS=[
-  {emoji:"😤",label:"Struggling",value:1,color:"#e63946"},
-  {emoji:"😔",label:"Low",value:2,color:"#f4a261"},
-  {emoji:"😐",label:"Neutral",value:3,color:"#f4c261"},
-  {emoji:"🙂",label:"Okay",value:4,color:"#5bb8e8"},
-  {emoji:"💪",label:"Strong",value:5,color:"#2d9a6e"},
-];
-const TRAUMA_CHECKS=[
-  {id:"sleep",label:"Sleep felt disrupted or restless",icon:"🌙"},
-  {id:"anxiety",label:"I felt anxious or on-edge today",icon:"⚡"},
-  {id:"trigger",label:"Something triggered a stress response",icon:"🔴"},
-  {id:"safe",label:"I felt safe in my body today",icon:"🛡️"},
-  {id:"grounded",label:"I felt grounded and present",icon:"🌱"},
-  {id:"support",label:"I reached out to someone for support",icon:"🤝"},
-];
-const AFFIRMATIONS=[
-  "Your pain is real. Your healing is possible.",
-  "Every small step forward is still forward.",
-  "You are more than your diagnosis.",
-  "Rest is not giving up. Rest is rebuilding.",
-  "Your body is doing its best. So are you.",
-];
-const SEED_CHAT=[
-  {id:1,user:"Maya R.",avatar:"🌸",text:"Anyone else notice their pain spikes mid-week? Wednesday always gets me.",time:"2h ago",mine:false},
-  {id:2,user:"Jordan K.",avatar:"🌊",text:"Yes! Short noon rest really helps me manage that.",time:"1h ago",mine:false},
-  {id:3,user:"Sam T.",avatar:"🌿",text:"Gentle reminder: rest is not failure 💚",time:"45m ago",mine:false},
-  {id:4,user:"Alex P.",avatar:"💙",text:"Does anyone use heat therapy? Just got a heating pad for back pain.",time:"20m ago",mine:false},
-];
-const EXERCISES=[
-  {id:"anxiety",icon:"🧘",title:"Anxiety Management",desc:"Breathing & grounding",steps:["Find a comfortable position and close your eyes.","Breathe in slowly for 4 counts.","Hold for 4 counts.","Exhale slowly for 6 counts.","Repeat 5 times, focusing only on your breath.","Name 5 things you can see around you."]},
-  {id:"goals",icon:"🎯",title:"Goal Setting",desc:"Small steps toward healing",steps:["Write one thing you'd like to improve this week.","Break it into 3 small daily actions.","Celebrate every small win — they all count.","Review each evening: did you take one step today?"]},
-  {id:"selfcare",icon:"💆",title:"Self-Care",desc:"Nurture your body & mind",steps:["Drink a full glass of water right now.","Step outside for 5 minutes of fresh air.","Put your hand on your heart and breathe deeply.","Do one kind thing for your body today."]},
-  {id:"grounding",icon:"🌍",title:"Grounding",desc:"Connect with the present",steps:["Feel your feet firmly on the floor.","Name 5 things you can see.","Name 4 things you can touch.","Name 3 things you can hear.","Name 2 things you can smell.","Name 1 thing you can taste."]},
-  {id:"mindfulness",icon:"🌸",title:"Mindfulness",desc:"Awareness without judgment",steps:["Sit comfortably and gently close your eyes.","Bring attention to your breathing — don't control it.","Notice thoughts without judging them.","Gently return focus to your breath each time.","Continue for 5–10 minutes."]},
-  {id:"emotions",icon:"💡",title:"Understanding Emotions",desc:"Identify & process feelings",steps:["Name what you are feeling right now.","Ask: where do I feel this in my body?","Is this feeling familiar?","What does this feeling need from me?","Write it down or speak it aloud."]},
-];
-const seedHistory=()=>Array.from({length:7},(_,i)=>{
-  const pain=Math.floor(Math.random()*5)+3,mood=Math.floor(Math.random()*3)+2,checks=Math.floor(Math.random()*4)+1;
-  return{id:i,date:DAYS[i],fullDate:new Date(Date.now()-(6-i)*86400000).toLocaleDateString("en-US",{month:"short",day:"numeric"}),
-    painLevel:pain,mood,checkedCount:checks,areas:[],notes:"",score:Math.round(((10-pain)*3+mood*4+checks*5)/3)};
-});
-
-/* ── Logo SVG ── */
-const Logo=({size=56})=>(
-  <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-    <defs>
-      <radialGradient id="bgrad" cx="35%" cy="35%"><stop offset="0%" stopColor="#5bb8e8"/><stop offset="100%" stopColor="#1a6fa0"/></radialGradient>
-      <radialGradient id="rgrad" cx="50%" cy="40%"><stop offset="0%" stopColor="#ff8a8a"/><stop offset="100%" stopColor="#c0392b"/></radialGradient>
-    </defs>
-    <circle cx="50" cy="50" r="47" fill="url(#bgrad)" stroke="rgba(255,255,255,0.5)" strokeWidth="2"/>
-    <ellipse cx="50" cy="30" rx="9" ry="10" fill="url(#rgrad)"/>
-    <path d="M33 68 Q39 46 50 44 Q61 46 67 68Z" fill="url(#rgrad)"/>
-    <circle cx="50" cy="52" r="7" fill="rgba(255,140,100,0.55)"/>
-    <path d="M17 56 Q24 36 37 49 Q29 55 27 66 Q18 69 17 56Z" fill="#2196c4" opacity="0.9"/>
-    <path d="M19 53 Q27 45 35 51" stroke="#7dd4f5" strokeWidth="2" fill="none"/>
-    <path d="M20 58 Q28 50 36 55" stroke="#7dd4f5" strokeWidth="1.5" fill="none"/>
-    <path d="M83 56 Q76 36 63 49 Q71 55 73 66 Q82 69 83 56Z" fill="#2d9a6e" opacity="0.9"/>
-    <path d="M81 53 Q73 45 65 51" stroke="#5cd4a0" strokeWidth="2" fill="none"/>
-    <path d="M80 58 Q72 50 64 55" stroke="#5cd4a0" strokeWidth="1.5" fill="none"/>
-    <ellipse cx="38" cy="22" rx="11" ry="7" fill="rgba(255,255,255,0.22)" transform="rotate(-22 38 22)"/>
-  </svg>
-);
-
-/* ── Primitives ── */
-const GCard=({children,style={}})=>(
-  <div className="glass" style={{borderRadius:20,padding:22,margin:"0 18px 16px",...style}}>{children}</div>
-);
-const SectionTitle=({icon,title,sub})=>(
-  <div style={{padding:"18px 22px 4px",animation:"fadeIn 0.4s ease both"}}>
-    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:2}}>
-      {icon&&<span style={{fontSize:22}}>{icon}</span>}
-      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark,letterSpacing:"-0.01em"}}>{title}</div>
-    </div>
-    {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:icon?32:0,marginTop:3}}>{sub}</div>}
-  </div>
-);
-const BottomNav=({tab,setTab})=>{
-  const items=[{id:"home",icon:"🏠",label:"Home"},{id:"pain",icon:"🩺",label:"Pain"},{id:"trauma",icon:"🧠",label:"Recovery"},{id:"community",icon:"💬",label:"Community"},{id:"profile",icon:"👤",label:"Profile"}];
-  return(
-    <div className="glass" style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,display:"flex",justifyContent:"space-around",padding:"8px 0 max(10px,env(safe-area-inset-bottom))",zIndex:100,borderRadius:"20px 20px 0 0",borderBottom:"none",boxShadow:"0 -4px 20px rgba(26,80,130,0.1)"}}>
-      {items.map(t=>(
-        <button key={t.id} onClick={()=>setTab(t.id)}
-          style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,cursor:"pointer",color:tab===t.id?C.blue:C.textLight,fontSize:9,fontWeight:tab===t.id?800:600,textTransform:"uppercase",letterSpacing:"0.04em",border:"none",background:"transparent",padding:"4px 8px",transition:"color 0.2s",minWidth:0}}>
-          <span style={{fontSize:tab===t.id?22:19,transition:"font-size 0.2s"}}>{t.icon}</span>
-          {t.label}
-          {tab===t.id&&<div style={{width:4,height:4,borderRadius:"50%",background:C.blue}}/>}
-        </button>
-      ))}
-    </div>
-  );
-};
-const AppShell=({children,tab,setTab,user,onLogout})=>(
-  <div style={{background:"transparent",minHeight:"100vh",maxWidth:430,margin:"0 auto",color:C.textDark,overflowX:"hidden"}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 18px 8px"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
-        <Logo size={30}/>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:15}}>
-          <span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span>
-        </div>
-      </div>
-      <div style={{display:"flex",gap:6,alignItems:"center"}}>
-        <div className="glass-soft" style={{borderRadius:18,padding:"4px 11px",fontSize:12,fontWeight:700,color:C.textMid}}>
-          {user?.name?.split(" ")[0]||"You"}
-        </div>
-        <button onClick={onLogout} className="glass-soft" style={{borderRadius:18,padding:"4px 11px",fontSize:11,fontWeight:700,color:C.textLight,border:"none",cursor:"pointer"}}>Out</button>
-      </div>
-    </div>
-    <div style={{overflowY:"auto",maxHeight:"100vh",paddingBottom:88}}>{children}</div>
-    <BottomNav tab={tab} setTab={setTab}/>
-  </div>
-);
-
-/* ══ AUTH ══ */
-const AuthShell=({children})=>(
-  <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",background:"linear-gradient(160deg,#daf0ff 0%,#b4dcf5 30%,#c6e8f8 65%,#dbf0ff 100%)",overflowX:"hidden",position:"relative"}}>
-    <div style={{position:"fixed",top:-90,right:-90,width:260,height:260,borderRadius:"50%",background:"radial-gradient(circle,rgba(26,111,160,0.18),transparent 70%)",pointerEvents:"none"}}/>
-    <div style={{position:"fixed",bottom:-70,left:-70,width:210,height:210,borderRadius:"50%",background:"radial-gradient(circle,rgba(45,154,110,0.13),transparent 70%)",pointerEvents:"none"}}/>
-    <div style={{overflowY:"auto",maxHeight:"100vh",padding:"0 24px 48px"}}>
-      <div style={{textAlign:"center",padding:"44px 0 14px",animation:"fadeIn 0.5s ease both"}}>
-        <div style={{display:"inline-block",animation:"float 3s ease-in-out infinite"}}><Logo size={70}/></div>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:27,fontWeight:800,marginTop:12}}>
-          <span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span>
-        </div>
-        <div style={{fontSize:11,color:C.textLight,letterSpacing:"0.12em",textTransform:"uppercase",marginTop:4}}>Chronic Pain &amp; Trauma Recovery</div>
-      </div>
-      {children}
-    </div>
-  </div>
-);
-
-const LoginScreen=({onLogin,onGoRegister})=>{
-  const [email,setEmail]=useState(""); const [pass,setPass]=useState("");
-  const [errors,setErrors]=useState({}); const [loading,setLoading]=useState(false);
-  const doLogin=async()=>{
-    const e={};
-    if(!email.includes("@")) e.email="Enter a valid email";
-    if(pass.length<6) e.pass="Min 6 characters";
-    if(Object.keys(e).length){setErrors(e);return;}
-    setLoading(true); await new Promise(r=>setTimeout(r,800));
-    const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
-    const user=users.find(u=>u.email===email&&u.password===pass);
-    if(!user){setErrors({pass:"Incorrect email or password"});setLoading(false);return;}
-    onLogin(user); setLoading(false);
-  };
-  return(
-    <div style={{animation:"fadeIn 0.5s ease both"}}>
-      <div style={{marginBottom:24}}>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,color:C.textDark}}>Welcome Back 👋</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:4}}>Sign in to continue your healing journey</div>
-      </div>
-      {[{label:"Username / Email",key:"email",type:"email",val:email,set:setEmail,ph:"you@email.com",err:errors.email},
-        {label:"Password",key:"pass",type:"password",val:pass,set:setPass,ph:"••••••••",err:errors.pass}
-      ].map(f=>(
-        <div key={f.key} style={{marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.09em",marginBottom:5}}>{f.label}</div>
-          <input className="field" type={f.type} value={f.val} onChange={e=>f.set(e.target.value)} placeholder={f.ph}/>
-          {f.err&&<div style={{fontSize:11,color:C.red,marginTop:3}}>⚠ {f.err}</div>}
-        </div>
-      ))}
-      <div style={{textAlign:"right",marginBottom:22}}><span style={{fontSize:12,color:C.blue,fontWeight:700,cursor:"pointer"}}>Forgot Password?</span></div>
-      <button className="btn-blue" onClick={doLogin} disabled={loading}>{loading?"Signing in…":"Sign In →"}</button>
-      <div style={{textAlign:"center",marginTop:18,fontSize:13,color:C.textLight}}>
-        Don't have an account?{" "}<span onClick={onGoRegister} style={{color:C.blue,fontWeight:800,cursor:"pointer"}}>Register</span>
-      </div>
-    </div>
-  );
-};
-
-const RegisterScreen=({onGoLogin,onRegistered})=>{
-  const [name,setName]=useState(""); const [email,setEmail]=useState("");
-  const [pass,setPass]=useState(""); const [confirm,setConfirm]=useState("");
-  const [dob,setDob]=useState(""); const [gender,setGender]=useState("");
-  const [agreed,setAgreed]=useState(false); const [errors,setErrors]=useState({});
-  const [loading,setLoading]=useState(false); const [showTerms,setShowTerms]=useState(false);
-  const doRegister=async()=>{
-    const e={};
-    if(name.trim().length<2) e.name="Enter your full name";
-    if(!email.includes("@")) e.email="Enter a valid email";
-    if(pass.length<6) e.pass="Min 6 characters";
-    if(pass!==confirm) e.confirm="Passwords don't match";
-    if(!agreed) e.agreed="Please accept the terms";
-    if(Object.keys(e).length){setErrors(e);return;}
-    setLoading(true); await new Promise(r=>setTimeout(r,900));
-    const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
-    if(users.find(u=>u.email===email)){setErrors({email:"Already registered"});setLoading(false);return;}
-    const code=Math.floor(100000+Math.random()*900000).toString();
-    const newUser={name:name.trim(),email,password:pass,dob,gender,verified:false,verifyCode:code,trialStart:Date.now(),plan:"trial",silhouette:1};
-    users.push(newUser); localStorage.setItem("p2c_users",JSON.stringify(users));
-    setLoading(false); onRegistered({email,code,name:name.trim()});
-  };
-  if(showTerms) return(
-    <div style={{animation:"fadeIn 0.3s ease both"}}>
-      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:19,fontWeight:800,color:C.textDark,marginBottom:14}}>Terms &amp; Conditions</div>
-      <div className="glass" style={{borderRadius:16,padding:18,maxHeight:"52vh",overflowY:"auto",marginBottom:18,fontSize:13,lineHeight:1.7,color:C.textMid}}>
-        <p><strong>1. Acceptance</strong><br/>By using Pain2Care, you agree to these Terms.</p><br/>
-        <p><strong>2. Not Medical Advice</strong><br/>Pain2Care is a self-tracking tool only — not a medical device or diagnosis tool. Always consult a qualified healthcare provider.</p><br/>
-        <p><strong>3. Privacy</strong><br/>Your health data is stored securely. We never sell your personal data to third parties.</p><br/>
-        <p><strong>4. Free Trial</strong><br/>A 7-day free trial is provided. After the trial, a subscription is required to continue using the app.</p><br/>
-        <p><strong>5. Community</strong><br/>The community chat is anonymous and supportive. Harmful or abusive content is not permitted.</p><br/>
-        <p><strong>6. Limitation of Liability</strong><br/>Pain2Care is not liable for any decisions made based on app data.</p><br/>
-        <p><strong>7. Changes</strong><br/>We may update these terms with notice via the app.</p>
-      </div>
-      <div onClick={()=>setAgreed(!agreed)} style={{display:"flex",alignItems:"center",gap:12,marginBottom:18,padding:"12px 14px",background:"rgba(26,111,160,0.07)",borderRadius:13,cursor:"pointer"}}>
-        <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${agreed?C.blue:"rgba(26,111,160,0.28)"}`,background:agreed?C.blue:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.2s"}}>
-          {agreed&&<span style={{color:"#fff",fontSize:13,fontWeight:900}}>✓</span>}
-        </div>
-        <span style={{fontSize:13,color:C.textMid,fontWeight:600}}>I agree to the Terms &amp; Conditions</span>
-      </div>
-      <button className="btn-blue" onClick={()=>setShowTerms(false)} disabled={!agreed}>Continue →</button>
-    </div>
-  );
-  return(
-    <div style={{animation:"fadeIn 0.5s ease both"}}>
-      <div style={{marginBottom:18}}>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Create Account</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>Start your free 7-day trial</div>
-      </div>
-      {[{label:"Full Name",key:"name",val:name,set:setName,type:"text",ph:"Your full name",err:errors.name},
-        {label:"Email",key:"email",val:email,set:setEmail,type:"email",ph:"you@email.com",err:errors.email},
-        {label:"Date of Birth",key:"dob",val:dob,set:setDob,type:"date",ph:"",err:null},
-      ].map(f=>(
-        <div key={f.key} style={{marginBottom:13}}>
-          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5}}>{f.label}</div>
-          <input className="field" type={f.type} value={f.val} onChange={e=>f.set(e.target.value)} placeholder={f.ph}/>
-          {f.err&&<div style={{fontSize:11,color:C.red,marginTop:3}}>⚠ {f.err}</div>}
-        </div>
-      ))}
-      <div style={{marginBottom:13}}>
-        <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5}}>Gender</div>
-        <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-          {["Female","Male","Other","Prefer not to say"].map(g=>(
-            <div key={g} onClick={()=>setGender(g)}
-              style={{flex:"1 0 40%",padding:"9px 6px",borderRadius:11,border:`1.5px solid ${gender===g?C.blue:"rgba(26,111,160,0.18)"}`,background:gender===g?"rgba(26,111,160,0.1)":"rgba(255,255,255,0.5)",cursor:"pointer",textAlign:"center",fontSize:12,fontWeight:700,color:gender===g?C.blue:C.textLight,transition:"all 0.15s"}}>
-              {g}
-            </div>
-          ))}
-        </div>
-      </div>
-      {[{label:"Password",key:"pass",val:pass,set:setPass,err:errors.pass},
-        {label:"Confirm Password",key:"confirm",val:confirm,set:setConfirm,err:errors.confirm}
-      ].map(f=>(
-        <div key={f.key} style={{marginBottom:13}}>
-          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5}}>{f.label}</div>
-          <input className="field" type="password" value={f.val} onChange={e=>f.set(e.target.value)} placeholder="••••••••"/>
-          {f.err&&<div style={{fontSize:11,color:C.red,marginTop:3}}>⚠ {f.err}</div>}
-        </div>
-      ))}
-      <div onClick={()=>setShowTerms(true)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,cursor:"pointer",padding:"11px 13px",background:"rgba(26,111,160,0.06)",borderRadius:11}}>
-        <div style={{width:20,height:20,borderRadius:5,border:`2px solid ${agreed?C.blue:"rgba(26,111,160,0.28)"}`,background:agreed?C.blue:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-          {agreed&&<span style={{color:"#fff",fontSize:11,fontWeight:900}}>✓</span>}
-        </div>
-        <span style={{fontSize:12,color:C.textMid}}>I agree to the <span style={{color:C.blue,fontWeight:700}}>Terms &amp; Conditions</span></span>
-      </div>
-      {errors.agreed&&<div style={{fontSize:11,color:C.red,marginBottom:10}}>⚠ {errors.agreed}</div>}
-      <button className="btn-blue" onClick={doRegister} disabled={loading}>{loading?"Creating…":"Create Account →"}</button>
-      <div style={{textAlign:"center",marginTop:14,fontSize:13,color:C.textLight}}>
-        Already have an account?{" "}<span onClick={onGoLogin} style={{color:C.blue,fontWeight:800,cursor:"pointer"}}>Sign In</span>
-      </div>
-    </div>
-  );
-};
-
-const VerifyScreen=({email,code,onVerified,onBack})=>{
-  const [input,setInput]=useState(["","","","","",""]);
-  const [error,setError]=useState(""); const [loading,setLoading]=useState(false);
-  const refs=useRef([]);
-  const handleInput=(i,v)=>{if(!/^\d?$/.test(v))return;const n=[...input];n[i]=v;setInput(n);if(v&&i<5)refs.current[i+1]?.focus();};
-  const handleKey=(i,e)=>{if(e.key==="Backspace"&&!input[i]&&i>0)refs.current[i-1]?.focus();};
-  const verify=async()=>{
-    const entered=input.join("");if(entered.length<6){setError("Enter all 6 digits");return;}
-    setLoading(true); await new Promise(r=>setTimeout(r,700));
-    if(entered===code){
-      const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
-      const idx=users.findIndex(u=>u.email===email);
-      if(idx>=0){users[idx].verified=true;localStorage.setItem("p2c_users",JSON.stringify(users));}
-      onVerified();
-    } else {setError("Incorrect code. Try again.");}
-    setLoading(false);
-  };
-  return(
-    <div style={{animation:"fadeIn 0.5s ease both"}}>
-      <div style={{marginBottom:18}}>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:20,fontWeight:800,color:C.textDark}}>Verify Your Email ✉️</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:5,lineHeight:1.6}}>We sent a 6-digit code to <strong style={{color:C.textDark}}>{email}</strong></div>
-      </div>
-      <div className="glass-soft" style={{borderRadius:13,padding:"11px 15px",marginBottom:18,fontSize:12,color:C.blue,fontWeight:700}}>
-        💡 Demo mode — your code is: <strong>{code}</strong>
-      </div>
-      <div style={{display:"flex",gap:8,justifyContent:"center",marginBottom:18}}>
-        {input.map((v,i)=>(
-          <input key={i} ref={el=>refs.current[i]=el} value={v} maxLength={1}
-            onChange={e=>handleInput(i,e.target.value)} onKeyDown={e=>handleKey(i,e)}
-            style={{width:42,height:54,textAlign:"center",background:"rgba(255,255,255,0.7)",border:`2px solid ${v?C.blue:"rgba(26,111,160,0.2)"}`,borderRadius:13,color:C.textDark,fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,outline:"none"}}/>
-        ))}
-      </div>
-      {error&&<div style={{fontSize:12,color:C.red,textAlign:"center",marginBottom:11}}>⚠ {error}</div>}
-      <button className="btn-blue" onClick={verify} disabled={loading}>{loading?"Verifying…":"Verify & Continue →"}</button>
-      <div style={{textAlign:"center",marginTop:12}}><span onClick={onBack} style={{fontSize:12,color:C.textLight,cursor:"pointer"}}>← Back</span></div>
-    </div>
-  );
-};
-
-const SilhouetteScreen=({onContinue})=>{
-  const [sel,setSel]=useState(2);
-  const opts=[{id:1,icon:"🧍‍♀️",label:"Slim",desc:"Slender build"},{id:2,icon:"🧍‍♂️",label:"Average",desc:"Average build"},{id:3,icon:"🧍",label:"Large",desc:"Larger build"}];
-  return(
-    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 24px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
-      <div style={{textAlign:"center",padding:"36px 0 20px"}}><Logo size={56}/>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:19,fontWeight:800,color:C.textDark,marginTop:12}}>Choose Your Silhouette</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:5}}>For accurate pain body mapping</div>
-      </div>
-      <div style={{display:"flex",gap:12,marginBottom:28}}>
-        {opts.map(o=>(
-          <div key={o.id} onClick={()=>setSel(o.id)}
-            className={sel===o.id?"glass":"glass-soft"}
-            style={{flex:1,padding:"18px 10px",borderRadius:18,textAlign:"center",cursor:"pointer",border:`2px solid ${sel===o.id?C.blue:"transparent"}`,transition:"all 0.2s"}}>
-            <div style={{fontSize:42,marginBottom:8}}>{o.icon}</div>
-            <div style={{fontWeight:800,fontSize:13,color:sel===o.id?C.blue:C.textMid}}>{o.label}</div>
-            <div style={{fontSize:11,color:C.textLight,marginTop:2}}>{o.desc}</div>
+              );
+            })}
           </div>
-        ))}
-      </div>
-      <button className="btn-blue" onClick={()=>onContinue(sel)}>Continue →</button>
-    </div>
-  );
-};
-
-const WelcomeScreen=({user,onContinue})=>{
-  useEffect(()=>{const t=setTimeout(onContinue,3000);return()=>clearTimeout(t);},[]);
-  return(
-    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
-      <div style={{animation:"float 2s ease-in-out infinite"}}><Logo size={76}/></div>
-      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:26,fontWeight:800,color:C.blue,marginTop:18,textAlign:"center"}}>You're In! 🎉</div>
-      <div style={{fontSize:15,color:C.textMid,marginTop:10,textAlign:"center",lineHeight:1.7}}>Welcome, <strong>{user?.name}</strong>.<br/>Your 7-day free trial starts now.</div>
-      <div style={{fontSize:13,color:C.textLight,marginTop:10}}>Taking you to your dashboard…</div>
-      <div style={{marginTop:22,display:"flex",gap:6}}>
-        {[0,1,2].map(i=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:i===0?C.blue:"rgba(26,111,160,0.2)",animation:`pulse 1.2s ease ${i*0.3}s infinite`}}/>)}
+        )}
       </div>
     </div>
   );
 };
 
-const PaywallScreen=({user,onSubscribe,onLogout})=>{
-  const [plan,setPlan]=useState("monthly"); const [loading,setLoading]=useState(false);
-  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
-  const doSub=async()=>{
-    setLoading(true); await new Promise(r=>setTimeout(r,1200));
-    const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
-    const idx=users.findIndex(u=>u.email===user.email);
-    if(idx>=0){users[idx].plan=plan;localStorage.setItem("p2c_users",JSON.stringify(users));}
-    onSubscribe(plan); setLoading(false);
-  };
-  return(
-    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 0 0"}}>
-        <div style={{display:"flex",alignItems:"center",gap:8}}><Logo size={26}/>
-          <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:14}}><span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span></div>
-        </div>
-        <button onClick={onLogout} style={{fontSize:11,fontWeight:700,color:C.textLight,background:"rgba(255,255,255,0.5)",border:"1px solid rgba(26,111,160,0.2)",borderRadius:18,padding:"5px 11px",cursor:"pointer"}}>Log Out</button>
-      </div>
-      <div style={{textAlign:"center",padding:"24px 0 14px"}}>
-        <div style={{fontSize:44}}>✨</div>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:24,fontWeight:800,color:C.textDark,marginTop:8}}>Unlock Full Access</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:6,lineHeight:1.6}}>Continue your healing journey.</div>
-      </div>
-      {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
-        <span style={{fontSize:18}}>⏳</span>
-        <div><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} Days Left in Free Trial</div>
-        <div style={{fontSize:11,color:C.textLight}}>Your trial ends soon</div></div>
-      </div>}
-      <div style={{marginBottom:18}}>
-        {[["✅","Unlimited check-ins"],["📈","Trends & AI insights"],["🩺","Pain body heat map"],["💬","Community chat"],["📸","Secure documentation"],["📄","PDF health reports"]].map(([icon,text])=>(
-          <div key={text} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 0",borderBottom:"1px solid rgba(26,111,160,0.08)"}}>
-            <span style={{fontSize:15}}>{icon}</span>
-            <span style={{fontSize:13,fontWeight:600,color:C.textMid}}>{text}</span>
-            <div style={{marginLeft:"auto",width:17,height:17,borderRadius:"50%",background:C.green,display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <span style={{color:"#fff",fontSize:10,fontWeight:900}}>✓</span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="glass" style={{borderRadius:15,padding:5,display:"flex",gap:5,marginBottom:18}}>
-        {[{id:"monthly",label:"Monthly",price:"€4.99",sub:"/month"},{id:"annual",label:"Annual",price:"€49.99",sub:"/year · Save 17%"}].map(p=>(
-          <div key={p.id} onClick={()=>setPlan(p.id)}
-            style={{flex:1,padding:"13px 8px",borderRadius:11,textAlign:"center",cursor:"pointer",background:plan===p.id?"rgba(26,111,160,0.88)":"transparent",transition:"all 0.2s"}}>
-            <div style={{fontWeight:800,fontSize:12,color:plan===p.id?"#fff":C.textMid}}>{p.label}</div>
-            <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:plan===p.id?"#fff":C.textDark,marginTop:2}}>{p.price}</div>
-            <div style={{fontSize:10,color:plan===p.id?"rgba(255,255,255,0.7)":C.textLight,marginTop:2}}>{p.sub}</div>
-          </div>
-        ))}
-      </div>
-      <button className="btn-blue" onClick={doSub} disabled={loading} style={{animation:"glow 2.5s ease-in-out infinite"}}>
-        {loading?"Processing…":`Subscribe ${plan==="monthly"?"€4.99/mo":"€49.99/yr"} →`}
-      </button>
-      <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginTop:10}}>Cancel anytime · No hidden fees</div>
-      {daysLeft>0&&<div style={{textAlign:"center",marginTop:11}}><span onClick={()=>onSubscribe("trial")} style={{fontSize:12,color:C.textLight,cursor:"pointer",textDecoration:"underline"}}>Continue free trial ({daysLeft} days left)</span></div>}
-    </div>
-  );
-};
-
-/* ══ HOME TAB ══ */
-const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
-  const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
-  const isPaid=user?.plan==="monthly"||user?.plan==="annual";
-  const affIdx=Math.floor(Date.now()/86400000)%AFFIRMATIONS.length;
-  const modules=[
-    {id:"pain",icon:"🩺",title:"Pain Module",sub:"Chronic Pain",color:C.red,border:"rgba(230,57,70,0.2)"},
-    {id:"violence",icon:"📸",title:"Violence Report",sub:"Documentation",color:C.purple,border:"rgba(123,63,158,0.2)"},
-    {id:"community",icon:"💬",title:"Community Chat",sub:"Anonymous",color:C.teal,border:"rgba(26,140,122,0.2)"},
-    {id:"trauma",icon:"🧠",title:"Trauma Recovery",sub:"Self-Guided",color:C.blue,border:"rgba(26,111,160,0.2)"},
-  ];
-  return(
-    <div style={{padding:"10px 0",animation:"fadeIn 0.4s ease both"}}>
-      {!isPaid&&daysLeft>0&&(
-        <div onClick={onShowPaywall} className="glass" style={{margin:"0 18px 14px",borderRadius:13,padding:"11px 14px",display:"flex",alignItems:"center",gap:11,cursor:"pointer",border:"1px solid rgba(244,162,97,0.35)"}}>
-          <span style={{fontSize:17}}>⏳</span>
-          <div style={{flex:1}}><div style={{fontWeight:800,fontSize:12,color:C.gold}}>{daysLeft} days left in free trial</div>
-          <div style={{fontSize:11,color:C.textLight}}>Tap to upgrade</div></div>
-          <span style={{color:C.gold,fontSize:14}}>→</span>
-        </div>
-      )}
-      <div style={{padding:"0 22px",marginBottom:18}}>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Hello, {user?.name?.split(" ")[0]||"Friend"} 👋</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>How are you feeling today?</div>
-      </div>
-      <div className="glass" style={{margin:"0 18px 18px",borderRadius:17,padding:18,background:"rgba(26,111,160,0.07)",border:"1px solid rgba(26,111,160,0.15)"}}>
-        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Today's Reminder 💙</div>
-        <div style={{fontSize:14,fontStyle:"italic",lineHeight:1.65,color:C.textMid}}>"{AFFIRMATIONS[affIdx]}"</div>
-      </div>
-      {history.length>0&&(
-        <div style={{display:"flex",gap:10,padding:"0 18px",marginBottom:18,overflowX:"auto"}}>
-          {[{label:"Last Pain",value:`${history[history.length-1]?.painLevel}/10`,color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Check-Ins",value:history.length,color:C.green}].map(s=>(
-            <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 14px",flexShrink:0,minWidth:85}}>
-              <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
-              <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:21,color:s.color}}>{s.value}</div>
-            </div>
-          ))}
-        </div>
-      )}
-      <div style={{padding:"0 18px"}}>
-        <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:12}}>Your Modules</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
-          {modules.map(m=>(
-            <div key={m.id} onClick={()=>onModuleSelect(m.id)} className="glass"
-              style={{borderRadius:18,padding:18,cursor:"pointer",border:`1px solid ${m.border}`,transition:"transform 0.15s",background:`rgba(255,255,255,0.4)`}}>
-              <div style={{fontSize:30,marginBottom:9}}>{m.icon}</div>
-              <div style={{fontWeight:800,fontSize:13,color:m.color,lineHeight:1.2}}>{m.title}</div>
-              <div style={{fontSize:11,color:C.textLight,marginTop:3}}>{m.sub}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+/* ══ PAIN MODULE ══ */
 
 /* ══ PAIN MODULE ══ */
 
