@@ -1014,13 +1014,15 @@ const Logo=({size=56})=>(
 const GCard=({children,style={}})=>(
   <div className="glass" style={{borderRadius:20,padding:22,margin:"0 18px 16px",...style}}>{children}</div>
 );
-const SectionTitle=({icon,title,sub})=>(
-  <div style={{padding:"18px 22px 4px",animation:"fadeIn 0.4s ease both"}}>
-    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:2}}>
+const SectionTitle=({icon,title,sub,onBack,onHome})=>(
+  <div style={{padding:"14px 18px 4px",animation:"fadeIn 0.4s ease both"}}>
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:2}}>
+      {onBack&&<button onClick={onBack} style={{background:"rgba(26,111,160,0.10)",border:"none",borderRadius:10,width:34,height:34,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,fontSize:17,color:C.blue,fontWeight:700}}>&#8249;</button>}
       {icon&&<span style={{fontSize:22}}>{icon}</span>}
-      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark,letterSpacing:"-0.01em"}}>{title}</div>
+      <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:20,fontWeight:800,color:C.textDark,letterSpacing:"-0.01em",flex:1}}>{title}</div>
+      {onHome&&<button onClick={onHome} style={{background:"rgba(26,111,160,0.10)",border:"none",borderRadius:10,width:34,height:34,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,fontSize:17}}>&#127968;</button>}
     </div>
-    {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:icon?32:0,marginTop:3}}>{sub}</div>}
+    {sub&&<div style={{fontSize:12,color:C.textLight,paddingLeft:(onBack||icon)?40:0,marginTop:3}}>{sub}</div>}
   </div>
 );
 const BottomNav=({tab,setTab})=>{
@@ -1527,7 +1529,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
 
   return(
     <div>
-      <SectionTitle icon="🩺" title="Pain Module" sub="Track & visualise your pain" onBack={onBack}/>
+      <SectionTitle icon="🩺" title="Pain Module" sub="Track & visualise your pain" onBack={onBack} onHome={onBack}/>
 
       {/* Tab bar */}
       <div style={{display:"flex",margin:"6px 18px 10px",borderRadius:14,background:"rgba(26,111,160,0.08)",padding:3}}>
@@ -2088,7 +2090,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
   // Main screen
   return(
     <div>
-      <SectionTitle icon="🛡️" title="Violence Documentation" sub="Private & secure" onBack={onBack}/>
+      <SectionTitle icon="🛡️" title="Violence Documentation" sub="Private & secure" onBack={onBack} onHome={onBack}/>
       <GCard style={{background:"rgba(123,63,158,0.07)",border:"1px solid rgba(123,63,158,0.18)"}}>
         <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
           <span style={{fontSize:18}}>🔒</span>
@@ -2310,7 +2312,7 @@ const TraumaModule=({user,onBack})=>{
   // Main view
   return(
     <div>
-      <SectionTitle icon="🧠" title="Trauma Recovery" sub="Self-guided exercises & empowerment" onBack={onBack}/>
+      <SectionTitle icon="🧠" title="Trauma Recovery" sub="Self-guided exercises & empowerment" onBack={onBack} onHome={onBack}/>
 
       {/* Anchor card */}
       <div style={{padding:"0 18px",marginBottom:4}}>
@@ -2376,7 +2378,7 @@ const CommunityModule=({user,onBack})=>{
   // Channel list view
   if(!channel) return(
     <div>
-      <SectionTitle icon="💬" title="Community Chat" sub="Choose a topic to join" onBack={onBack}/>
+      <SectionTitle icon="💬" title="Community Chat" sub="Choose a topic to join" onBack={onBack} onHome={onBack}/>
       <GCard style={{background:"rgba(26,140,122,0.07)",border:"1px solid rgba(26,140,122,0.17)"}}>
         <div style={{display:"flex",alignItems:"center",gap:9}}>
           <span style={{fontSize:16}}>🔒</span>
@@ -2462,7 +2464,7 @@ const TrendsTab=({history,onBack})=>{
   const trend=history.length>=2?history[history.length-1].painLevel-history[history.length-2].painLevel:0;
   return(
     <div>
-      <SectionTitle icon="📈" title="Your Journey" sub={`${history.length} check-ins tracked`} onBack={onBack}/>
+      <SectionTitle icon="📈" title="Your Journey" sub={`${history.length} check-ins tracked`} onBack={onBack} onHome={onBack}/>
       <div style={{display:"flex",gap:10,padding:"8px 18px 4px",overflowX:"auto"}}>
         {[{label:T.avgPain,value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Best Day",value:history.reduce((a,b)=>b.score>a.score?b:a,history[0]).date,color:C.green},{label:"Trend",value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"=",color:trend>0?C.red:trend<0?C.green:C.textLight}].map(s=>(
           <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 13px",flexShrink:0}}>
