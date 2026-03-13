@@ -1554,65 +1554,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
               <button onClick={()=>setPainTab("track")} className="btn-blue" style={{marginTop:16}}>Start Check-In →</button>
             </GCard>
           ):(
-            <>
-              <div style={{display:"flex",gap:10,padding:"0 18px 4px",overflowX:"auto"}}>
-                {[
-                  {label:T.avgPain,value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.red},
-                  {label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},
-                  {label:T.checkIns,value:history.length,color:C.green},
-                  {label:"Trend",value:(()=>{const t=history.length>=2?history[history.length-1].painLevel-history[history.length-2].painLevel:0;return t>0?`+${t}↑`:t<0?`${t}↓`:"→";})(),color:(()=>{const t=history.length>=2?history[history.length-1].painLevel-history[history.length-2].painLevel:0;return t>0?C.red:t<0?C.green:C.textLight;})()},
-                ].map(s=>(
-                  <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 13px",flexShrink:0}}>
-                    <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
-                    <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:20,color:s.color}}>{s.value}</div>
-                  </div>
-                ))}
-              </div>
-              <GCard style={{marginTop:8}}>
-                <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:3}}>📉 Pain Over Time</div>
-                <div style={{fontSize:11,color:C.textLight,marginBottom:8}}>Lower is better</div>
-                <MiniChart data={history.slice(-7).map(h=>({v:h.painLevel,day:h.date}))} color={C.red} maxVal={10} height={90} filled={true}/>
-              </GCard>
-              <GCard>
-                <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:3}}>📈 Recovery Score</div>
-                <div style={{fontSize:11,color:C.textLight,marginBottom:8}}>Higher is better · max 30</div>
-                <MiniChart data={history.slice(-7).map(h=>({v:h.score,day:h.date}))} color={C.blue} maxVal={30} height={90} filled={false}/>
-              </GCard>
-              <GCard>
-                <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:13}}>🗂 Check-In Log</div>
-                {[...history].reverse().map((entry,i)=>{
-                  const sc=entry.score>=20?C.green:entry.score>=12?C.gold:C.red;
-                  const activeAreas=(entry.areas||[]).filter(a=>a.maxIntensity>0);
-                  return(
-                    <div key={entry.id} style={{padding:"11px 0",borderBottom:i<history.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
-                      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:activeAreas.length>0?6:0}}>
-                        <div>
-                          <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{entry.fullDate}</div>
-                          <div style={{fontSize:11,color:C.textLight,marginTop:2}}>Pain {entry.painLevel}/10 · {MOODS.find(m=>m.value===entry.mood)?.emoji||"—"} · {entry.checkedCount} checks</div>
-                        </div>
-                        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:sc}}>{entry.score}</div>
-                      </div>
-                      {activeAreas.length>0&&(
-                        <div style={{display:"flex",flexDirection:"column",gap:3,paddingLeft:4,borderLeft:`3px solid ${sc}`}}>
-                          {activeAreas.map(a=>{
-                            const painAreas=Object.entries(a.subareas||{}).filter(([,v])=>v>0).map(([n,v])=>`${n} (${v}/10)`).join(', ');
-                            const col=a.maxIntensity>=7?C.red:a.maxIntensity>=4?C.gold:'#b37a00';
-                            return(
-                              <div key={a.id} style={{paddingLeft:8}}>
-                                <span style={{fontSize:12,fontWeight:700,color:C.textMid}}>{a.label}</span>
-                                <span style={{fontSize:11,fontWeight:800,color:col,marginLeft:6}}>{a.maxIntensity}/10</span>
-                                {(a.hasSwelling||a.hasNumbness)&&<span style={{fontSize:10,color:C.blue,marginLeft:6}}>{a.hasSwelling?"Swelling":""}{a.hasSwelling&&a.hasNumbness?" · ":""}{a.hasNumbness?"Numbness":""}</span>}
-                                {painAreas&&<div style={{fontSize:10,color:C.textLight,marginTop:1}}>📍 {painAreas}</div>}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </GCard>
-            </>
+            <TrendsTab history={history} onBack={onBack} embedded={true}/>
           )}
         </div>
       )}
@@ -2466,7 +2408,7 @@ const PERIOD_OPTIONS=[
   {label:"All",days:null},
   {label:"Custom",days:"custom"},
 ];
-const TrendsTab=({history,onBack})=>{
+const TrendsTab=({history,onBack,embedded})=>{
   const [period,setPeriod]=useState(7);
   const today=new Date().toISOString().slice(0,10);
   const weekAgo=new Date(Date.now()-6*86400000).toISOString().slice(0,10);
@@ -2489,7 +2431,7 @@ const TrendsTab=({history,onBack})=>{
   const trend=displayHistory.length>=2?displayHistory[displayHistory.length-1].painLevel-displayHistory[displayHistory.length-2].painLevel:0;
   return(
     <div>
-      <SectionTitle icon="📈" title="Your Journey" sub={`${displayHistory.length} check-ins tracked`} onBack={onBack} onHome={onBack}/>
+      {!embedded&&<SectionTitle icon="📈" title="Your Journey" sub={`${displayHistory.length} check-ins tracked`} onBack={onBack} onHome={onBack}/>}
       {/* Period selector */}
       <div style={{display:"flex",gap:6,padding:"4px 18px 0",flexWrap:"wrap"}}>
         {PERIOD_OPTIONS.map(opt=>{
