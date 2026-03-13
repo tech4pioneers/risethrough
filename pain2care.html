@@ -2988,11 +2988,49 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
         </div>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>{user?.name}</div>
         <div style={{fontSize:13,color:C.textLight,marginTop:3}}>{user?.email}</div>
-        <div style={{marginTop:11,display:"inline-block",padding:"4px 13px",borderRadius:18,background:isPaid?"rgba(45,154,110,0.1)":"rgba(244,162,97,0.1)",fontSize:11,fontWeight:700,color:isPaid?C.green:C.gold}}>
+        <div style={{marginTop:11,display:"inline-block",padding:"4px 13px",borderRadius:18,
+          background:isPaid?(user?.plan?.startsWith("premium")?"rgba(249,168,37,0.12)":"rgba(26,111,160,0.1)"):"rgba(244,162,97,0.1)",
+          fontSize:11,fontWeight:700,
+          color:isPaid?(user?.plan?.startsWith("premium")?C.gold:C.blue):C.gold}}>
           {isPaid?(user?.plan?.startsWith("premium")?"⭐ Premium Member":"💙 Normal Member"):`Free Trial · ${daysLeft} days left`}
         </div>
       </GCard>
-      {!isPaid&&<div style={{margin:"0 18px 14px"}}><button className="btn-blue" onClick={onShowPaywall}>⭐ Upgrade to Premium</button></div>}
+      {/* Subscription card — shown for trial users */}
+      {!isPaid&&(
+        <div className="glass" style={{margin:"0 18px 14px",borderRadius:16,padding:"16px 16px",border:"1px solid rgba(26,111,160,0.15)"}}>
+          <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:4}}>Free Trial</div>
+          <div style={{fontSize:12,color:C.textLight,marginBottom:12}}>
+            ⏳ {daysLeft} day{daysLeft!==1?"s":""} remaining · Normal Plan features active<br/>
+            🔒 Premium features not available during trial
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={onShowPaywall}
+              style={{flex:1,padding:"11px 8px",borderRadius:11,border:"2px solid "+C.blue,background:"rgba(26,111,160,0.08)",
+                fontWeight:800,fontSize:12,color:C.blue,cursor:"pointer"}}>
+              💙 Normal Plan
+            </button>
+            <button onClick={onShowPaywall}
+              style={{flex:1,padding:"11px 8px",borderRadius:11,border:"none",
+                background:"linear-gradient(135deg,"+C.gold+",#e67e00)",
+                fontWeight:800,fontSize:12,color:"#fff",cursor:"pointer"}}>
+              ⭐ Premium Plan
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Upgrade banner for Normal plan users */}
+      {isPaid&&!user?.plan?.startsWith("premium")&&(
+        <div className="glass" style={{margin:"0 18px 14px",borderRadius:16,padding:"14px 16px",border:"1px solid rgba(249,168,37,0.25)"}}>
+          <div style={{fontWeight:800,fontSize:12,color:C.gold,marginBottom:4}}>⭐ Upgrade to Premium</div>
+          <div style={{fontSize:11,color:C.textLight,marginBottom:10}}>Unlock photo documentation, AI analysis & priority support</div>
+          <button onClick={onShowPaywall}
+            style={{width:"100%",padding:"10px",borderRadius:10,border:"none",
+              background:"linear-gradient(135deg,"+C.gold+",#e67e00)",
+              fontWeight:800,fontSize:12,color:"#fff",cursor:"pointer"}}>
+            Upgrade to Premium →
+          </button>
+        </div>
+      )}
       <GCard>
         <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:13}}>Account</div>
         {[
