@@ -45,20 +45,33 @@ textarea{font-family:'Nunito',sans-serif}
 <script type="text/babel" data-presets="react">
 const {useState,useRef,useEffect}=React;
 
-const MiniChart=({data,color,maxVal,height=120,filled=false})=>{
-  const W=320,H=height,padX=8,padY=16,pts=data.length;
+const MiniChart=({data,color,maxVal,height=120,filled=false,yLabel=""})=>{
+  const W=320,H=height,padX=28,padY=16,pts=data.length;
   if(!pts||pts<2) return null;
-  const xs=data.map((_,i)=>padX+(i/(pts-1))*(W-padX*2));
+  const xs=data.map((_,i)=>padX+(i/(pts-1))*(W-padX-8));
   const ys=data.map(d=>padY+((maxVal-d.v)/(maxVal))*(H-padY*2));
   const line=xs.map((x,i)=>`${i===0?"M":"L"}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(" ");
   const area=line+` L${xs[pts-1].toFixed(1)},${H} L${xs[0].toFixed(1)},${H} Z`;
   const gid="g"+color.replace(/[^a-z0-9]/gi,"");
+  const yTicks=[0,Math.round(maxVal/2),maxVal];
   return(
-    <svg viewBox={`0 0 ${W} ${H+20}`} width="100%" style={{display:"block"}}>
+    <svg viewBox={`0 0 ${W} ${H+22}`} width="100%" style={{display:"block"}}>
       <defs><linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stopColor={color} stopOpacity="0.3"/>
         <stop offset="100%" stopColor={color} stopOpacity="0"/>
       </linearGradient></defs>
+      {/* Y axis gridlines + labels */}
+      {yTicks.map(tick=>{
+        const y=padY+((maxVal-tick)/maxVal)*(H-padY*2);
+        return(
+          <g key={tick}>
+            <line x1={padX} y1={y} x2={W-8} y2={y} stroke="rgba(26,111,160,0.08)" strokeWidth="1" strokeDasharray="3,3"/>
+            <text x={padX-4} y={y+4} textAnchor="end" fontSize="9" fill="#6b95ad">{tick}</text>
+          </g>
+        );
+      })}
+      {/* Y axis line */}
+      <line x1={padX} y1={padY} x2={padX} y2={H} stroke="rgba(26,111,160,0.15)" strokeWidth="1"/>
       {filled&&<path d={area} fill={`url(#${gid})`}/>}
       <path d={line} stroke={color} strokeWidth="2.5" fill="none" strokeLinejoin="round" strokeLinecap="round"/>
       {data.map((d,i)=>(
@@ -2494,7 +2507,7 @@ const CheckInEntry=({entry,isLast})=>{
                   const col=a.maxIntensity>=7?C.red:a.maxIntensity>=4?C.gold:C.green;
                   const bg=a.maxIntensity>=7?"rgba(220,50,50,0.07)":a.maxIntensity>=4?"rgba(240,165,0,0.07)":"rgba(50,180,100,0.07)";
                   const subAreas=Object.entries(a.subareas||{}).filter(([,v])=>v>0).sort((x,y)=>y[1]-x[1]);
-                  const displayVal=subAreas.length>1?Math.round(subAreas.reduce((s,[,v])=>s+v,0)/subAreas.length):a.maxIntensity;
+                  const displayVal=subAreas.length>0?Math.round(subAreas.reduce((s,[,v])=>s+v,0)/subAreas.length):a.maxIntensity;
                   const displayCol=displayVal>=7?C.red:displayVal>=4?C.gold:C.green;
                   const displayBg=displayVal>=7?"rgba(220,50,50,0.07)":displayVal>=4?"rgba(240,165,0,0.07)":"rgba(50,180,100,0.07)";
                   return(
@@ -2651,10 +2664,18 @@ const TrendsTab=({history,onBack,embedded})=>{
       <GCard>
         <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:3}}>⭐ Wellbeing Score</div>
         <div style={{fontSize:11,color:C.textLight,marginBottom:8}}>Higher is better · 1–5 stars</div>
-        <MiniChart data={chartData.map(d=>({v:d.Score,day:d.day}))} color={C.blue} maxVal={30} height={100} filled={false}/>
+        <MiniChart data={chartData.map(d=>({v:parseFloat(toStars(d.Score).toFixed(1)),day:d.day}))} color={C.blue} maxVal={5} height={100} filled={false}/>
       </GCard>
       <GCard>
-        <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:13}}>🗂 Check-In Log</div>
+        <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:10}}>🗂 Check-In Log</div>
+        {/* Column headers */}
+        <div style={{display:"flex",alignItems:"center",gap:10,padding:"0 0 8px",borderBottom:"1px solid rgba(26,111,160,0.1)",marginBottom:4}}>
+          <span style={{width:16}}/>
+          <span style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",minWidth:52}}>Date</span>
+          <span style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",flex:1}}>Wellbeing</span>
+          <span style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",minWidth:48,textAlign:"right"}}>Pain</span>
+          <span style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",minWidth:24,textAlign:"center"}}>Mood</span>
+        </div>
         <CheckInLog entries={displayHistory} />
       </GCard>
     </div>
