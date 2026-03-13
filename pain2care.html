@@ -2459,19 +2459,83 @@ const CommunityModule=({user,onBack})=>{
 };
 
 /* ══ TRENDS TAB ══ */
+const PERIOD_OPTIONS=[
+  {label:"7d",days:7},
+  {label:"30d",days:30},
+  {label:"90d",days:90},
+  {label:"All",days:null},
+  {label:"Custom",days:"custom"},
+];
 const TrendsTab=({history,onBack})=>{
-  const chartData=history.slice(-7).map(h=>({day:h.date,Pain:h.painLevel,Score:h.score}));
-  const trend=history.length>=2?history[history.length-1].painLevel-history[history.length-2].painLevel:0;
+  const [period,setPeriod]=useState(7);
+  const today=new Date().toISOString().slice(0,10);
+  const weekAgo=new Date(Date.now()-6*86400000).toISOString().slice(0,10);
+  const [customStart,setCustomStart]=useState(weekAgo);
+  const [customEnd,setCustomEnd]=useState(today);
+  const filtered=(()=>{
+    if(period==="custom"){
+      const s=new Date(customStart);
+      const e=new Date(customEnd);
+      e.setHours(23,59,59);
+      return history.filter(h=>{const d=new Date(h.fullDate||h.date);return d>=s&&d<=e;});
+    }
+    if(period===null) return history;
+    const cutoff=new Date();
+    cutoff.setDate(cutoff.getDate()-period);
+    return history.filter(h=>new Date(h.fullDate||h.date)>=cutoff);
+  })();
+  const displayHistory=filtered.length>0?filtered:history;
+  const chartData=displayHistory.map(h=>({day:h.date,Pain:h.painLevel,Score:h.score}));
+  const trend=displayHistory.length>=2?displayHistory[displayHistory.length-1].painLevel-displayHistory[displayHistory.length-2].painLevel:0;
   return(
     <div>
-      <SectionTitle icon="📈" title="Your Journey" sub={`${history.length} check-ins tracked`} onBack={onBack} onHome={onBack}/>
-      <div style={{display:"flex",gap:10,padding:"8px 18px 4px",overflowX:"auto"}}>
-        {[{label:T.avgPain,value:(history.reduce((a,b)=>a+b.painLevel,0)/history.length).toFixed(1),color:C.red},{label:"Avg Score",value:(history.reduce((a,b)=>a+b.score,0)/history.length).toFixed(0),color:C.blue},{label:"Best Day",value:history.reduce((a,b)=>b.score>a.score?b:a,history[0]).date,color:C.green},{label:"Trend",value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"=",color:trend>0?C.red:trend<0?C.green:C.textLight}].map(s=>(
+      <SectionTitle icon="📈" title="Your Journey" sub={`${displayHistory.length} check-ins tracked`} onBack={onBack} onHome={onBack}/>
+      {/* Period selector */}
+      <div style={{display:"flex",gap:6,padding:"4px 18px 0",flexWrap:"wrap"}}>
+        {PERIOD_OPTIONS.map(opt=>{
+          const active=period===opt.days;
+          return(
+            <button key={opt.label} onClick={()=>setPeriod(opt.days)}
+              style={{flex:1,minWidth:opt.days==="custom"?"100%":"0",padding:"8px 0",borderRadius:10,border:"none",cursor:"pointer",fontFamily:"'Montserrat',sans-serif",fontWeight:700,fontSize:13,
+                background:active?"linear-gradient(135deg,"+C.blue+","+C.teal+")":"rgba(26,111,160,0.08)",
+                color:active?"#fff":C.textMid,
+                boxShadow:active?"0 3px 10px rgba(26,111,160,0.25)":"none",
+                transition:"all 0.18s"}}>
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+      {period==="custom"&&(
+        <div style={{display:"flex",gap:10,padding:"10px 18px 0",alignItems:"center"}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:4}}>Start</div>
+            <input type="date" value={customStart} max={customEnd}
+              onChange={e=>setCustomStart(e.target.value)}
+              style={{width:"100%",padding:"9px 12px",borderRadius:10,border:"1.5px solid rgba(26,111,160,0.2)",background:"rgba(255,255,255,0.85)",fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.textDark,outline:"none",boxSizing:"border-box"}}/>
+          </div>
+          <div style={{paddingTop:18,color:C.textLight,fontWeight:700}}>→</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:4}}>End</div>
+            <input type="date" value={customEnd} min={customStart} max={today}
+              onChange={e=>setCustomEnd(e.target.value)}
+              style={{width:"100%",padding:"9px 12px",borderRadius:10,border:"1.5px solid rgba(26,111,160,0.2)",background:"rgba(255,255,255,0.85)",fontFamily:"'DM Sans',sans-serif",fontSize:14,color:C.textDark,outline:"none",boxSizing:"border-box"}}/>
+          </div>
+        </div>
+      )}
+      <div style={{height:12}}/>
+      <div style={{display:"flex",gap:10,padding:"0px 18px 4px",overflowX:"auto"}}>
+        {displayHistory.length>0?[
+          {label:"Avg Pain",value:(displayHistory.reduce((a,b)=>a+b.painLevel,0)/displayHistory.length).toFixed(1),color:C.red},
+          {label:"Avg Score",value:(displayHistory.reduce((a,b)=>a+b.score,0)/displayHistory.length).toFixed(0),color:C.blue},
+          {label:"Best Day",value:displayHistory.reduce((a,b)=>b.score>a.score?b:a,displayHistory[0]).date,color:C.green},
+          {label:"Trend",value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"=",color:trend>0?C.red:trend<0?C.green:C.textLight}
+        ].map(s=>(
           <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 13px",flexShrink:0}}>
             <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
             <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:20,color:s.color}}>{s.value}</div>
           </div>
-        ))}
+        )):[]}
       </div>
       <GCard style={{marginTop:10}}>
         <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:3}}>📉 Pain Over Time</div>
@@ -2485,10 +2549,10 @@ const TrendsTab=({history,onBack})=>{
       </GCard>
       <GCard>
         <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:13}}>🗂 Check-In Log</div>
-        {[...history].reverse().map((entry,i)=>{const sc=entry.score>=20?C.green:entry.score>=12?C.gold:C.red;
+        {[...displayHistory].reverse().map((entry,i)=>{const sc=entry.score>=20?C.green:entry.score>=12?C.gold:C.red;
           const activeAreas=(entry.areas||[]).filter(a=>a.maxIntensity>0);
           return(
-          <div key={entry.id} style={{padding:"11px 0",borderBottom:i<history.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
+          <div key={entry.id} style={{padding:"11px 0",borderBottom:i<displayHistory.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:activeAreas.length>0?6:0}}>
               <div>
                 <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{entry.fullDate}</div>
@@ -2520,7 +2584,7 @@ const TrendsTab=({history,onBack})=>{
 };
 
 /* ══ PROFILE TAB ══ */
-const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser})=>{
+const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
   const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
   const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
   const [screen,setScreen]=useState("main"); // main | editProfile | mydata | deleteConfirm
@@ -2733,7 +2797,7 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser})=>{
 
   return(
     <div>
-      <SectionTitle icon="👤" title="Profile" sub="Your account & settings"/>
+      <SectionTitle icon="👤" title="Profile" sub="Your account & settings" onHome={onBack}/>
       <GCard style={{textAlign:"center",padding:26}}>
         <div style={{width:68,height:68,borderRadius:"50%",background:"linear-gradient(135deg,#1a6fa0,#2d9a6e)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,margin:"0 auto 11px",color:"#fff",fontFamily:"'Montserrat',sans-serif",fontWeight:800}}>
           {user?.name?.[0]?.toUpperCase()||"U"}
@@ -2937,7 +3001,7 @@ const MainApp=({user:initialUser,onLogout,onShowPaywall})=>{
       case "trauma": return <TraumaModule user={user} onBack={()=>setTab("home")}/>;
       case "community": return <CommunityModule user={user} onBack={()=>setTab("home")}/>;
       case "trends": return <TrendsTab history={history} onBack={()=>setTab("home")}/>;
-      case "profile": return <ProfileTab user={user} onLogout={onLogout} onShowPaywall={onShowPaywall} onUpdateUser={handleUpdateUser}/>;
+      case "profile": return <ProfileTab user={user} onLogout={onLogout} onShowPaywall={onShowPaywall} onUpdateUser={handleUpdateUser} onBack={()=>setTab("home")}/>;
       default: return <HomeTab user={user} onModuleSelect={setTab} onShowPaywall={onShowPaywall} history={history}/>;
     }
   };
