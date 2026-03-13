@@ -1301,59 +1301,95 @@ const WelcomeScreen=({user,onContinue})=>{
 };
 
 const PaywallScreen=({user,onSubscribe,onLogout})=>{
-  const [plan,setPlan]=useState("monthly"); const [loading,setLoading]=useState(false);
+  const [tier,setTier]=useState("normal"); // "normal" | "premium"
+  const [billing,setBilling]=useState("monthly"); // "monthly" | "annual"
+  const [loading,setLoading]=useState(false);
   const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
+  const prices={normal:{monthly:"€2.99",annual:"€29.99",monthlySub:"/month",annualSub:"/year · Save 16%"},
+                premium:{monthly:"€4.99",annual:"€49.99",monthlySub:"/month",annualSub:"/year · Save 17%"}};
+  const planKey=`${tier}_${billing}`;
   const doSub=async()=>{
     setLoading(true); await new Promise(r=>setTimeout(r,1200));
     const users=JSON.parse(localStorage.getItem("p2c_users")||"[]");
     const idx=users.findIndex(u=>u.email===user.email);
-    if(idx>=0){users[idx].plan=plan;localStorage.setItem("p2c_users",JSON.stringify(users));}
-    onSubscribe(plan); setLoading(false);
+    if(idx>=0){users[idx].plan=planKey;localStorage.setItem("p2c_users",JSON.stringify(users));}
+    onSubscribe(planKey); setLoading(false);
   };
+  const normalFeatures=[["✅","Unlimited check-ins"],["📈","Trends & AI insights"],["🩺","Pain body heat map"],["💬","Community chat"],["📄","PDF health reports"]];
+  const premiumExtras=[["📸","Secure photo documentation"],["🤖","AI-powered pain analysis"],["👨‍⚕️","Priority support"]];
   return(
-    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 0 0"}}>
-        <div style={{display:"flex",alignItems:"center",gap:8}}><Logo size={26}/>
-          <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:14}}><span style={{color:C.red}}>Pain</span><span style={{color:C.blue}}>2</span><span style={{color:C.teal}}>Care</span></div>
-        </div>
+    <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)",overflowY:"auto"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 0 12px"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}><Logo size={26}/></div>
         <button onClick={onLogout} style={{fontSize:11,fontWeight:700,color:C.textLight,background:"rgba(255,255,255,0.5)",border:"1px solid rgba(26,111,160,0.2)",borderRadius:18,padding:"5px 11px",cursor:"pointer"}}>Log Out</button>
       </div>
-      <div style={{textAlign:"center",padding:"24px 0 14px"}}>
-        <div style={{fontSize:44}}>✨</div>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:24,fontWeight:800,color:C.textDark,marginTop:8}}>Unlock Full Access</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:6,lineHeight:1.6}}>Continue your healing journey.</div>
+      <div style={{textAlign:"center",padding:"8px 0 16px"}}>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,color:C.textDark}}>Choose Your Plan</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:5,lineHeight:1.6}}>Continue your healing journey.</div>
       </div>
-      {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"12px 16px",marginBottom:16,display:"flex",alignItems:"center",gap:12}}>
+      {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"11px 15px",marginBottom:14,display:"flex",alignItems:"center",gap:12}}>
         <span style={{fontSize:18}}>⏳</span>
-        <div><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} Days Left in Free Trial</div>
-        <div style={{fontSize:11,color:C.textLight}}>Your trial ends soon</div></div>
+        <div style={{flex:1}}><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} day{daysLeft!==1?"s":""} left in free trial</div>
+        <div style={{fontSize:11,color:C.textLight}}>Currently on Normal Plan features</div></div>
       </div>}
-      <div style={{marginBottom:18}}>
-        {[["✅","Unlimited check-ins"],["📈","Trends & AI insights"],["🩺","Pain body heat map"],["💬","Community chat"],["📸","Secure documentation"],["📄","PDF health reports"]].map(([icon,text])=>(
-          <div key={text} style={{display:"flex",alignItems:"center",gap:12,padding:"9px 0",borderBottom:"1px solid rgba(26,111,160,0.08)"}}>
-            <span style={{fontSize:15}}>{icon}</span>
-            <span style={{fontSize:13,fontWeight:600,color:C.textMid}}>{text}</span>
-            <div style={{marginLeft:"auto",width:17,height:17,borderRadius:"50%",background:C.green,display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <span style={{color:"#fff",fontSize:10,fontWeight:900}}>✓</span>
-            </div>
+      {/* Tier selector */}
+      <div style={{display:"flex",gap:10,marginBottom:16}}>
+        {[{id:"normal",label:"Normal",icon:"💙",desc:"Essential tools"},{id:"premium",label:"Premium",icon:"⭐",desc:"Full experience"}].map(t=>(
+          <div key={t.id} onClick={()=>setTier(t.id)} className="glass"
+            style={{flex:1,borderRadius:14,padding:"14px 10px",textAlign:"center",cursor:"pointer",
+              border:tier===t.id?`2px solid ${t.id==="premium"?C.gold:C.blue}`:"2px solid transparent",
+              background:tier===t.id?(t.id==="premium"?"rgba(249,168,37,0.1)":"rgba(26,111,160,0.1)"):"rgba(255,255,255,0.4)",
+              transition:"all 0.2s"}}>
+            <div style={{fontSize:22}}>{t.icon}</div>
+            <div style={{fontWeight:800,fontSize:14,color:t.id==="premium"?C.gold:C.blue,marginTop:4}}>{t.label}</div>
+            <div style={{fontSize:10,color:C.textLight,marginTop:2}}>{t.desc}</div>
           </div>
         ))}
       </div>
-      <div className="glass" style={{borderRadius:15,padding:5,display:"flex",gap:5,marginBottom:18}}>
-        {[{id:"monthly",label:"Monthly",price:"€4.99",sub:"/month"},{id:"annual",label:"Annual",price:"€49.99",sub:"/year · Save 17%"}].map(p=>(
-          <div key={p.id} onClick={()=>setPlan(p.id)}
-            style={{flex:1,padding:"13px 8px",borderRadius:11,textAlign:"center",cursor:"pointer",background:plan===p.id?"rgba(26,111,160,0.88)":"transparent",transition:"all 0.2s"}}>
-            <div style={{fontWeight:800,fontSize:12,color:plan===p.id?"#fff":C.textMid}}>{p.label}</div>
-            <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:24,color:plan===p.id?"#fff":C.textDark,marginTop:2}}>{p.price}</div>
-            <div style={{fontSize:10,color:plan===p.id?"rgba(255,255,255,0.7)":C.textLight,marginTop:2}}>{p.sub}</div>
+      {/* Features list */}
+      <div className="glass" style={{borderRadius:14,padding:"12px 15px",marginBottom:14}}>
+        {normalFeatures.map(([icon,text])=>(
+          <div key={text} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:"1px solid rgba(26,111,160,0.07)"}}>
+            <span style={{fontSize:14}}>{icon}</span>
+            <span style={{fontSize:13,color:C.textMid,flex:1}}>{text}</span>
+            <span style={{color:C.green,fontWeight:900,fontSize:12}}>✓</span>
+          </div>
+        ))}
+        {premiumExtras.map(([icon,text])=>(
+          <div key={text} style={{display:"flex",alignItems:"center",gap:10,padding:"7px 0",borderBottom:"1px solid rgba(26,111,160,0.07)",opacity:tier==="premium"?1:0.4}}>
+            <span style={{fontSize:14}}>{icon}</span>
+            <span style={{fontSize:13,color:C.textMid,flex:1}}>{text}</span>
+            {tier==="premium"
+              ?<span style={{color:C.gold,fontWeight:900,fontSize:12}}>✓</span>
+              :<span style={{fontSize:10,color:C.textLight,background:"rgba(0,0,0,0.06)",borderRadius:6,padding:"2px 6px"}}>Premium</span>}
           </div>
         ))}
       </div>
-      <button className="btn-blue" onClick={doSub} disabled={loading} style={{animation:"glow 2.5s ease-in-out infinite"}}>
-        {loading?"Processing…":`Subscribe ${plan==="monthly"?"€4.99/mo":"€49.99/yr"} →`}
+      {/* Billing toggle */}
+      <div className="glass" style={{borderRadius:13,padding:4,display:"flex",gap:4,marginBottom:16}}>
+        {[{id:"monthly",label:"Monthly",price:prices[tier].monthly,sub:prices[tier].monthlySub},
+          {id:"annual",label:"Annual",price:prices[tier].annual,sub:prices[tier].annualSub}].map(p=>(
+          <div key={p.id} onClick={()=>setBilling(p.id)}
+            style={{flex:1,padding:"11px 8px",borderRadius:10,textAlign:"center",cursor:"pointer",
+              background:billing===p.id?(tier==="premium"?"rgba(249,168,37,0.85)":"rgba(26,111,160,0.85)"):"transparent",transition:"all 0.2s"}}>
+            <div style={{fontWeight:700,fontSize:11,color:billing===p.id?"#fff":C.textMid}}>{p.label}</div>
+            <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:billing===p.id?"#fff":C.textDark,marginTop:1}}>{p.price}</div>
+            <div style={{fontSize:10,color:billing===p.id?"rgba(255,255,255,0.75)":C.textLight}}>{p.sub}</div>
+          </div>
+        ))}
+      </div>
+      <button onClick={doSub} disabled={loading}
+        style={{width:"100%",padding:"15px",borderRadius:14,border:"none",cursor:"pointer",fontWeight:800,fontSize:15,color:"#fff",
+          background:tier==="premium"?`linear-gradient(135deg,${C.gold},#e67e00)`:`linear-gradient(135deg,${C.blue},#1a5fa0)`,
+          animation:"glow 2.5s ease-in-out infinite",boxShadow:tier==="premium"?"0 4px 18px rgba(249,168,37,0.4)":"0 4px 18px rgba(26,111,160,0.4)"}}>
+        {loading?"Processing…":`Get ${tier==="premium"?"⭐ Premium":"💙 Normal"} · ${prices[tier][billing]} →`}
       </button>
       <div style={{fontSize:11,color:C.textLight,textAlign:"center",marginTop:10}}>Cancel anytime · No hidden fees</div>
-      {daysLeft>0&&<div style={{textAlign:"center",marginTop:11}}><span onClick={()=>onSubscribe("trial")} style={{fontSize:12,color:C.textLight,cursor:"pointer",textDecoration:"underline"}}>Continue free trial ({daysLeft} days left)</span></div>}
+      {daysLeft>0&&<div style={{textAlign:"center",marginTop:12}}>
+        <span onClick={()=>onSubscribe("trial")} style={{fontSize:12,color:C.textLight,cursor:"pointer",textDecoration:"underline"}}>
+          Continue free trial ({daysLeft} day{daysLeft!==1?"s":""} left)
+        </span>
+      </div>}
     </div>
   );
 };
