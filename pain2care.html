@@ -1388,27 +1388,19 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
       </div>
       {history.length>0&&(()=>{
         const last=history[history.length-1];
-        const week7=history.filter(h=>{const d=new Date(h.fullDate||h.date);const c=new Date();c.setDate(c.getDate()-7);return d>=c;});
+        const now=new Date();
+        const cutoff7=new Date(now);cutoff7.setDate(cutoff7.getDate()-7);cutoff7.setHours(0,0,0,0);
+        const cutoff14=new Date(now);cutoff14.setDate(cutoff14.getDate()-14);cutoff14.setHours(0,0,0,0);
+        // Use entry index as proxy for date ordering (history is sorted oldest→newest)
+        // 7d = last 7 entries, prev7 = entries before that (reliable regardless of date parsing)
+        const week7=history.slice(-7);
+        const prev7=history.length>7?history.slice(-14,-7):[];
         const avg7=week7.length>0?(week7.reduce((a,b)=>a+b.painLevel,0)/week7.length).toFixed(1):null;
-        // Trend: compare last 3 vs previous 3
-        const recent=history.slice(-3);
-        const prev=history.slice(-6,-3);
-        const trendVal=recent.length>0&&prev.length>0
-          ?((recent.reduce((a,b)=>a+b.painLevel,0)/recent.length)-(prev.reduce((a,b)=>a+b.painLevel,0)/prev.length)).toFixed(1)
-          :null;
-        const trendUp=trendVal>0;
+        const avgPrev7=prev7.length>0?(prev7.reduce((a,b)=>a+b.painLevel,0)/prev7.length):null;
+        const trendRaw=avg7!==null&&avgPrev7!==null?(parseFloat(avg7)-avgPrev7):null;
+        const trendVal=trendRaw!==null?trendRaw.toFixed(1):null;
         const trendColor=trendVal>0?C.red:trendVal<0?C.green:C.textLight;
         const trendIcon=trendVal>0?"↑":trendVal<0?"↓":"→";
-        // Streak: consecutive days with entries
-        const sortedDates=[...new Set(history.map(h=>h.fullDate||h.date))].sort();
-        let streak=0;
-        const today=new Date();
-        for(let i=sortedDates.length-1;i>=0;i--){
-          const d=new Date(sortedDates[i]);
-          const diff=Math.round((today-d)/86400000);
-          if(diff<=streak+1) streak++;
-          else break;
-        }
         return(
         <div style={{padding:"0 18px",marginBottom:18}}>
           {/* Row 1: Last pain + 7d avg + history */}
@@ -1429,19 +1421,13 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
               <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginTop:3}}>History</div>
             </div>
           </div>
-          {/* Row 2: Trend + Streak */}
+          {/* Row 2: Trend only */}
+          {trendVal!==null&&(
           <div style={{display:"flex",gap:8}}>
-            {trendVal!==null&&(
             <div className="glass" style={{borderRadius:13,padding:"11px 14px",flex:1}}>
-              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>Pain trend</div>
+              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>Pain trend · 7d</div>
               <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:trendColor,lineHeight:1}}>{trendVal>0?"+":""}{trendVal} {trendIcon}</div>
-              <div style={{fontSize:9,color:C.textLight,marginTop:2}}>vs. previous period</div>
-            </div>
-            )}
-            <div className="glass" style={{borderRadius:13,padding:"11px 14px",flex:1}}>
-              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>Streak</div>
-              <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:C.gold,lineHeight:1}}>{streak} 🔥</div>
-              <div style={{fontSize:9,color:C.textLight,marginTop:2}}>day{streak!==1?"s":""} in a row</div>
+              <div style={{fontSize:9,color:C.textLight,marginTop:2}}>vs. previous 7 entries</div>
             </div>
           </div>
         </div>
