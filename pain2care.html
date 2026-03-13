@@ -911,8 +911,8 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
             <div style={{fontSize:11,color:C.textLight,textAlign:'center',marginBottom:8}}>Tap to select · Colors show saved pain</div>
             {side==='front' && <FigureFront areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
             {side==='back' && <FigureBack areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
-            {side==='left' && <FigureRight areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
-            {side==='right' && <FigureLeft areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
+            {side==='left' && <FigureRight areaSymptoms={areaSymptoms} onAreaClick={(id)=>openArea(id.startsWith('r')?'l'+id.slice(1):id.startsWith('l')?'r'+id.slice(1):id)}/>}
+            {side==='right' && <FigureLeft areaSymptoms={areaSymptoms} onAreaClick={(id)=>openArea(id.startsWith('l')?'r'+id.slice(1):id.startsWith('r')?'l'+id.slice(1):id)}/>}
           </div>
         </>
       )}
