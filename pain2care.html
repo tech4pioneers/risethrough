@@ -28,6 +28,7 @@ textarea{font-family:'Nunito',sans-serif}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 @keyframes scaleIn{from{transform:scale(0.93);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
 @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(26,111,160,0.25)}50%{box-shadow:0 0 40px rgba(26,111,160,0.5)}}
 .glass{background:rgba(255,255,255,0.52);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.72);box-shadow:0 8px 32px rgba(26,80,130,0.1)}
 .glass-soft{background:rgba(255,255,255,0.35);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.5)}
@@ -1361,7 +1362,43 @@ const PaywallScreen=({user,onSubscribe,onLogout})=>{
 const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
   const daysLeft=Math.max(0,7-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
   const isPaid=user?.plan==="monthly"||user?.plan==="annual";
-  const affIdx=Math.floor(Date.now()/86400000)%AFFIRMATIONS.length;
+  const todayKey="p2c_reminder_"+new Date().toISOString().slice(0,10);
+  const [reminder,setReminder]=useState(()=>localStorage.getItem(todayKey)||null);
+  const [reminderLoading,setReminderLoading]=useState(false);
+  useEffect(()=>{
+    if(reminder) return;
+    setReminderLoading(true);
+    const last=history[history.length-1];
+    const avg7=history.slice(-7).length>0?(history.slice(-7).reduce((a,b)=>a+b.painLevel,0)/history.slice(-7).length).toFixed(1):null;
+    const trend=history.length>=2?(history[history.length-1].painLevel-history[history.length-2].painLevel):0;
+    const mood=last?.mood||3;
+    const prompt=`You are a compassionate chronic pain support companion. Generate ONE short, warm, personalized daily reminder (max 2 sentences) for a user based on their data:
+- Last pain level: ${last?.painLevel??"-"}/10
+- 7-day average pain: ${avg7??"-"}/10  
+- Pain trend: ${trend>0?"worsening":trend<0?"improving":"stable"}
+- Last mood: ${mood}/5
+- Total check-ins: ${history.length}
+Be empathetic, realistic and encouraging. Do NOT use generic platitudes. Tailor the message to their specific situation. Reply with ONLY the reminder text, no quotes or labels.`;
+    fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:100,messages:[{role:"user",content:prompt}]})
+    })
+    .then(r=>r.json())
+    .then(d=>{
+      const text=d?.content?.[0]?.text?.trim();
+      if(text){
+        // Clear previous day keys
+        Object.keys(localStorage).filter(k=>k.startsWith("p2c_reminder_")&&k!==todayKey).forEach(k=>localStorage.removeItem(k));
+        localStorage.setItem(todayKey,text);
+        setReminder(text);
+      } else {
+        setReminder(AFFIRMATIONS[Math.floor(Date.now()/86400000)%AFFIRMATIONS.length]);
+      }
+    })
+    .catch(()=>setReminder(AFFIRMATIONS[Math.floor(Date.now()/86400000)%AFFIRMATIONS.length]))
+    .finally(()=>setReminderLoading(false));
+  },[]);
   const modules=[
     {id:"pain",icon:"🩺",title:"Pain Module",sub:"Chronic Pain",color:C.red,border:"rgba(230,57,70,0.2)"},
     {id:"violence",icon:"📸",title:"Violence Report",sub:"Documentation",color:C.purple,border:"rgba(123,63,158,0.2)"},
@@ -1383,8 +1420,11 @@ const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
         <div style={{fontSize:13,color:C.textLight,marginTop:3}}>How are you feeling today?</div>
       </div>
       <div className="glass" style={{margin:"0 18px 18px",borderRadius:17,padding:18,background:"rgba(26,111,160,0.07)",border:"1px solid rgba(26,111,160,0.15)"}}>
-        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Today's Reminder 💙</div>
-        <div style={{fontSize:14,fontStyle:"italic",lineHeight:1.65,color:C.textMid}}>"{AFFIRMATIONS[affIdx]}"</div>
+        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Your Daily Insight ✨</div>
+        {reminderLoading
+          ?<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:16,height:16,borderRadius:"50%",border:"2px solid "+C.blue,borderTopColor:"transparent",animation:"spin 0.8s linear infinite"}}/><span style={{fontSize:13,color:C.textLight}}>Personalizing your reminder…</span></div>
+          :<div style={{fontSize:14,fontStyle:"italic",lineHeight:1.65,color:C.textMid}}>"{reminder||AFFIRMATIONS[0]}"</div>
+        }
       </div>
       {history.length>0&&(()=>{
         const last=history[history.length-1];
