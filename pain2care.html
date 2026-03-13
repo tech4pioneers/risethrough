@@ -121,116 +121,656 @@ let fbAuth=null,fbDb=null,fbSet=null,fbRef=null,fbOnVal=null,fbSignIn=null,fbSig
 /* ── TRANSLATIONS ── */
 const TRANSLATIONS={
   en:{
-    hello:"Hello",howFeeling:"How are you feeling today?",
-    todayReminder:"Today's Reminder",yourModules:"Your Modules",
-    painModule:"Pain Module",chronicPain:"Chronic Pain",
+    // Navigation
+    home:T.home,pain:T.pain,safety:T.safety,recovery:T.recovery,chat:T.chat,profile:T.profile,
+    // Home
+    hello:"Hello",howFeeling:T.howFeeling,
+    yourDailyInsight:T.yourDailyInsight,personalizingReminder:T.personalizingReminder,
+    yourModules:T.yourModules,
+    lastPain:"Last pain",avgPain7d:"Avg pain · 7d",history:"History",
+    painTrend7d:"Pain trend · 7d",vsPrevious7:"vs. previous 7 entries",
+    checkIn:(n)=>`${n} check-in${n!==1?"s":""}`,
+    daysLeft:(n)=>`${n} day${n!==1?"s":""} left in free trial`,
+    upgradeArrow:T.upgradeArrow,
+    trialIncludesNormal:"Free trial includes all Normal Plan features",
+    premiumNotAvailable:"Premium features not available during trial",
+    // Module titles
+    painModule:T.painModule,chronicPain:"Chronic Pain",
     violenceReport:"Violence Report",documentation:"Documentation",
     communityChat:"Community Chat",anonymous:"Anonymous",
     traumaRecovery:"Trauma Recovery",selfGuided:"Self-Guided",
-    painHistory:"Pain History & Trends",checkInsRecorded:n=>`${n} check-in${n!==1?"s":""} · tap to view your journey`,
-    lastPain:"Last Pain",avgPain:"Avg Pain",checkIns:"Check-Ins",
-    logCheckIn:"Log Pain Check-In →",newCheckIn:"+ New Check-In",
-    home:"HOME",pain:"PAIN",safety:"SAFETY",recovery:"RECOVERY",chat:"CHAT",profile:"PROFILE",
-    daysLeft:n=>`${n} days left in free trial`,tapToUpgrade:"Tap to upgrade",
-    trackTab:"🩺 Track",historyTab:"📈 History",noDataYet:"No data yet",
-    noDataSub:"Complete your first check-in to see trends.",startCheckIn:"Start Check-In →",
-    avgScore:"Avg Score",bestDay:"Best Day",trend:"Trend",
+    // Pain module
+    trackTab:"🩺 Track",historyTab:"📈 History",
+    todaysReport:T.todaysReport,hereIsHow:T.hereIsHow,
+    wellbeingScore:T.wellbeingScore,snapshot:T.snapshot,
+    painLevel:T.painLevel,mood:T.mood,areasLogged:T.areasLogged,recoveryChecks:T.recoveryChecks,
+    painAreas:T.painAreas,
+    newCheckIn:T.newCheckIn,viewBodyMap:T.viewBodyMap,
+    painModuleSub:T.painModuleSub,
+    howBadPain:T.howBadPain,
+    painNone:"None",painMinimal:"Minimal",painMild:"Mild",painModerate:"Moderate",painSevere:"Severe",painIntense:"Intense",
+    bodyMap:"Body Map",tapBodyArea:"Tap a body area to mark it",
+    selectArea:T.selectArea,specifyLocation:T.specifyLocation,
+    front:"Front",back:"Back",left:"Left",right:"Right ▶",leftArrow:"◀ Left",
+    tapToSelect:T.tapToSelect,
+    whereDoesItHurt:T.whereDoesItHurt,tapBodyAreaSpecify:T.tapBodyAreaSpecify,
+    setIntensity:T.setIntensity,
+    swelling:T.swelling,numbness:T.numbness,yes:"Yes",no:"No",
+    addCustomArea:T.addCustomArea,typeCustomArea:T.typeCustomArea,
+    savedAreas:T.savedAreas,noAreasYet:T.noAreasYet,
+    save:T.save,back_btn:T.back_btn,done:T.done,
+    howAreYouFeeling:T.howAreYouFeeling,
+    recoveryMoment:T.recoveryMoment,checkWhatApplies:T.checkWhatApplies,
+    voiceNotes:T.voiceNotes,tapMicToRecord:T.tapMicToRecord,
+    listening:T.listening,voiceSaved:T.voiceSaved,voiceError:T.voiceError,voiceNotSupported:T.voiceNotSupported,
+    logCheckIn:T.logCheckIn,
+    noDataYet:T.noDataYet,noDataSub:T.noDataSub,startCheckIn:T.startCheckIn,
+    avgScore:T.avgScore,bestDay:T.bestDay,trend:T.trend,
+    painHistory:T.painHistory,checkInsRecorded:(n)=>T.checkInsRecorded(n),
+    // Body map
+    areasSaved:(n)=>`${n} area${n!==1?"s":""} saved`,
+    // Violence module
+    violenceModuleSub:T.violenceModuleSub,
+    setSecurePIN:T.setSecurePIN,pinProtected:"PIN-protected private records",
+    addRecord:T.addRecord,noRecords:T.noRecords,
+    date:"Date",time:"Time",type:"Type",description:"Description",
+    photos:"📸 Photos (Premium)",addPhotos:"Add Photos",
+    saveRecord:T.saveRecord,cancel:T.cancel,
+    shareRecord:"Share Record",deleteRecord:"Delete Record",
+    incidentTypes:["Physical","Emotional","Sexual","Financial","Stalking","Other"],
+    // Trauma module
+    traumaModuleSub:T.traumaModuleSub,
+    exerciseComplete:T.exerciseComplete,
+    steps:"Steps",startExercise:"Start Exercise",
+    myAnchor:T.myAnchor,anchorSub:T.anchorSub,
+    // Community module
+    anonymousSafeSpace:T.anonymousSafeSpace,
+    topics:T.topics,send:T.send,
+    typeMessage:T.typeMessage,
+    // Trends
+    trendsSub:T.trendsSub,
+    weeklyAvg:T.weeklyAvg,
+    entries:"entries",
+    // Profile
+    editProfile:T.editProfile,
+    fullName:T.fullName,dateOfBirth:T.dateOfBirth,gender:"Gender",
+    male:T.male,female:T.female,other:"Other",preferNotToSay:"Prefer not to say",
+    bodyType:"Body Type",
+    saveChanges:T.saveChanges,
+    myPlan:T.myPlan,
+    freeTrial:T.freeTrial,normalPlan:T.normalPlan,premiumPlan:T.premiumPlan,
+    daysRemaining:(n)=>`${n} days remaining`,
+    normalPlanActive:T.normalPlanActive,
+    upgradeToPremium:T.upgradeToPremium,
+    upgradeBtn:"⭐ Upgrade →",
+    normalPlanBtn:"💙 Normal Plan",premiumPlanBtn:"⭐ Premium Plan",
+    language:T.language,
+    helpSupport:T.helpSupport,
+    myDataGDPR:T.myDataGDPR,
+    deleteAccount:T.deleteAccount,
+    logOut:T.logOut,
+    // Paywall
+    choosePlan:T.choosePlan,
+    continueHealing:T.continueHealing,
+    monthly:T.monthly,annual:T.annual,
+    subscribe:T.subscribe,
+    continueFreeTrial:(n)=>`Continue free trial (${n} days left)`,
+    currentlyNormalPlan:T.currentlyNormalPlan,
+    normalIncludes:T.normalIncludes,
+    premiumExtras:T.premiumExtras,
+    // Auth
+    welcomeBack:"Welcome back",createAccount:"Create account",
+    email:"Email",password:"Password",name:"Name",
+    signIn:"Sign In",signUp:"Sign Up",
+    forgotPassword:"Forgot password?",
+    orContinueWith:"or continue with",
+    continueAsGuest:"Continue as guest",
+    alreadyHaveAccount:"Already have an account? Sign in",
+    dontHaveAccount:"Don't have an account? Sign up",
+    verifyEmail:"Verify your email",
+    enterCode:"Enter the 6-digit code sent to",
+    verify:"Verify",resendCode:"Resend code",
+    // General
+    loading:"Loading…",error:"Error",retry:"Retry",
+    comingSoon:"Coming Soon",
+    swelling_yes:"Swelling: Yes",swelling_no:"Swelling: No",
+    numbness_yes:"Numbness: Yes",numbness_no:"Numbness: No",
+    custom:T.custom,
+    intensity:"Intensity",
+    worsening:"worsening",improving:"improving",stable:"stable",
+    today:"Today",yesterday:"Yesterday",
   },
   fi:{
+    home:"KOTI",pain:"KIPU",safety:"TURVA",recovery:"TOIPUMINEN",chat:T.chat,profile:"PROFIILI",
     hello:"Hei",howFeeling:"Miten voit tänään?",
-    todayReminder:"Päivän muistutus",yourModules:"Moduulit",
+    yourDailyInsight:"Päivittäinen oivalluksesi ✨",personalizingReminder:"Muokataan muistutustasi…",
+    yourModules:"Moduulit",
+    lastPain:"Viim. kipu",avgPain7d:"Keskim. kipu · 7pv",history:"Historia",
+    painTrend7d:"Kiputrendi · 7pv",vsPrevious7:"vs. edelliset 7 kirjausta",
+    checkIn:(n)=>`${n} kirjaus${n!==1?"ta":""}`,
+    daysLeft:(n)=>`${n} päivää ilmaisjaksoa jäljellä`,
+    upgradeArrow:"Päivitä →",
+    trialIncludesNormal:"Ilmaisjakso sisältää kaikki Normaali-paketin ominaisuudet",
+    premiumNotAvailable:"Premium-ominaisuudet eivät saatavilla kokeilujaksolla",
     painModule:"Kipumoduli",chronicPain:"Krooninen kipu",
     violenceReport:"Väkivaltaraportti",documentation:"Dokumentointi",
     communityChat:"Yhteisökeskustelu",anonymous:"Anonyymi",
     traumaRecovery:"Traumasta toipuminen",selfGuided:"Iteohjattu",
-    painHistory:"Kiputrendit & historia",checkInsRecorded:n=>`${n} kirjaus${n!==1?"ta":""} · katso matkaasi`,
-    lastPain:"Viim. kipu",avgPain:"Kipu keskim.",checkIns:"Kirjaukset",
-    logCheckIn:"Kirjaa kiputarkistus \u2192",newCheckIn:"+ Uusi kirjaus",
-    home:"KOTI",pain:"KIPU",safety:"TURVA",recovery:"TOIPUMINEN",chat:"CHAT",profile:"PROFIILI",
-    daysLeft:n=>`${n} päivää ilmaisjaksoa jäljellä`,tapToUpgrade:"Napauta päivittääksesi",
-    trackTab:"\uD83E\uDE7A Seuraa",historyTab:"\uD83D\uDCC8 Historia",noDataYet:"Ei vielä tietoja",
-    noDataSub:"Tee ensimmäinen kirjaus nähdäksesi trendit.",startCheckIn:"Aloita kirjaus \u2192",
+    trackTab:"🩺 Seuraa",historyTab:"📈 Historia",
+    todaysReport:"Päivän raportti",hereIsHow:"Näin sujui tänään",
+    wellbeingScore:"Hyvinvointipistemäärä",snapshot:"📊 Yhteenveto",
+    painLevel:"Kipuaste",mood:"Mieliala",areasLogged:"Kirjatut alueet",recoveryChecks:"Toipumistarkistukset",
+    painAreas:"🗺️ Kipualueet",
+    newCheckIn:"+ Uusi kirjaus",viewBodyMap:"Näytä kehonkartta",
+    painModuleSub:"Seuraa ja visualisoi kipuasi",
+    howBadPain:"Kuinka kova kipu on nyt?",
+    painNone:"Ei kipua",painMinimal:"Minimaalinen",painMild:"Lievä",painModerate:"Kohtalainen",painSevere:"Vaikea",painIntense:"Erittäin vaikea",
+    bodyMap:"Kehonkartta",tapBodyArea:"Napauta aluetta merkitäksesi sen",
+    selectArea:"① Valitse alue",specifyLocation:"② Tarkenna sijaintia",
+    front:"Edestä",back:"Takaa",left:"Vasen",right:"Oikea ▶",leftArrow:"◀ Vasen",
+    tapToSelect:"Napauta valitaksesi · Värit näyttävät tallennetun kivun",
+    whereDoesItHurt:"Missä sattuu?",tapBodyAreaSpecify:"Napauta aluetta tarkentaaksesi",
+    setIntensity:"Aseta voimakkuus · turvotus · puutuminen per osa-alue",
+    swelling:"Turvotus",numbness:"Puutuminen",yes:"Kyllä",no:"Ei",
+    addCustomArea:"+ Lisää oma alue",typeCustomArea:"Kirjoita oma alueen nimi…",
+    savedAreas:"Tallennetut alueet:",noAreasYet:"Alueita ei valittu",
+    save:"Tallenna",back_btn:"← Takaisin",done:"✓ Valmis",
+    howAreYouFeeling:"Miten voit?",
+    recoveryMoment:"Toipumishetki",checkWhatApplies:"Rastita kaikki mikä sopii tänään:",
+    voiceNotes:"Äänimuistiinpanot",tapMicToRecord:"Napauta mikrofonia nauhoittaaksesi",
+    listening:"Kuunnellaan…",voiceSaved:"✓ Tallennettu!",voiceError:"Mikrofonivirhe — yritä uudelleen",voiceNotSupported:"Ääni ei tuettu.",
+    logCheckIn:"Kirjaa kiputarkistus →",
+    noDataYet:"Ei vielä tietoja",noDataSub:"Tee ensimmäinen kirjaus nähdäksesi trendit.",startCheckIn:"Aloita kirjaus →",
     avgScore:"Keskim. pisteet",bestDay:"Paras päivä",trend:"Trendi",
+    painHistory:"Kiputrendit & historia",checkInsRecorded:(n)=>`${n} kirjaus${n!==1?"ta":""} · katso matkaasi`,
+    areasSaved:(n)=>`${n} alue${n!==1?"tta":""} tallennettu`,
+    violenceModuleSub:"Turvallinen tapahtumakirjaus",
+    setSecurePIN:"🔒 Aseta turvallinen PIN",pinProtected:"PIN-suojatut yksityiset tietueet",
+    addRecord:"+ Lisää tietue",noRecords:"Ei vielä tietueita",
+    date:"Päivämäärä",time:"Aika",type:"Tyyppi",description:"Kuvaus",
+    photos:"📸 Kuvat (Premium)",addPhotos:"Lisää kuvia",
+    saveRecord:"Tallenna tietue",cancel:"Peruuta",
+    shareRecord:"Jaa tietue",deleteRecord:"Poista tietue",
+    incidentTypes:["Fyysinen","Henkinen","Seksuaalinen","Taloudellinen","Vaino","Muu"],
+    traumaModuleSub:"Ohjatut toipumisharjoitukset",
+    exerciseComplete:"✅ Harjoitus suoritettu",
+    steps:"Vaiheet",startExercise:"Aloita harjoitus",
+    myAnchor:"⚓ Ankkurini",anchorSub:"Turvallinen paikkasi — tallenna kappale ja kuva",
+    anonymousSafeSpace:"Anonyymi & turvallinen tila",
+    topics:"Aiheet",send:"Lähetä",typeMessage:"Kirjoita viesti…",
+    trendsSub:"Kipusi ajan myötä",weeklyAvg:"Viikottainen keskiarvo",entries:"kirjausta",
+    editProfile:"✏️ Muokkaa profiilia",
+    fullName:"Koko nimi",dateOfBirth:"Syntymäaika",gender:"Sukupuoli",
+    male:"Mies",female:"Nainen",other:"Muu",preferNotToSay:"En halua kertoa",
+    bodyType:"Vartalotyyppi",
+    saveChanges:"Tallenna muutokset",
+    myPlan:"Oma paketti",
+    freeTrial:"Ilmaisjakso",normalPlan:"Normaali",premiumPlan:"Premium",
+    daysRemaining:(n)=>`${n} päivää jäljellä`,
+    normalPlanActive:"Normaali-paketin ominaisuudet aktiivisena",
+    upgradeToPremium:"Päivitä Premiumiin",
+    upgradeBtn:"⭐ Päivitä →",
+    normalPlanBtn:"💙 Normaali",premiumPlanBtn:"⭐ Premium",
+    language:"🌍 Kieli",helpSupport:"❓ Ohje & tuki",myDataGDPR:"🔒 Omat tiedot (GDPR)",
+    deleteAccount:"🗑 Poista tili",logOut:"Kirjaudu ulos",
+    choosePlan:"Valitse pakettisi",continueHealing:"Jatka toipumismatkaasi.",
+    monthly:"Kuukausittain",annual:"Vuosittain (säästä 40%)",
+    subscribe:"Tilaa",
+    continueFreeTrial:(n)=>`Jatka ilmaisjaksoa (${n} päivää jäljellä)`,
+    currentlyNormalPlan:"Käytössä Normaali-paketin ominaisuudet",
+    normalIncludes:"Normaali sisältää:",premiumExtras:"Premiumin lisät:",
+    welcomeBack:"Tervetuloa takaisin",createAccount:"Luo tili",
+    email:"Sähköposti",password:"Salasana",name:"Nimi",
+    signIn:"Kirjaudu",signUp:"Rekisteröidy",
+    forgotPassword:"Unohditko salasanan?",orContinueWith:"tai jatka",
+    continueAsGuest:"Jatka vieraana",alreadyHaveAccount:"Onko sinulla tili? Kirjaudu",dontHaveAccount:"Ei tiliä? Rekisteröidy",
+    verifyEmail:"Vahvista sähköposti",enterCode:"Syötä 6-numeroinen koodi joka lähetettiin",
+    verify:"Vahvista",resendCode:"Lähetä koodi uudelleen",
+    loading:"Ladataan…",error:"Virhe",retry:"Yritä uudelleen",comingSoon:"Tulossa pian",
+    swelling_yes:"Turvotus: Kyllä",swelling_no:"Turvotus: Ei",numbness_yes:"Puutuminen: Kyllä",numbness_no:"Puutuminen: Ei",
+    custom:"(oma)",intensity:"Voimakkuus",
+    worsening:"pahenee",improving:"paranee",stable:"vakaa",
+    today:"Tänään",yesterday:"Eilen",
   },
   sv:{
+    home:"HEM",pain:"SMÄRTA",safety:"SÄKERHET",recovery:"ÅTERHÄMT.",chat:"CHATT",profile:"PROFIL",
     hello:"Hej",howFeeling:"Hur mår du idag?",
-    todayReminder:"Dagens påminnelse",yourModules:"Dina moduler",
+    yourDailyInsight:"Din dagliga insikt ✨",personalizingReminder:"Anpassar din påminnelse…",
+    yourModules:"Dina moduler",
+    lastPain:"Senaste smärta",avgPain7d:"Genomsn. smärta · 7d",history:"Historik",
+    painTrend7d:"Smärttrend · 7d",vsPrevious7:"vs. föregående 7 poster",
+    checkIn:(n)=>`${n} registrering${n!==1?"ar":""}`,
+    daysLeft:(n)=>`${n} dagar kvar av provperioden`,
+    upgradeArrow:"Uppgradera →",
+    trialIncludesNormal:"Provperioden inkluderar alla funktioner i Normal-planen",
+    premiumNotAvailable:"Premium-funktioner ej tillgängliga under provperioden",
     painModule:"Smärtmodul",chronicPain:"Kronisk smärta",
     violenceReport:"Våldsrapport",documentation:"Dokumentation",
     communityChat:"Gemenskapschatt",anonymous:"Anonym",
     traumaRecovery:"Traumaåterhämtning",selfGuided:"Självledd",
-    painHistory:"Smärthistorik & trender",checkInsRecorded:n=>`${n} registrering${n!==1?"ar":""} · se din resa`,
-    lastPain:"Senaste smärta",avgPain:"Genomsn. smärta",checkIns:"Registreringar",
-    logCheckIn:"Logga smärtkontroll \u2192",newCheckIn:"+ Ny registrering",
-    home:"HEM",pain:"SMÄRTA",safety:"SÄKERHET",recovery:"ÅTERHÄMT.",chat:"CHATT",profile:"PROFIL",
-    daysLeft:n=>`${n} dagar kvar av provperioden`,tapToUpgrade:"Tryck för att uppgradera",
-    trackTab:"\uD83E\uDE7A Spåra",historyTab:"\uD83D\uDCC8 Historik",noDataYet:"Ingen data ännu",
-    noDataSub:"Gör din första registrering för att se trender.",startCheckIn:"Starta registrering \u2192",
-    avgScore:"Genomsn. poäng",bestDay:"Bästa dag",trend:"Trend",
+    trackTab:"🩺 Spåra",historyTab:"📈 Historik",
+    todaysReport:"Dagens rapport",hereIsHow:"Så här gick dagen",
+    wellbeingScore:"Välmående-poäng",snapshot:"📊 Sammanfattning",
+    painLevel:"Smärtnivå",mood:"Humör",areasLogged:"Loggade områden",recoveryChecks:"Återhämtningskontroller",
+    painAreas:"🗺️ Smärtområden",
+    newCheckIn:"+ Ny registrering",viewBodyMap:"Visa kroppskarta",
+    painModuleSub:"Spåra och visualisera din smärta",
+    howBadPain:"Hur stark är smärtan just nu?",
+    painNone:"Ingen",painMinimal:"Minimal",painMild:"Mild",painModerate:"Måttlig",painSevere:"Svår",painIntense:"Intensiv",
+    bodyMap:"Kroppskarta",tapBodyArea:"Tryck på ett område för att markera",
+    selectArea:"① Välj område",specifyLocation:"② Specificera plats",
+    front:"Framsida",back:"Baksida",left:"Vänster",right:"Höger ▶",leftArrow:"◀ Vänster",
+    tapToSelect:"Tryck för att välja · Färger visar sparad smärta",
+    whereDoesItHurt:"Var gör det ont?",tapBodyAreaSpecify:"Tryck på ett område för att specificera",
+    setIntensity:"Ange intensitet · svullnad · domning per delområde",
+    swelling:"Svullnad",numbness:"Domning",yes:"Ja",no:"Nej",
+    addCustomArea:"+ Lägg till eget område",typeCustomArea:"Skriv eget områdesnamn…",
+    savedAreas:"Sparade områden:",noAreasYet:"Inga områden valda",
+    save:"Spara",back_btn:"← Tillbaka",done:"✓ Klar",
+    howAreYouFeeling:"Hur mår du?",
+    recoveryMoment:"Återhämtningsmoment",checkWhatApplies:"Kryssa i allt som stämmer idag:",
+    voiceNotes:"Röstanteckningar",tapMicToRecord:"Tryck på mikrofonen för att spela in",
+    listening:"Lyssnar…",voiceSaved:"✓ Sparat!",voiceError:"Mikrofonfel — försök igen",voiceNotSupported:"Röst stöds ej.",
+    logCheckIn:"Logga smärtkontroll →",
+    noDataYet:"Ingen data ännu",noDataSub:"Gör din första registrering för att se trender.",startCheckIn:"Starta registrering →",
+    avgScore:"Genomsn. poäng",bestDay:"Bästa dag",trend:T.trend,
+    painHistory:"Smärthistorik & trender",checkInsRecorded:(n)=>`${n} registrering${n!==1?"ar":""} · se din resa`,
+    areasSaved:(n)=>`${n} område${n!==1?"n":""} sparat`,
+    violenceModuleSub:"Säker incidentdokumentation",
+    setSecurePIN:"🔒 Ange säker PIN",pinProtected:"PIN-skyddade privata poster",
+    addRecord:"+ Lägg till post",noRecords:"Inga poster ännu",
+    date:"Datum",time:"Tid",type:"Typ",description:"Beskrivning",
+    photos:"📸 Foton (Premium)",addPhotos:"Lägg till foton",
+    saveRecord:"Spara post",cancel:"Avbryt",
+    shareRecord:"Dela post",deleteRecord:"Ta bort post",
+    incidentTypes:["Fysisk","Emotionell","Sexuell","Ekonomisk","Stalkning","Annat"],
+    traumaModuleSub:"Guidade återhämtningsövningar",
+    exerciseComplete:"✅ Övning slutförd",
+    steps:"Steg",startExercise:"Starta övning",
+    myAnchor:"⚓ Mitt ankare",anchorSub:"Din trygga plats — spara en låt och bild",
+    anonymousSafeSpace:"Anonymt & tryggt utrymme",
+    topics:"Ämnen",send:"Skicka",typeMessage:"Skriv ett meddelande…",
+    trendsSub:"Din smärta över tid",weeklyAvg:"Veckomedelvärde",entries:"poster",
+    editProfile:"✏️ Redigera profil",
+    fullName:"Fullständigt namn",dateOfBirth:"Födelsedatum",gender:"Kön",
+    male:"Man",female:"Kvinna",other:"Annat",preferNotToSay:"Föredrar att inte ange",
+    bodyType:"Kroppstyp",saveChanges:"Spara ändringar",
+    myPlan:"Min plan",freeTrial:"Provperiod",normalPlan:"Normal",premiumPlan:"Premium",
+    daysRemaining:(n)=>`${n} dagar kvar`,
+    normalPlanActive:"Normal-planens funktioner aktiva",
+    upgradeToPremium:"Uppgradera till Premium",upgradeBtn:"⭐ Uppgradera →",
+    normalPlanBtn:"💙 Normal",premiumPlanBtn:"⭐ Premium",
+    language:"🌍 Språk",helpSupport:"❓ Hjälp & support",myDataGDPR:"🔒 Mina uppgifter (GDPR)",
+    deleteAccount:"🗑 Radera konto",logOut:"Logga ut",
+    choosePlan:"Välj din plan",continueHealing:"Fortsätt din läkningsresa.",
+    monthly:"Månadsvis",annual:"Årsvis (spara 40%)",subscribe:"Prenumerera",
+    continueFreeTrial:(n)=>`Fortsätt provperiod (${n} dagar kvar)`,
+    currentlyNormalPlan:"Har för närvarande Normal-planens funktioner",
+    normalIncludes:"Normal inkluderar:",premiumExtras:"Premium-tillägg:",
+    welcomeBack:"Välkommen tillbaka",createAccount:"Skapa konto",
+    email:"E-post",password:"Lösenord",name:"Namn",
+    signIn:"Logga in",signUp:"Registrera",
+    forgotPassword:"Glömt lösenord?",orContinueWith:"eller fortsätt med",
+    continueAsGuest:"Fortsätt som gäst",alreadyHaveAccount:"Har du ett konto? Logga in",dontHaveAccount:"Inget konto? Registrera dig",
+    verifyEmail:"Verifiera din e-post",enterCode:"Ange den 6-siffriga koden skickad till",
+    verify:"Verifiera",resendCode:"Skicka koden igen",
+    loading:"Laddar…",error:"Fel",retry:"Försök igen",comingSoon:"Kommer snart",
+    swelling_yes:"Svullnad: Ja",swelling_no:"Svullnad: Nej",numbness_yes:"Domning: Ja",numbness_no:"Domning: Nej",
+    custom:"(eget)",intensity:"Intensitet",
+    worsening:"försämras",improving:"förbättras",stable:"stabilt",
+    today:"Idag",yesterday:"Igår",
   },
   de:{
+    home:"START",pain:"SCHMERZ",safety:"SICHERHEIT",recovery:"ERHOLUNG",chat:T.chat,profile:"PROFIL",
     hello:"Hallo",howFeeling:"Wie geht es dir heute?",
-    todayReminder:"Heutige Erinnerung",yourModules:"Deine Module",
+    yourDailyInsight:"Deine tägliche Erkenntnis ✨",personalizingReminder:"Deine Erinnerung wird personalisiert…",
+    yourModules:"Deine Module",
+    lastPain:"Letzter Schmerz",avgPain7d:"Durchschn. Schmerz · 7T",history:"Verlauf",
+    painTrend7d:"Schmerztrend · 7T",vsPrevious7:"vs. vorherige 7 Einträge",
+    checkIn:(n)=>`${n} Eintrag${n!==1?"einträge":""}`,
+    daysLeft:(n)=>`Noch ${n} Tage der Testphase`,
+    upgradeArrow:"Upgraden →",
+    trialIncludesNormal:"Testphase enthält alle Normal-Plan-Funktionen",
+    premiumNotAvailable:"Premium-Funktionen während der Testphase nicht verfügbar",
     painModule:"Schmerzmodul",chronicPain:"Chronische Schmerzen",
     violenceReport:"Gewaltbericht",documentation:"Dokumentation",
     communityChat:"Gemeinschafts-Chat",anonymous:"Anonym",
     traumaRecovery:"Trauma-Erholung",selfGuided:"Selbstgeleitet",
-    painHistory:"Schmerzhistorie & Trends",checkInsRecorded:n=>`${n} Eintrag${n!==1?"einträge":""} · Reise ansehen`,
-    lastPain:"Letzter Schmerz",avgPain:"Durchschn. Schmerz",checkIns:"Einträge",
-    logCheckIn:"Schmerzkontrolle speichern \u2192",newCheckIn:"+ Neuer Eintrag",
-    home:"STARTSEITE",pain:"SCHMERZ",safety:"SICHERHEIT",recovery:"ERHOLUNG",chat:"CHAT",profile:"PROFIL",
-    daysLeft:n=>`Noch ${n} Tage der Testphase`,tapToUpgrade:"Tippen zum Upgraden",
-    trackTab:"\uD83E\uDE7A Verfolgen",historyTab:"\uD83D\uDCC8 Verlauf",noDataYet:"Noch keine Daten",
-    noDataSub:"Erstelle deinen ersten Eintrag, um Trends zu sehen.",startCheckIn:"Eintrag starten \u2192",
-    avgScore:"Durchschn. Punkte",bestDay:"Bester Tag",trend:"Trend",
+    trackTab:"🩺 Verfolgen",historyTab:"📈 Verlauf",
+    todaysReport:"Heutiger Bericht",hereIsHow:"So war dein heutiger Tag",
+    wellbeingScore:"Wohlbefindens-Score",snapshot:"📊 Übersicht",
+    painLevel:"Schmerzniveau",mood:"Stimmung",areasLogged:"Erfasste Bereiche",recoveryChecks:"Erholungs-Checks",
+    painAreas:"🗺️ Schmerzbereiche",
+    newCheckIn:"+ Neuer Eintrag",viewBodyMap:"Körperkarte anzeigen",
+    painModuleSub:"Schmerz verfolgen und visualisieren",
+    howBadPain:"Wie stark sind die Schmerzen gerade?",
+    painNone:"Kein",painMinimal:"Minimal",painMild:"Mild",painModerate:"Mäßig",painSevere:"Stark",painIntense:"Intensiv",
+    bodyMap:"Körperkarte",tapBodyArea:"Bereich antippen zum Markieren",
+    selectArea:"① Bereich wählen",specifyLocation:"② Ort angeben",
+    front:"Vorderseite",back:"Rückseite",left:"Links",right:"Rechts ▶",leftArrow:"◀ Links",
+    tapToSelect:"Tippen zum Auswählen · Farben zeigen gespeicherten Schmerz",
+    whereDoesItHurt:"Wo tut es weh?",tapBodyAreaSpecify:"Bereich antippen zum Angeben",
+    setIntensity:"Intensität · Schwellung · Taubheit pro Teilbereich festlegen",
+    swelling:"Schwellung",numbness:"Taubheit",yes:"Ja",no:"Nein",
+    addCustomArea:"+ Eigenen Bereich hinzufügen",typeCustomArea:"Eigenen Bereichsnamen eingeben…",
+    savedAreas:"Gespeicherte Bereiche:",noAreasYet:"Noch keine Bereiche ausgewählt",
+    save:"Speichern",back_btn:"← Zurück",done:"✓ Fertig",
+    howAreYouFeeling:"Wie fühlst du dich?",
+    recoveryMoment:"Erholungsmoment",checkWhatApplies:"Alles ankreuzen, was heute zutrifft:",
+    voiceNotes:"Sprachnotizen",tapMicToRecord:"Mikrofon antippen zum Aufnehmen",
+    listening:"Höre zu…",voiceSaved:"✓ Gespeichert!",voiceError:"Mikrofonfehler — nochmal versuchen",voiceNotSupported:"Sprache nicht unterstützt.",
+    logCheckIn:"Schmerzkontrolle speichern →",
+    noDataYet:"Noch keine Daten",noDataSub:"Erstelle deinen ersten Eintrag, um Trends zu sehen.",startCheckIn:"Eintrag starten →",
+    avgScore:"Durchschn. Score",bestDay:"Bester Tag",trend:T.trend,
+    painHistory:"Schmerzhistorie & Trends",checkInsRecorded:(n)=>`${n} Eintrag${n!==1?" Einträge":""} · Reise ansehen`,
+    areasSaved:(n)=>`${n} Bereich${n!==1?"e":""} gespeichert`,
+    violenceModuleSub:"Sichere Vorfallsdokumentation",
+    setSecurePIN:"🔒 Sicheren PIN festlegen",pinProtected:"PIN-geschützte private Einträge",
+    addRecord:"+ Eintrag hinzufügen",noRecords:"Noch keine Einträge",
+    date:"Datum",time:"Uhrzeit",type:"Typ",description:"Beschreibung",
+    photos:"📸 Fotos (Premium)",addPhotos:"Fotos hinzufügen",
+    saveRecord:"Eintrag speichern",cancel:"Abbrechen",
+    shareRecord:"Eintrag teilen",deleteRecord:"Eintrag löschen",
+    incidentTypes:["Körperlich","Emotional","Sexuell","Finanziell","Stalking","Sonstiges"],
+    traumaModuleSub:"Geführte Erholungsübungen",
+    exerciseComplete:"✅ Übung abgeschlossen",
+    steps:"Schritte",startExercise:"Übung starten",
+    myAnchor:"⚓ Mein Anker",anchorSub:"Dein sicherer Ort — speichere ein Lied und Bild",
+    anonymousSafeSpace:"Anonymer & sicherer Raum",
+    topics:"Themen",send:"Senden",typeMessage:"Nachricht schreiben…",
+    trendsSub:"Dein Schmerz im Zeitverlauf",weeklyAvg:"Wöchentlicher Durchschnitt",entries:"Einträge",
+    editProfile:"✏️ Profil bearbeiten",
+    fullName:"Vollständiger Name",dateOfBirth:"Geburtsdatum",gender:"Geschlecht",
+    male:"Männlich",female:"Weiblich",other:"Divers",preferNotToSay:"Keine Angabe",
+    bodyType:"Körpertyp",saveChanges:"Änderungen speichern",
+    myPlan:"Mein Plan",freeTrial:"Testphase",normalPlan:"Normal",premiumPlan:"Premium",
+    daysRemaining:(n)=>`Noch ${n} Tage`,
+    normalPlanActive:"Normal-Plan-Funktionen aktiv",
+    upgradeToPremium:"Auf Premium upgraden",upgradeBtn:"⭐ Upgraden →",
+    normalPlanBtn:"💙 Normal",premiumPlanBtn:"⭐ Premium",
+    language:"🌍 Sprache",helpSupport:"❓ Hilfe & Support",myDataGDPR:"🔒 Meine Daten (DSGVO)",
+    deleteAccount:"🗑 Konto löschen",logOut:"Abmelden",
+    choosePlan:"Plan wählen",continueHealing:"Setze deine Heilungsreise fort.",
+    monthly:"Monatlich",annual:"Jährlich (40% sparen)",subscribe:"Abonnieren",
+    continueFreeTrial:(n)=>`Testphase fortsetzen (noch ${n} Tage)`,
+    currentlyNormalPlan:"Derzeit Normal-Plan-Funktionen",
+    normalIncludes:"Normal enthält:",premiumExtras:"Premium-Extras:",
+    welcomeBack:"Willkommen zurück",createAccount:"Konto erstellen",
+    email:"E-Mail",password:"Passwort",name:"Name",
+    signIn:"Anmelden",signUp:"Registrieren",
+    forgotPassword:"Passwort vergessen?",orContinueWith:"oder weiter mit",
+    continueAsGuest:"Als Gast fortfahren",alreadyHaveAccount:"Hast du ein Konto? Anmelden",dontHaveAccount:"Kein Konto? Registrieren",
+    verifyEmail:"E-Mail bestätigen",enterCode:"6-stelligen Code eingeben, gesendet an",
+    verify:"Bestätigen",resendCode:"Code erneut senden",
+    loading:"Wird geladen…",error:"Fehler",retry:"Erneut versuchen",comingSoon:"Demnächst",
+    swelling_yes:"Schwellung: Ja",swelling_no:"Schwellung: Nein",numbness_yes:"Taubheit: Ja",numbness_no:"Taubheit: Nein",
+    custom:"(eigens)",intensity:"Intensität",
+    worsening:"verschlechtert",improving:"verbessert",stable:"stabil",
+    today:"Heute",yesterday:"Gestern",
   },
   es:{
+    home:"INICIO",pain:"DOLOR",safety:"SEGURIDAD",recovery:"RECUPERAC.",chat:T.chat,profile:"PERFIL",
     hello:"Hola",howFeeling:"¿Cómo te sientes hoy?",
-    todayReminder:"Recordatorio de hoy",yourModules:"Tus módulos",
+    yourDailyInsight:"Tu perspectiva diaria ✨",personalizingReminder:"Personalizando tu recordatorio…",
+    yourModules:"Tus módulos",
+    lastPain:"Último dolor",avgPain7d:"Dolor prom. · 7d",history:"Historial",
+    painTrend7d:"Tendencia dolor · 7d",vsPrevious7:"vs. 7 entradas anteriores",
+    checkIn:(n)=>`${n} registro${n!==1?"s":""}`,
+    daysLeft:(n)=>`${n} día${n!==1?"s":""} restantes de prueba`,
+    upgradeArrow:"Actualizar →",
+    trialIncludesNormal:"La prueba incluye todas las funciones del Plan Normal",
+    premiumNotAvailable:"Funciones Premium no disponibles durante la prueba",
     painModule:"Módulo de dolor",chronicPain:"Dolor crónico",
     violenceReport:"Informe de violencia",documentation:"Documentación",
     communityChat:"Chat comunitario",anonymous:"Anónimo",
     traumaRecovery:"Recuperación del trauma",selfGuided:"Autoguiado",
-    painHistory:"Historial de dolor y tendencias",checkInsRecorded:n=>`${n} registro${n!==1?"s":""} · ver tu camino`,
-    lastPain:"Último dolor",avgPain:"Dolor prom.",checkIns:"Registros",
-    logCheckIn:"Registrar control de dolor \u2192",newCheckIn:"+ Nuevo registro",
-    home:"INICIO",pain:"DOLOR",safety:"SEGURIDAD",recovery:"RECUPERAC.",chat:"CHAT",profile:"PERFIL",
-    daysLeft:n=>`${n} días restantes de prueba`,tapToUpgrade:"Toca para actualizar",
-    trackTab:"\uD83E\uDE7A Registrar",historyTab:"\uD83D\uDCC8 Historial",noDataYet:"Sin datos todavía",
-    noDataSub:"Completa tu primer registro para ver tendencias.",startCheckIn:"Iniciar registro \u2192",
+    trackTab:"🩺 Registrar",historyTab:"📈 Historial",
+    todaysReport:"Informe de hoy",hereIsHow:"Así fue tu día hoy",
+    wellbeingScore:"Puntuación de bienestar",snapshot:"📊 Resumen",
+    painLevel:"Nivel de dolor",mood:"Estado de ánimo",areasLogged:"Áreas registradas",recoveryChecks:"Controles de recuperación",
+    painAreas:"🗺️ Áreas de dolor",
+    newCheckIn:"+ Nuevo registro",viewBodyMap:"Ver mapa corporal",
+    painModuleSub:"Registra y visualiza tu dolor",
+    howBadPain:"¿Qué tan fuerte es el dolor ahora?",
+    painNone:"Sin dolor",painMinimal:"Mínimo",painMild:"Leve",painModerate:"Moderado",painSevere:"Severo",painIntense:"Intenso",
+    bodyMap:"Mapa corporal",tapBodyArea:"Toca un área para marcarla",
+    selectArea:"① Seleccionar área",specifyLocation:"② Especificar ubicación",
+    front:"Frente",back:"Espalda",left:"Izquierda",right:"Derecha ▶",leftArrow:"◀ Izquierda",
+    tapToSelect:"Toca para seleccionar · Los colores muestran el dolor guardado",
+    whereDoesItHurt:"¿Dónde te duele?",tapBodyAreaSpecify:"Toca un área para especificarla",
+    setIntensity:"Establecer intensidad · hinchazón · entumecimiento por subárea",
+    swelling:"Hinchazón",numbness:"Entumecimiento",yes:"Sí",no:"No",
+    addCustomArea:"+ Agregar área personalizada",typeCustomArea:"Escribe nombre de área personalizada…",
+    savedAreas:"Áreas guardadas:",noAreasYet:"No se han seleccionado áreas",
+    save:"Guardar",back_btn:"← Volver",done:"✓ Listo",
+    howAreYouFeeling:"¿Cómo te sientes?",
+    recoveryMoment:"Momento de recuperación",checkWhatApplies:"Marca todo lo que aplique hoy:",
+    voiceNotes:"Notas de voz",tapMicToRecord:"Toca el micrófono para grabar",
+    listening:"Escuchando…",voiceSaved:"✓ ¡Guardado!",voiceError:"Error de micrófono — inténtalo de nuevo",voiceNotSupported:"Voz no compatible.",
+    logCheckIn:"Registrar control de dolor →",
+    noDataYet:"Sin datos todavía",noDataSub:"Completa tu primer registro para ver tendencias.",startCheckIn:"Iniciar registro →",
     avgScore:"Puntuación prom.",bestDay:"Mejor día",trend:"Tendencia",
+    painHistory:"Historial de dolor y tendencias",checkInsRecorded:(n)=>`${n} registro${n!==1?"s":""} · ver tu camino`,
+    areasSaved:(n)=>`${n} área${n!==1?"s":""} guardada${n!==1?"s":""}`,
+    violenceModuleSub:"Documentación segura de incidentes",
+    setSecurePIN:"🔒 Establecer PIN seguro",pinProtected:"Registros privados protegidos con PIN",
+    addRecord:"+ Agregar registro",noRecords:"No hay registros aún",
+    date:"Fecha",time:"Hora",type:"Tipo",description:"Descripción",
+    photos:"📸 Fotos (Premium)",addPhotos:"Agregar fotos",
+    saveRecord:"Guardar registro",cancel:"Cancelar",
+    shareRecord:"Compartir registro",deleteRecord:"Eliminar registro",
+    incidentTypes:["Físico","Emocional","Sexual","Económico","Acoso","Otro"],
+    traumaModuleSub:"Ejercicios guiados de recuperación",
+    exerciseComplete:"✅ Ejercicio completado",
+    steps:"Pasos",startExercise:"Iniciar ejercicio",
+    myAnchor:"⚓ Mi ancla",anchorSub:"Tu lugar seguro — guarda una canción e imagen",
+    anonymousSafeSpace:"Espacio anónimo y seguro",
+    topics:"Temas",send:"Enviar",typeMessage:"Escribe un mensaje…",
+    trendsSub:"Tu dolor a lo largo del tiempo",weeklyAvg:"Promedio semanal",entries:"registros",
+    editProfile:"✏️ Editar perfil",
+    fullName:"Nombre completo",dateOfBirth:"Fecha de nacimiento",gender:"Género",
+    male:"Masculino",female:"Femenino",other:"Otro",preferNotToSay:"Prefiero no decir",
+    bodyType:"Tipo de cuerpo",saveChanges:"Guardar cambios",
+    myPlan:"Mi plan",freeTrial:"Prueba gratuita",normalPlan:"Normal",premiumPlan:"Premium",
+    daysRemaining:(n)=>`${n} día${n!==1?"s":""} restante${n!==1?"s":""}`,
+    normalPlanActive:"Funciones del Plan Normal activas",
+    upgradeToPremium:"Actualizar a Premium",upgradeBtn:"⭐ Actualizar →",
+    normalPlanBtn:"💙 Normal",premiumPlanBtn:"⭐ Premium",
+    language:"🌍 Idioma",helpSupport:"❓ Ayuda y soporte",myDataGDPR:"🔒 Mis datos (GDPR)",
+    deleteAccount:"🗑 Eliminar cuenta",logOut:"Cerrar sesión",
+    choosePlan:"Elige tu plan",continueHealing:"Continúa tu viaje de recuperación.",
+    monthly:"Mensual",annual:"Anual (ahorra 40%)",subscribe:"Suscribirse",
+    continueFreeTrial:(n)=>`Continuar prueba (${n} día${n!==1?"s":""} restante${n!==1?"s":""})`,
+    currentlyNormalPlan:"Actualmente con funciones del Plan Normal",
+    normalIncludes:"Normal incluye:",premiumExtras:"Extras Premium:",
+    welcomeBack:"Bienvenido de vuelta",createAccount:"Crear cuenta",
+    email:"Correo electrónico",password:"Contraseña",name:"Nombre",
+    signIn:"Iniciar sesión",signUp:"Registrarse",
+    forgotPassword:"¿Olvidaste tu contraseña?",orContinueWith:"o continúa con",
+    continueAsGuest:"Continuar como invitado",alreadyHaveAccount:"¿Tienes cuenta? Inicia sesión",dontHaveAccount:"¿Sin cuenta? Regístrate",
+    verifyEmail:"Verifica tu correo",enterCode:"Ingresa el código de 6 dígitos enviado a",
+    verify:"Verificar",resendCode:"Reenviar código",
+    loading:"Cargando…",error:"Error",retry:"Reintentar",comingSoon:"Próximamente",
+    swelling_yes:"Hinchazón: Sí",swelling_no:"Hinchazón: No",numbness_yes:"Entumecimiento: Sí",numbness_no:"Entumecimiento: No",
+    custom:"(personalizado)",intensity:"Intensidad",
+    worsening:"empeorando",improving:"mejorando",stable:"estable",
+    today:"Hoy",yesterday:"Ayer",
   },
   fr:{
-    hello:"Bonjour",howFeeling:"Comment vous sentez-vous aujourd'hui?",
-    todayReminder:"Rappel du jour",yourModules:"Vos modules",
+    home:"ACCUEIL",pain:"DOULEUR",safety:"SÉCURITÉ",recovery:"RÉTABL.",chat:T.chat,profile:"PROFIL",
+    hello:"Bonjour",howFeeling:"Comment vous sentez-vous aujourd'hui ?",
+    yourDailyInsight:"Votre aperçu quotidien ✨",personalizingReminder:"Personnalisation de votre rappel…",
+    yourModules:"Vos modules",
+    lastPain:"Dernière douleur",avgPain7d:"Douleur moy. · 7j",history:"Historique",
+    painTrend7d:"Tendance douleur · 7j",vsPrevious7:"vs. 7 entrées précédentes",
+    checkIn:(n)=>`${n} enregistrement${n!==1?"s":""}`,
+    daysLeft:(n)=>`${n} jour${n!==1?"s":""} d'essai restants`,
+    upgradeArrow:"Mettre à niveau →",
+    trialIncludesNormal:"L'essai inclut toutes les fonctionnalités du Plan Normal",
+    premiumNotAvailable:"Fonctionnalités Premium non disponibles pendant l'essai",
     painModule:"Module douleur",chronicPain:"Douleur chronique",
     violenceReport:"Rapport de violence",documentation:"Documentation",
     communityChat:"Chat communautaire",anonymous:"Anonyme",
-    traumaRecovery:"Retablissement du trauma",selfGuided:"Auto-guide",
-    painHistory:"Historique de la douleur",checkInsRecorded:n=>`${n} enregistrement${n!==1?"s":""} · voir votre parcours`,
-    lastPain:"Derniere douleur",avgPain:"Douleur moy.",checkIns:"Enregistrements",
-    logCheckIn:"Enregistrer la douleur \u2192",newCheckIn:"+ Nouvel enregistrement",
-    home:"ACCUEIL",pain:"DOULEUR",safety:"SECURITE",recovery:"RETABL.",chat:"CHAT",profile:"PROFIL",
-    daysLeft:n=>`${n} jours d'essai restants`,tapToUpgrade:"Appuyez pour mettre a niveau",
-    trackTab:"\uD83E\uDE7A Suivre",historyTab:"\uD83D\uDCC8 Historique",noDataYet:"Pas encore de donnees",
-    noDataSub:"Completez votre premier enregistrement pour voir les tendances.",startCheckIn:"Commencer \u2192",
+    traumaRecovery:"Rétablissement du trauma",selfGuided:"Auto-guidé",
+    trackTab:"🩺 Suivre",historyTab:"📈 Historique",
+    todaysReport:"Rapport du jour",hereIsHow:"Voici comment s'est passée votre journée",
+    wellbeingScore:"Score de bien-être",snapshot:"📊 Résumé",
+    painLevel:"Niveau de douleur",mood:"Humeur",areasLogged:"Zones enregistrées",recoveryChecks:"Contrôles de rétablissement",
+    painAreas:"🗺️ Zones douloureuses",
+    newCheckIn:"+ Nouvel enregistrement",viewBodyMap:"Voir carte corporelle",
+    painModuleSub:"Suivre et visualiser votre douleur",
+    howBadPain:"Quelle est l'intensité de la douleur maintenant ?",
+    painNone:"Aucune",painMinimal:"Minimale",painMild:"Légère",painModerate:"Modérée",painSevere:"Sévère",painIntense:"Intense",
+    bodyMap:"Carte corporelle",tapBodyArea:"Appuyez sur une zone pour la marquer",
+    selectArea:"① Sélectionner zone",specifyLocation:"② Préciser l'emplacement",
+    front:"Face avant",back:"Face arrière",left:"Gauche",right:"Droite ▶",leftArrow:"◀ Gauche",
+    tapToSelect:"Appuyez pour sélectionner · Les couleurs indiquent la douleur sauvegardée",
+    whereDoesItHurt:"Où avez-vous mal ?",tapBodyAreaSpecify:"Appuyez sur une zone pour préciser",
+    setIntensity:"Définir intensité · gonflement · engourdissement par sous-zone",
+    swelling:"Gonflement",numbness:"Engourdissement",yes:"Oui",no:"Non",
+    addCustomArea:"+ Ajouter zone personnalisée",typeCustomArea:"Saisir nom de zone personnalisée…",
+    savedAreas:"Zones sauvegardées :",noAreasYet:"Aucune zone sélectionnée",
+    save:"Sauvegarder",back_btn:"← Retour",done:"✓ Terminé",
+    howAreYouFeeling:"Comment vous sentez-vous ?",
+    recoveryMoment:"Moment de rétablissement",checkWhatApplies:"Cochez tout ce qui s'applique aujourd'hui :",
+    voiceNotes:"Notes vocales",tapMicToRecord:"Appuyez sur le micro pour enregistrer",
+    listening:"Écoute en cours…",voiceSaved:"✓ Sauvegardé !",voiceError:"Erreur micro — réessayez",voiceNotSupported:"Voix non supportée.",
+    logCheckIn:"Enregistrer la douleur →",
+    noDataYet:"Pas encore de données",noDataSub:"Effectuez votre premier enregistrement pour voir les tendances.",startCheckIn:"Commencer →",
     avgScore:"Score moy.",bestDay:"Meilleur jour",trend:"Tendance",
+    painHistory:"Historique de la douleur",checkInsRecorded:(n)=>`${n} enregistrement${n!==1?"s":""} · voir votre parcours`,
+    areasSaved:(n)=>`${n} zone${n!==1?"s":""} sauvegardée${n!==1?"s":""}`,
+    violenceModuleSub:"Documentation sécurisée des incidents",
+    setSecurePIN:"🔒 Définir PIN sécurisé",pinProtected:"Enregistrements privés protégés par PIN",
+    addRecord:"+ Ajouter enregistrement",noRecords:"Pas encore d'enregistrements",
+    date:"Date",time:"Heure",type:"Type",description:"Description",
+    photos:"📸 Photos (Premium)",addPhotos:"Ajouter des photos",
+    saveRecord:"Sauvegarder",cancel:"Annuler",
+    shareRecord:"Partager",deleteRecord:"Supprimer",
+    incidentTypes:["Physique","Émotionnel","Sexuel","Financier","Harcèlement","Autre"],
+    traumaModuleSub:"Exercices de rétablissement guidés",
+    exerciseComplete:"✅ Exercice terminé",
+    steps:"Étapes",startExercise:"Démarrer l'exercice",
+    myAnchor:"⚓ Mon ancre",anchorSub:"Votre lieu sûr — sauvegardez une chanson et une image",
+    anonymousSafeSpace:"Espace anonyme et sécurisé",
+    topics:"Sujets",send:"Envoyer",typeMessage:"Écrire un message…",
+    trendsSub:"Votre douleur dans le temps",weeklyAvg:"Moyenne hebdomadaire",entries:"entrées",
+    editProfile:"✏️ Modifier le profil",
+    fullName:"Nom complet",dateOfBirth:"Date de naissance",gender:"Genre",
+    male:"Masculin",female:"Féminin",other:"Autre",preferNotToSay:"Préfère ne pas dire",
+    bodyType:"Type de corps",saveChanges:"Sauvegarder",
+    myPlan:"Mon plan",freeTrial:"Période d'essai",normalPlan:"Normal",premiumPlan:"Premium",
+    daysRemaining:(n)=>`${n} jour${n!==1?"s":""} restant${n!==1?"s":""}`,
+    normalPlanActive:"Fonctionnalités du Plan Normal actives",
+    upgradeToPremium:"Passer à Premium",upgradeBtn:"⭐ Upgrader →",
+    normalPlanBtn:"💙 Normal",premiumPlanBtn:"⭐ Premium",
+    language:"🌍 Langue",helpSupport:"❓ Aide & support",myDataGDPR:"🔒 Mes données (RGPD)",
+    deleteAccount:"🗑 Supprimer le compte",logOut:"Se déconnecter",
+    choosePlan:"Choisissez votre plan",continueHealing:"Continuez votre chemin de guérison.",
+    monthly:"Mensuel",annual:"Annuel (économisez 40%)",subscribe:"S'abonner",
+    continueFreeTrial:(n)=>`Continuer l'essai (${n} jour${n!==1?"s":""} restant${n!==1?"s":""})`,
+    currentlyNormalPlan:"Actuellement sur les fonctionnalités du Plan Normal",
+    normalIncludes:"Normal comprend :",premiumExtras:"Extras Premium :",
+    welcomeBack:"Bon retour",createAccount:"Créer un compte",
+    email:"E-mail",password:"Mot de passe",name:"Nom",
+    signIn:"Se connecter",signUp:"S'inscrire",
+    forgotPassword:"Mot de passe oublié ?",orContinueWith:"ou continuer avec",
+    continueAsGuest:"Continuer en tant qu'invité",alreadyHaveAccount:"Vous avez un compte ? Connectez-vous",dontHaveAccount:"Pas de compte ? Inscrivez-vous",
+    verifyEmail:"Vérifiez votre e-mail",enterCode:"Entrez le code à 6 chiffres envoyé à",
+    verify:"Vérifier",resendCode:"Renvoyer le code",
+    loading:"Chargement…",error:"Erreur",retry:"Réessayer",comingSoon:"Bientôt disponible",
+    swelling_yes:"Gonflement : Oui",swelling_no:"Gonflement : Non",numbness_yes:"Engourdissement : Oui",numbness_no:"Engourdissement : Non",
+    custom:"(personnalisé)",intensity:"Intensité",
+    worsening:"aggravation",improving:"amélioration",stable:"stable",
+    today:"Aujourd'hui",yesterday:"Hier",
   },
   pt:{
-    hello:"Ola",howFeeling:"Como voce esta se sentindo hoje?",
-    todayReminder:"Lembrete de hoje",yourModules:"Seus modulos",
-    painModule:"Modulo de dor",chronicPain:"Dor cronica",
-    violenceReport:"Relatorio de violencia",documentation:"Documentacao",
-    communityChat:"Chat da comunidade",anonymous:"Anonimo",
-    traumaRecovery:"Recuperacao do trauma",selfGuided:"Auto-guiado",
-    painHistory:"Historico de dor e tendencias",checkInsRecorded:n=>`${n} registro${n!==1?"s":""} · ver sua jornada`,
-    lastPain:"Ultima dor",avgPain:"Dor media",checkIns:"Registros",
-    logCheckIn:"Registrar controle de dor \u2192",newCheckIn:"+ Novo registro",
-    home:"INICIO",pain:"DOR",safety:"SEGURANCA",recovery:"RECUPER.",chat:"CHAT",profile:"PERFIL",
-    daysLeft:n=>`${n} dias de teste restantes`,tapToUpgrade:"Toque para atualizar",
-    trackTab:"\uD83E\uDE7A Registrar",historyTab:"\uD83D\uDCC8 Historico",noDataYet:"Sem dados ainda",
-    noDataSub:"Complete seu primeiro registro para ver tendencias.",startCheckIn:"Iniciar registro \u2192",
-    avgScore:"Pontuacao media",bestDay:"Melhor dia",trend:"Tendencia",
+    home:"INÍCIO",pain:"DOR",safety:"SEGURANÇA",recovery:"RECUPER.",chat:T.chat,profile:"PERFIL",
+    hello:"Olá",howFeeling:"Como você está se sentindo hoje?",
+    yourDailyInsight:"Seu insight diário ✨",personalizingReminder:"Personalizando seu lembrete…",
+    yourModules:"Seus módulos",
+    lastPain:"Última dor",avgPain7d:"Dor média · 7d",history:"Histórico",
+    painTrend7d:"Tendência de dor · 7d",vsPrevious7:"vs. 7 entradas anteriores",
+    checkIn:(n)=>`${n} registro${n!==1?"s":""}`,
+    daysLeft:(n)=>`${n} dia${n!==1?"s":""} restantes do período de teste`,
+    upgradeArrow:"Atualizar →",
+    trialIncludesNormal:"O período de teste inclui todos os recursos do Plano Normal",
+    premiumNotAvailable:"Recursos Premium não disponíveis durante o período de teste",
+    painModule:"Módulo de dor",chronicPain:"Dor crônica",
+    violenceReport:"Relatório de violência",documentation:"Documentação",
+    communityChat:"Chat da comunidade",anonymous:"Anônimo",
+    traumaRecovery:"Recuperação do trauma",selfGuided:"Auto-guiado",
+    trackTab:"🩺 Registrar",historyTab:"📈 Histórico",
+    todaysReport:"Relatório de hoje",hereIsHow:"Veja como foi o seu dia",
+    wellbeingScore:"Pontuação de bem-estar",snapshot:"📊 Resumo",
+    painLevel:"Nível de dor",mood:"Humor",areasLogged:"Áreas registradas",recoveryChecks:"Controles de recuperação",
+    painAreas:"🗺️ Áreas de dor",
+    newCheckIn:"+ Novo registro",viewBodyMap:"Ver mapa corporal",
+    painModuleSub:"Rastreie e visualize sua dor",
+    howBadPain:"Quão forte é a dor agora?",
+    painNone:"Sem dor",painMinimal:"Mínima",painMild:"Leve",painModerate:"Moderada",painSevere:"Severa",painIntense:"Intensa",
+    bodyMap:"Mapa corporal",tapBodyArea:"Toque em uma área para marcá-la",
+    selectArea:"① Selecionar área",specifyLocation:"② Especificar localização",
+    front:"Frente",back:"Costas",left:"Esquerda",right:"Direita ▶",leftArrow:"◀ Esquerda",
+    tapToSelect:"Toque para selecionar · As cores mostram a dor salva",
+    whereDoesItHurt:"Onde dói?",tapBodyAreaSpecify:"Toque em uma área para especificar",
+    setIntensity:"Definir intensidade · inchaço · dormência por subárea",
+    swelling:"Inchaço",numbness:"Dormência",yes:"Sim",no:"Não",
+    addCustomArea:"+ Adicionar área personalizada",typeCustomArea:"Digite nome de área personalizada…",
+    savedAreas:"Áreas salvas:",noAreasYet:"Nenhuma área selecionada",
+    save:"Salvar",back_btn:"← Voltar",done:"✓ Pronto",
+    howAreYouFeeling:"Como você está se sentindo?",
+    recoveryMoment:"Momento de recuperação",checkWhatApplies:"Marque tudo que se aplica hoje:",
+    voiceNotes:"Notas de voz",tapMicToRecord:"Toque no microfone para gravar",
+    listening:"Ouvindo…",voiceSaved:"✓ Salvo!",voiceError:"Erro no microfone — tente novamente",voiceNotSupported:"Voz não suportada.",
+    logCheckIn:"Registrar controle de dor →",
+    noDataYet:"Sem dados ainda",noDataSub:"Complete seu primeiro registro para ver tendências.",startCheckIn:"Iniciar registro →",
+    avgScore:"Pontuação média",bestDay:"Melhor dia",trend:"Tendência",
+    painHistory:"Histórico de dor e tendências",checkInsRecorded:(n)=>`${n} registro${n!==1?"s":""} · ver sua jornada`,
+    areasSaved:(n)=>`${n} área${n!==1?"s":""} salva${n!==1?"s":""}`,
+    violenceModuleSub:"Documentação segura de incidentes",
+    setSecurePIN:"🔒 Definir PIN seguro",pinProtected:"Registros privados protegidos por PIN",
+    addRecord:"+ Adicionar registro",noRecords:"Nenhum registro ainda",
+    date:"Data",time:"Hora",type:"Tipo",description:"Descrição",
+    photos:"📸 Fotos (Premium)",addPhotos:"Adicionar fotos",
+    saveRecord:"Salvar registro",cancel:"Cancelar",
+    shareRecord:"Compartilhar registro",deleteRecord:"Excluir registro",
+    incidentTypes:["Físico","Emocional","Sexual","Financeiro","Perseguição","Outro"],
+    traumaModuleSub:"Exercícios guiados de recuperação",
+    exerciseComplete:"✅ Exercício concluído",
+    steps:"Passos",startExercise:"Iniciar exercício",
+    myAnchor:"⚓ Minha âncora",anchorSub:"Seu lugar seguro — salve uma música e imagem",
+    anonymousSafeSpace:"Espaço anônimo e seguro",
+    topics:"Tópicos",send:"Enviar",typeMessage:"Digite uma mensagem…",
+    trendsSub:"Sua dor ao longo do tempo",weeklyAvg:"Média semanal",entries:"registros",
+    editProfile:"✏️ Editar perfil",
+    fullName:"Nome completo",dateOfBirth:"Data de nascimento",gender:"Gênero",
+    male:"Masculino",female:"Feminino",other:"Outro",preferNotToSay:"Prefiro não dizer",
+    bodyType:"Tipo de corpo",saveChanges:"Salvar alterações",
+    myPlan:"Meu plano",freeTrial:"Período de teste",normalPlan:"Normal",premiumPlan:"Premium",
+    daysRemaining:(n)=>`${n} dia${n!==1?"s":""} restante${n!==1?"s":""}`,
+    normalPlanActive:"Recursos do Plano Normal ativos",
+    upgradeToPremium:"Atualizar para Premium",upgradeBtn:"⭐ Atualizar →",
+    normalPlanBtn:"💙 Normal",premiumPlanBtn:"⭐ Premium",
+    language:"🌍 Idioma",helpSupport:"❓ Ajuda e suporte",myDataGDPR:"🔒 Meus dados (LGPD)",
+    deleteAccount:"🗑 Excluir conta",logOut:"Sair",
+    choosePlan:"Escolha seu plano",continueHealing:"Continue sua jornada de cura.",
+    monthly:"Mensal",annual:"Anual (economize 40%)",subscribe:"Assinar",
+    continueFreeTrial:(n)=>`Continuar período de teste (${n} dia${n!==1?"s":""} restante${n!==1?"s":""})`,
+    currentlyNormalPlan:"Atualmente com recursos do Plano Normal",
+    normalIncludes:"Normal inclui:",premiumExtras:"Extras Premium:",
+    welcomeBack:"Bem-vindo de volta",createAccount:"Criar conta",
+    email:"E-mail",password:"Senha",name:"Nome",
+    signIn:"Entrar",signUp:"Registrar",
+    forgotPassword:"Esqueceu a senha?",orContinueWith:"ou continue com",
+    continueAsGuest:"Continuar como convidado",alreadyHaveAccount:"Tem uma conta? Entre",dontHaveAccount:"Sem conta? Registre-se",
+    verifyEmail:"Verifique seu e-mail",enterCode:"Digite o código de 6 dígitos enviado para",
+    verify:"Verificar",resendCode:"Reenviar código",
+    loading:"Carregando…",error:"Erro",retry:"Tentar novamente",comingSoon:"Em breve",
+    swelling_yes:"Inchaço: Sim",swelling_no:"Inchaço: Não",numbness_yes:"Dormência: Sim",numbness_no:"Dormência: Não",
+    custom:"(personalizado)",intensity:"Intensidade",
+    worsening:"piorando",improving:"melhorando",stable:"estável",
+    today:"Hoje",yesterday:"Ontem",
   },
 };
 const getLang=(user)=>{
@@ -244,8 +784,8 @@ const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 // Each area has: id, label, front/back side, sub-areas, symptom types
 const SYMPTOM_TYPES=[
   {id:"pain",label:"Pain",color:"#e63946",icon:"🔴"},
-  {id:"numb",label:"Numbness",color:"#5bb8e8",icon:"🔵"},
-  {id:"swell",label:"Swelling",color:"#f4c261",icon:"🟡"},
+  {id:"numb",label:T.numbness,color:"#5bb8e8",icon:"🔵"},
+  {id:"swell",label:T.swelling,color:"#f4c261",icon:"🟡"},
   {id:"burn",label:"Burning",color:"#f4a261",icon:"🟠"},
   {id:"radiate",label:"Radiating",color:"#9b59b6",icon:"🟣"},
 ];
@@ -775,6 +1315,7 @@ const AREAS_BY_SIDE = {
 const ALL_AREAS = [...AREAS_BY_SIDE.front,...AREAS_BY_SIDE.back,...AREAS_BY_SIDE.left,...AREAS_BY_SIDE.right];
 
 const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
+  const T=getLang(user);
   const gender = user?.gender || '';
   const [side, setSide] = React.useState('front');
   const [mainTab, setMainTab] = React.useState('map'); // 'map' | 'list'
@@ -848,7 +1389,7 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
             style={{background:'rgba(26,111,160,0.1)',border:'none',borderRadius:50,width:36,height:36,fontSize:18,cursor:'pointer',color:C.blue,display:'flex',alignItems:'center',justifyContent:'center'}}>←</button>
           <div>
             <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:16,color:C.textDark}}>{activeArea.label}</div>
-            <div style={{fontSize:11,color:C.textLight}}>Set intensity · swelling · numbness per sub-area</div>
+            <div style={{fontSize:11,color:C.textLight}}>{T.setIntensity}</div>
           </div>
         </div>
 
@@ -867,7 +1408,7 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
               <div key={name} style={{background:bgColor,border:`2px solid ${borderColor}`,borderRadius:14,padding:'12px 14px',transition:'all 0.2s'}}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:intensity>0?8:0}}>
                   <span style={{fontSize:13,fontWeight:700,color:C.textDark}}>
-                    {name}{isCustom && <span style={{fontSize:10,color:C.blue,marginLeft:5}}>(custom)</span>}
+                    {name}{isCustom && <span style={{fontSize:10,color:C.blue,marginLeft:5}}>{T.custom}</span>}
                   </span>
                   <span style={{fontSize:11,color:C.textLight,minWidth:58,textAlign:'right'}}>
                     {intensity===0?'':intensity<=3?'Mild':intensity<=6?'Moderate':intensity<=8?'Severe':'Worst'}
@@ -883,16 +1424,16 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
                 </div>
                 {intensity > 0 && (
                   <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-                    {[['swelling','Swelling',sw,setTempSwell],['numbness','Numbness',nu,setTempNumb]].map(([type,label,val,setter])=>(
+                    {[['swelling',T.swelling,sw,setTempSwell],['numbness',T.numbness,nu,setTempNumb]].map(([type,label,val,setter])=>(
                       <div key={type} style={{display:'flex',alignItems:'center',gap:0,borderRadius:50,overflow:'hidden',border:'1.5px solid rgba(107,149,173,0.3)',background:'rgba(255,255,255,0.4)'}}>
                         <span style={{fontSize:11,fontWeight:700,color:'#3d5a6e',padding:'5px 9px',borderRight:'1.5px solid rgba(107,149,173,0.2)',whiteSpace:'nowrap'}}>{label}</span>
-                        {['Yes','No'].map(opt=>{
-                          const isOn = val===(opt==='Yes'?'yes':'no');
+                        {[T.yes,T.no].map(opt=>{
+                          const isOn = val===(opt===T.yes?'yes':'no');
                           return(
-                            <button key={opt} onClick={()=>setter(p=>({...p,[name]:opt==='Yes'?'yes':'no'}))}
+                            <button key={opt} onClick={()=>setter(p=>({...p,[name]:opt===T.yes?'yes':'no'}))}
                               style={{padding:'5px 11px',fontSize:11,fontWeight:800,border:'none',cursor:'pointer',
-                                background:isOn?(opt==='Yes'?'#1976d2':'rgba(107,149,173,0.2)'):'transparent',
-                                color:isOn?(opt==='Yes'?'white':'#3d5a6e'):'#6b95ad',
+                                background:isOn?(opt===T.yes?'#1976d2':'rgba(107,149,173,0.2)'):'transparent',
+                                color:isOn?(opt===T.yes?'white':'#3d5a6e'):'#6b95ad',
                                 fontFamily:"'Nunito',sans-serif",transition:'all 0.15s'}}>
                               {opt}
                             </button>
@@ -971,7 +1512,7 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
 
           {/* Figure */}
           <div style={{background:'rgba(255,255,255,0.4)',borderRadius:18,padding:'16px 8px',marginBottom:10,minHeight:200}}>
-            <div style={{fontSize:11,color:C.textLight,textAlign:'center',marginBottom:8}}>Tap to select · Colors show saved pain</div>
+            <div style={{fontSize:11,color:C.textLight,textAlign:'center',marginBottom:8}}>{T.tapToSelect}</div>
             {side==='front' && <FigureFront areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
             {side==='back' && <FigureBack areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
             {side==='left' && <FigureRight areaSymptoms={areaSymptoms} onAreaClick={(id)=>{let r=id.startsWith('r')?'l'+id.slice(1):id.startsWith('l')?'r'+id.slice(1):id;r=r.endsWith('_r')?r.slice(0,-2)+'_l':r.endsWith('_l')?r.slice(0,-2)+'_r':r;openArea(r);}}/>}
@@ -1026,10 +1567,10 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
                   {painAreas && <div style={{fontSize:11,color:'#4a6a80',fontWeight:600,marginBottom:6,lineHeight:1.5}}>📍 {painAreas}</div>}
                   <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
                     <span style={{fontSize:11,fontWeight:700,color:d.hasSwelling?'#1976d2':C.textLight}}>
-                      Swelling: <span style={{color:d.hasSwelling?'#1976d2':'#999'}}>{d.hasSwelling?'Yes':'No'}</span>
+                      Swelling: <span style={{color:d.hasSwelling?'#1976d2':'#999'}}>{d.hasSwelling?T.yes:T.no}</span>
                     </span>
                     <span style={{fontSize:11,fontWeight:700,color:d.hasNumbness?'#7b1fa2':C.textLight}}>
-                      Numbness: <span style={{color:d.hasNumbness?'#7b1fa2':'#999'}}>{d.hasNumbness?'Yes':'No'}</span>
+                      Numbness: <span style={{color:d.hasNumbness?'#7b1fa2':'#999'}}>{d.hasNumbness?T.yes:T.no}</span>
                     </span>
                   </div>
                 </div>
@@ -1281,9 +1822,9 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Create Account</div>
         <div style={{fontSize:13,color:C.textLight,marginTop:3}}>Start your free 7-day trial</div>
       </div>
-      {[{label:"Full Name",key:"name",val:name,set:setName,type:"text",ph:"Your full name",err:errors.name},
+      {[{label:T.fullName,key:"name",val:name,set:setName,type:"text",ph:"Your full name",err:errors.name},
         {label:"Email",key:"email",val:email,set:setEmail,type:"email",ph:"you@email.com",err:errors.email},
-        {label:"Date of Birth",key:"dob",val:dob,set:setDob,type:"date",ph:"",err:null},
+        {label:T.dateOfBirth,key:"dob",val:dob,set:setDob,type:"date",ph:"",err:null},
       ].map(f=>(
         <div key={f.key} style={{marginBottom:13}}>
           <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5}}>{f.label}</div>
@@ -1294,7 +1835,7 @@ const RegisterScreen=({onGoLogin,onRegistered})=>{
       <div style={{marginBottom:13}}>
         <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:5}}>Gender</div>
         <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-          {["Female","Male","Other","Prefer not to say"].map(g=>(
+          {[T.female,T.male,"Other","Prefer not to say"].map(g=>(
             <div key={g} onClick={()=>setGender(g)}
               style={{flex:"1 0 40%",padding:"9px 6px",borderRadius:11,border:`1.5px solid ${gender===g?C.blue:"rgba(26,111,160,0.18)"}`,background:gender===g?"rgba(26,111,160,0.1)":"rgba(255,255,255,0.5)",cursor:"pointer",textAlign:"center",fontSize:12,fontWeight:700,color:gender===g?C.blue:C.textLight,transition:"all 0.15s"}}>
               {g}
@@ -1361,7 +1902,7 @@ const VerifyScreen=({email,code,onVerified,onBack})=>{
       </div>
       {error&&<div style={{fontSize:12,color:C.red,textAlign:"center",marginBottom:11}}>⚠ {error}</div>}
       <button className="btn-blue" onClick={verify} disabled={loading}>{loading?"Verifying…":"Verify & Continue →"}</button>
-      <div style={{textAlign:"center",marginTop:12}}><span onClick={onBack} style={{fontSize:12,color:C.textLight,cursor:"pointer"}}>← Back</span></div>
+      <div style={{textAlign:"center",marginTop:12}}><span onClick={onBack} style={{fontSize:12,color:C.textLight,cursor:"pointer"}}>{T.back_btn}</span></div>
     </div>
   );
 };
@@ -1407,6 +1948,7 @@ const WelcomeScreen=({user,onContinue})=>{
 };
 
 const PaywallScreen=({user,onSubscribe,onLogout})=>{
+  const T=getLang(user);
   const [tier,setTier]=useState("normal"); // "normal" | "premium"
   const [billing,setBilling]=useState("monthly"); // "monthly" | "annual"
   const [loading,setLoading]=useState(false);
@@ -1427,16 +1969,16 @@ const PaywallScreen=({user,onSubscribe,onLogout})=>{
     <div style={{minHeight:"100vh",maxWidth:430,margin:"0 auto",padding:"0 22px 48px",background:"linear-gradient(160deg,#daf0ff,#b4dcf5,#dbf0ff)",overflowY:"auto"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"max(18px,env(safe-area-inset-top)) 0 12px"}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}><Logo size={26}/></div>
-        <button onClick={onLogout} style={{fontSize:11,fontWeight:700,color:C.textLight,background:"rgba(255,255,255,0.5)",border:"1px solid rgba(26,111,160,0.2)",borderRadius:18,padding:"5px 11px",cursor:"pointer"}}>Log Out</button>
+        <button onClick={onLogout} style={{fontSize:11,fontWeight:700,color:C.textLight,background:"rgba(255,255,255,0.5)",border:"1px solid rgba(26,111,160,0.2)",borderRadius:18,padding:"5px 11px",cursor:"pointer"}}>{T.logOut}</button>
       </div>
       <div style={{textAlign:"center",padding:"8px 0 16px"}}>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,color:C.textDark}}>Choose Your Plan</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:5,lineHeight:1.6}}>Continue your healing journey.</div>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:22,fontWeight:800,color:C.textDark}}>{T.choosePlan}</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:5,lineHeight:1.6}}>{T.continueHealing}</div>
       </div>
       {daysLeft>0&&<div className="glass" style={{borderRadius:14,padding:"11px 15px",marginBottom:14,display:"flex",alignItems:"center",gap:12}}>
         <span style={{fontSize:18}}>⏳</span>
-        <div style={{flex:1}}><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} day{daysLeft!==1?"s":""} left in free trial</div>
-        <div style={{fontSize:11,color:C.textLight}}>Currently on Normal Plan features</div></div>
+        <div style={{flex:1}}><div style={{fontWeight:800,fontSize:13,color:C.gold}}>{T.daysLeft(daysLeft)}</div>
+        <div style={{fontSize:11,color:C.textLight}}>{T.currentlyNormalPlan}</div></div>
       </div>}
       {/* Tier selector */}
       <div style={{display:"flex",gap:10,marginBottom:16}}>
@@ -1473,7 +2015,7 @@ const PaywallScreen=({user,onSubscribe,onLogout})=>{
       </div>
       {/* Billing toggle */}
       <div className="glass" style={{borderRadius:13,padding:4,display:"flex",gap:4,marginBottom:16}}>
-        {[{id:"monthly",label:"Monthly",price:prices[tier].monthly,sub:prices[tier].monthlySub},
+        {[{id:"monthly",label:T.monthly,price:prices[tier].monthly,sub:prices[tier].monthlySub},
           {id:"annual",label:"Annual",price:prices[tier].annual,sub:prices[tier].annualSub}].map(p=>(
           <div key={p.id} onClick={()=>setBilling(p.id)}
             style={{flex:1,padding:"11px 8px",borderRadius:10,textAlign:"center",cursor:"pointer",
@@ -1502,6 +2044,7 @@ const PaywallScreen=({user,onSubscribe,onLogout})=>{
 
 /* ══ HOME TAB ══ */
 const HomeTab=({user,onModuleSelect,onShowPaywall,history})=>{
+  const T=getLang(user);
   const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
   const isPaid=user?.plan==="monthly"||user?.plan==="annual";
   const todayKey="p2c_reminder_"+new Date().toISOString().slice(0,10);
@@ -1542,10 +2085,10 @@ Be empathetic, realistic and encouraging. Do NOT use generic platitudes. Tailor 
     .finally(()=>setReminderLoading(false));
   },[]);
   const modules=[
-    {id:"pain",icon:"🩺",title:"Pain Module",sub:"Chronic Pain",color:C.red,border:"rgba(230,57,70,0.2)"},
-    {id:"violence",icon:"📸",title:"Violence Report",sub:"Documentation",color:C.purple,border:"rgba(123,63,158,0.2)"},
-    {id:"community",icon:"💬",title:"Community Chat",sub:"Anonymous",color:C.teal,border:"rgba(26,140,122,0.2)"},
-    {id:"trauma",icon:"🧠",title:"Trauma Recovery",sub:"Self-Guided",color:C.blue,border:"rgba(26,111,160,0.2)"},
+    {id:"pain",icon:"🩺",title:T.painModule,sub:T.chronicPain,color:C.red,border:"rgba(230,57,70,0.2)"},
+    {id:"violence",icon:"📸",title:T.violenceReport,sub:T.documentation,color:C.purple,border:"rgba(123,63,158,0.2)"},
+    {id:"community",icon:"💬",title:T.communityChat,sub:T.anonymous,color:C.teal,border:"rgba(26,140,122,0.2)"},
+    {id:"trauma",icon:"🧠",title:T.traumaRecovery,sub:T.selfGuided,color:C.blue,border:"rgba(26,111,160,0.2)"},
   ];
   return(
     <div style={{padding:"10px 0",animation:"fadeIn 0.4s ease both"}}>
@@ -1554,24 +2097,24 @@ Be empathetic, realistic and encouraging. Do NOT use generic platitudes. Tailor 
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
             <span style={{fontSize:18}}>⏳</span>
             <div style={{flex:1}}>
-              <div style={{fontWeight:800,fontSize:13,color:C.gold}}>{daysLeft} day{daysLeft!==1?"s":""} left in free trial</div>
+              <div style={{fontWeight:800,fontSize:13,color:C.gold}}>{T.daysLeft(daysLeft)}</div>
             </div>
-            <div onClick={onShowPaywall} style={{cursor:"pointer",background:C.gold,color:"#fff",fontSize:11,fontWeight:800,borderRadius:8,padding:"4px 10px"}}>Upgrade →</div>
+            <div onClick={onShowPaywall} style={{cursor:"pointer",background:C.gold,color:"#fff",fontSize:11,fontWeight:800,borderRadius:8,padding:"4px 10px"}}>{T.upgradeArrow}</div>
           </div>
           <div style={{fontSize:11,color:C.textMid,lineHeight:1.5}}>
-            ✅ Free trial includes all <strong>Normal Plan</strong> features<br/>
-            🔒 Premium features not available during trial
+            {T.trialIncludesNormal}<br/>
+            {T.premiumNotAvailable}
           </div>
         </div>
       )}
       <div style={{padding:"0 22px",marginBottom:18}}>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:21,fontWeight:800,color:C.textDark}}>Hello, {user?.name?.split(" ")[0]||"Friend"} 👋</div>
-        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>How are you feeling today?</div>
+        <div style={{fontSize:13,color:C.textLight,marginTop:3}}>{T.howFeeling}</div>
       </div>
       <div className="glass" style={{margin:"0 18px 18px",borderRadius:17,padding:18,background:"rgba(26,111,160,0.07)",border:"1px solid rgba(26,111,160,0.15)"}}>
-        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>Your Daily Insight ✨</div>
+        <div style={{fontSize:10,fontWeight:700,color:C.blue,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>{T.yourDailyInsight}</div>
         {reminderLoading
-          ?<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:16,height:16,borderRadius:"50%",border:"2px solid "+C.blue,borderTopColor:"transparent",animation:"spin 0.8s linear infinite"}}/><span style={{fontSize:13,color:C.textLight}}>Personalizing your reminder…</span></div>
+          ?<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:16,height:16,borderRadius:"50%",border:"2px solid "+C.blue,borderTopColor:"transparent",animation:"spin 0.8s linear infinite"}}/><span style={{fontSize:13,color:C.textLight}}>{T.personalizingReminder}</span></div>
           :<div style={{fontSize:14,fontStyle:"italic",lineHeight:1.65,color:C.textMid}}>"{reminder||AFFIRMATIONS[0]}"</div>
         }
       </div>
@@ -1595,28 +2138,28 @@ Be empathetic, realistic and encouraging. Do NOT use generic platitudes. Tailor 
           {/* Row 1: Last pain + 7d avg + history */}
           <div style={{display:"flex",gap:8,marginBottom:8}}>
             <div className="glass" style={{borderRadius:13,padding:"11px 14px",flex:1}}>
-              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>Last pain</div>
+              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>{T.lastPain}</div>
               <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:C.red,lineHeight:1}}>{last?.painLevel}/10</div>
               <div style={{fontSize:9,color:C.textLight,marginTop:2}}>{last?.fullDate||last?.date}</div>
             </div>
             <div className="glass" style={{borderRadius:13,padding:"11px 14px",flex:1}}>
-              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>Avg pain · 7d</div>
+              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>{T.avgPain7d}</div>
               <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:C.blue,lineHeight:1}}>{avg7??"-"}{avg7&&"/10"}</div>
-              <div style={{fontSize:9,color:C.textLight,marginTop:2}}>{week7.length} check-in{week7.length!==1?"s":""}</div>
+              <div style={{fontSize:9,color:C.textLight,marginTop:2}}>{T.checkIn(week7.length)}</div>
             </div>
             <div onClick={()=>onModuleSelect("pain-trends")} className="glass"
               style={{borderRadius:13,padding:"11px 14px",flexShrink:0,cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minWidth:52,userSelect:"none",WebkitTapHighlightColor:"transparent"}}>
               <span style={{fontSize:22}}>📈</span>
-              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginTop:3}}>History</div>
+              <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginTop:3}}>{T.history}</div>
             </div>
           </div>
           {/* Row 2: Trend only */}
           {trendVal!==null&&(
             <div style={{display:"flex",gap:8}}>
               <div className="glass" style={{borderRadius:13,padding:"11px 14px",flex:1}}>
-                <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>Pain trend · 7d</div>
+                <div style={{fontSize:9,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:2}}>{T.painTrend7d}</div>
                 <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:trendColor,lineHeight:1}}>{trendVal>0?"+":""}{trendVal} {trendIcon}</div>
-                <div style={{fontSize:9,color:C.textLight,marginTop:2}}>vs. previous 7 entries</div>
+                <div style={{fontSize:9,color:C.textLight,marginTop:2}}>{T.vsPrevious7}</div>
               </div>
             </div>
           )}
@@ -1624,7 +2167,7 @@ Be empathetic, realistic and encouraging. Do NOT use generic platitudes. Tailor 
         );
       })()}
       <div style={{padding:"0 18px"}}>
-        <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:12}}>Your Modules</div>
+        <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:12}}>{T.yourModules}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
           {modules.map(m=>(
             <div key={m.id} onClick={()=>onModuleSelect(m.id)} className="glass"
@@ -1658,17 +2201,17 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
   const activeAreaCount=Object.keys(areaSymptoms).filter(k=>areaSymptoms[k]&&areaSymptoms[k].maxIntensity>0).length;
   const bodyType=["slim","normal","large"][[1,2,3].indexOf(user?.silhouette||2)]||"normal";
   const painColor=painLevel<=3?C.green:painLevel<=6?C.gold:C.red;
-  const painLabel=["None","Minimal","Minimal","Mild","Mild","Moderate","Moderate","Severe","Severe","Intense","Intense"][painLevel];
+  const painLabel=[T.painNone,T.painMinimal,T.painMinimal,T.painMild,T.painMild,T.painModerate,T.painModerate,T.painSevere,T.painSevere,T.painIntense,T.painIntense][painLevel];
   const checkedCount=Object.values(traumaChecks).filter(Boolean).length;
   const selMood=MOODS.find(m=>m.value===mood);
 
   const startVoice=()=>{
     const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(!SR){setVoiceStatus("Voice not supported.");return;}
+    if(!SR){setVoiceStatus(T.voiceNotSupported);return;}
     const rec=new SR();rec.continuous=false;rec.interimResults=true;rec.lang="en-US";
-    rec.onstart=()=>{setIsListening(true);setVoiceStatus("Listening…");};
-    rec.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join("");setNotes(t);if(e.results[0].isFinal)setVoiceStatus("✓ Saved!");};
-    rec.onerror=()=>{setIsListening(false);setVoiceStatus("Mic error — try again");};
+    rec.onstart=()=>{setIsListening(true);setVoiceStatus(T.listening);};
+    rec.onresult=e=>{const t=Array.from(e.results).map(r=>r[0].transcript).join("");setNotes(t);if(e.results[0].isFinal)setVoiceStatus(T.voiceSaved);};
+    rec.onerror=()=>{setIsListening(false);setVoiceStatus(T.voiceError);};
     rec.onend=()=>setIsListening(false);
     recRef.current=rec;rec.start();
   };
@@ -1695,16 +2238,16 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
     const activeAreas=Object.entries(areaSymptoms).filter(([,v])=>v?.maxIntensity>0);
     return(
       <div style={{animation:"scaleIn 0.35s ease both"}}>
-        <SectionTitle icon="✅" title="Today's Report" sub="Here's how you showed up today"/>
+        <SectionTitle icon="✅" title=T.todaysReport sub=T.hereIsHow/>
         <GCard style={{textAlign:"center",padding:28}}>
-          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Wellbeing Score</div>
+          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>{T.wellbeingScore}</div>
           <div style={{fontSize:52,lineHeight:1,marginBottom:6}}>{renderStars(toStars(score),40)}</div>
           <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:32,fontWeight:800,color:starsColor(toStars(score)),lineHeight:1}}>{toStars(score).toFixed(1)} / 5</div>
           <div style={{fontSize:13,color:C.textLight,marginTop:6}}>{starsLabel(toStars(score))}</div>
         </GCard>
         <GCard>
-          <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:13}}>📊 Snapshot</div>
-          {[{label:"Pain Level",value:`${painLevel}/10 · ${painLabel}`,color:painColor},{label:"Mood",value:selMood?`${selMood.emoji} ${selMood.label}`:"—",color:selMood?.color},{label:"Areas Logged",value:`${activeAreaCount} area${activeAreaCount!==1?"s":""}`},{label:"Recovery Checks",value:`${checkedCount}/${TRAUMA_CHECKS.length}`,color:C.blue}].map((row,i,arr)=>(
+          <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:13}}>{T.snapshot}</div>
+          {[{label:T.painLevel,value:`${painLevel}/10 · ${painLabel}`,color:painColor},{label:T.mood,value:selMood?`${selMood.emoji} ${selMood.label}`:"—",color:selMood?.color},{label:T.areasLogged,value:T.areasSaved ? `${activeAreaCount} ${T.areasLogged}` : `${activeAreaCount} area${activeAreaCount!==1?"s":""}`},{label:T.recoveryChecks,value:`${checkedCount}/${TRAUMA_CHECKS.length}`,color:C.blue}].map((row,i,arr)=>(
             <div key={row.label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none"}}>
               <span style={{fontSize:13,color:C.textLight}}>{row.label}</span>
               <span style={{fontWeight:800,fontSize:13,color:row.color||C.textDark}}>{row.value}</span>
@@ -1712,7 +2255,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
           ))}
         </GCard>
         {activeAreas.length>0&&<GCard>
-          <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:12}}>🗺️ Pain Areas</div>
+          <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:12}}>{T.painAreas}</div>
           {activeAreas.map(([id,data])=>{
             const areaInfo=[...FRONT_AREAS,...BACK_AREAS].find(a=>a.id===id);
             const maxI=data.maxIntensity||0;
@@ -1726,11 +2269,11 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
                 </div>
                 {painAreas&&<div style={{fontSize:11,color:C.textLight,lineHeight:1.5}}>📍 {painAreas}</div>}
                 <div style={{display:'flex',gap:6,marginTop:4,flexWrap:'wrap'}}>
-                  {[['Swelling',data.hasSwelling],['Numbness',data.hasNumbness]].map(([lbl,val])=>(
+                  {[[T.swelling,data.hasSwelling],[T.numbness,data.hasNumbness]].map(([lbl,val])=>(
                     <span key={lbl} style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:50,
                       background:val?'rgba(25,118,210,0.12)':'rgba(107,149,173,0.08)',
                       color:val?'#1565c0':'#90a4ae'}}>
-                      {lbl}: {val?'Yes':'No'}
+                      {lbl}: {val?T.yes:T.no}
                     </span>
                   ))}
                 </div>
@@ -1739,8 +2282,8 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
           })}
         </GCard>}
         <div style={{margin:"0 18px 28px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-          <button className="btn-blue" onClick={resetForm}>+ New Check-In</button>
-          <button className="btn-outline" onClick={()=>setScreen("form")}>View Body Map</button>
+          <button className="btn-blue" onClick={resetForm}>{T.newCheckIn}</button>
+          <button className="btn-outline" onClick={()=>setScreen("form")}>{T.viewBodyMap}</button>
         </div>
       </div>
     );
@@ -1748,7 +2291,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
 
   return(
     <div>
-      <SectionTitle icon="🩺" title="Pain Module" sub="Track & visualise your pain" onBack={onBack} onHome={onBack}/>
+      <SectionTitle icon="🩺" title=T.painModule sub=T.painModuleSub onBack={onBack} onHome={onBack}/>
 
       {/* Tab bar */}
       <div style={{display:"flex",margin:"6px 18px 10px",borderRadius:14,background:"rgba(26,111,160,0.08)",padding:3}}>
@@ -1768,12 +2311,12 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
           {history.length===0?(
             <GCard style={{textAlign:"center",padding:32}}>
               <div style={{fontSize:40,marginBottom:12}}>📊</div>
-              <div style={{fontWeight:800,fontSize:15,color:C.textDark,marginBottom:8}}>No data yet</div>
+              <div style={{fontWeight:800,fontSize:15,color:C.textDark,marginBottom:8}}>{T.noDataYet}</div>
               <div style={{fontSize:13,color:C.textLight}}>Complete your first check-in to see trends.</div>
-              <button onClick={()=>setPainTab("track")} className="btn-blue" style={{marginTop:16}}>Start Check-In →</button>
+              <button onClick={()=>setPainTab("track")} className="btn-blue" style={{marginTop:16}}>{T.startCheckIn}</button>
             </GCard>
           ):(
-            <TrendsTab history={history} onBack={onBack} embedded={true}/>
+            <TrendsTab history={history} onBack={onBack} embedded={true} user={user}/>
           )}
         </div>
       )}
@@ -1842,7 +2385,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
           style={{width:"100%",background:"rgba(255,255,255,0.5)",border:"1px solid rgba(26,111,160,0.13)",borderRadius:11,color:C.textDark,fontSize:13,padding:13,resize:"none",outline:"none",lineHeight:1.6}}/>
       </GCard>
       <div style={{margin:"0 18px 32px"}}>
-        <button className="btn-red" onClick={handleSubmit}>Log Pain Check-In →</button>
+        <button className="btn-red" onClick={handleSubmit}>{T.logCheckIn}</button>
       </div>
     </div>}
   </div>
@@ -1851,6 +2394,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
 
 /* ══ VIOLENCE MODULE ══ */
 const ViolenceModule=({user,onShowPaywall,onBack})=>{
+  const T=getLang(user);
   const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
   const storageKey=`p2c_vdocs_${user?.uid||user?.email||"local"}`;
   const pinKey=`p2c_vpin_${user?.uid||user?.email||"local"}`;
@@ -1909,8 +2453,8 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
   if(screen==="pinSetup") return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setScreen("main")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>🔒 Set Secure PIN</div>
+        <button onClick={()=>setScreen("main")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>{T.setSecurePIN}</div>
       </div>
       <GCard style={{marginTop:14,textAlign:"center"}}>
         <div style={{fontSize:13,color:C.textMid,marginBottom:20,lineHeight:1.6}}>
@@ -1943,7 +2487,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
   if(screen==="pinEntryRecords") return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>{setScreen("main");setPinInput("");setPinError("");}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>{setScreen("main");setPinInput("");setPinError("");}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>🔒 Your Records</div>
       </div>
       <GCard style={{marginTop:14,textAlign:"center"}}>
@@ -1982,7 +2526,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
   if(screen==="pinEntry") return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>{setScreen("main");setPinInput("");setPinError("");}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>{setScreen("main");setPinInput("");setPinError("");}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>🔒 Secure Photos</div>
       </div>
       <GCard style={{marginTop:14,textAlign:"center"}}>
@@ -2021,7 +2565,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>{setScreen("main");setPhotos([]);}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+          <button onClick={()=>{setScreen("main");setPhotos([]);}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
           <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>🔒 Secure Photos</div>
         </div>
         <button onClick={()=>{setScreen("main");setPhotos([]);}} style={{background:"rgba(230,57,70,0.12)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:11,fontWeight:700,color:C.red,cursor:"pointer"}}>🚪 Exit</button>
@@ -2070,7 +2614,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
   if(screen==="newDoc") return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setScreen("main")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>setScreen("main")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>📝 Document Incident</div>
       </div>
       <GCard style={{marginTop:14}}>
@@ -2115,7 +2659,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
   if(screen==="viewDoc"&&activeDoc) return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>{setScreen("main");setActiveDoc(null);}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>{setScreen("main");setActiveDoc(null);}} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>📄 Incident Record</div>
       </div>
       <GCard style={{marginTop:14}}>
@@ -2171,7 +2715,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
   if(screen==="share"&&activeDoc) return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setScreen("viewDoc")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>setScreen("viewDoc")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>📤 Share Record</div>
       </div>
       <GCard style={{marginTop:14,background:"rgba(123,63,158,0.05)",border:"1px solid rgba(123,63,158,0.15)"}}>
@@ -2347,6 +2891,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
 
 /* ══ TRAUMA MODULE ══ */
 const TraumaModule=({user,onBack})=>{
+  const T=getLang(user);
   const [active,setActive]=useState(null); // exercise id or "anchor"
   const anchorKey=`p2c_anchor_${user?.uid||user?.email||"local"}`;
   const [anchor,setAnchor]=useState(()=>{try{return JSON.parse(localStorage.getItem(anchorKey)||"null");}catch(e){return null;}});
@@ -2372,7 +2917,7 @@ const TraumaModule=({user,onBack})=>{
     return(
       <div style={{animation:"scaleIn 0.3s ease both"}}>
         <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setActive(null)} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+          <button onClick={()=>setActive(null)} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
           <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>{ex?.icon} {ex?.title}</div>
         </div>
         <GCard style={{marginTop:14}}>
@@ -2384,7 +2929,7 @@ const TraumaModule=({user,onBack})=>{
             </div>
           ))}
         </GCard>
-        <div style={{margin:"0 18px 28px"}}><button className="btn-blue" onClick={()=>setActive(null)}>✅ Exercise Complete</button></div>
+        <div style={{margin:"0 18px 28px"}}><button className="btn-blue" onClick={()=>setActive(null)}>{T.exerciseComplete}</button></div>
       </div>
     );
   }
@@ -2393,7 +2938,7 @@ const TraumaModule=({user,onBack})=>{
   if(active==="anchor") return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setActive(null)} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>setActive(null)} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.teal}}>⚓ My Anchor</div>
       </div>
 
@@ -2518,6 +3063,7 @@ const TraumaModule=({user,onBack})=>{
 
 /* ══ COMMUNITY ══ */
 const CommunityModule=({user,onBack})=>{
+  const T=getLang(user);
   const [channel,setChannel]=useState(null);
   const [allMessages,setAllMessages]=useState(()=>{
     const init={};
@@ -2543,12 +3089,12 @@ const CommunityModule=({user,onBack})=>{
       <GCard style={{background:"rgba(26,140,122,0.07)",border:"1px solid rgba(26,140,122,0.17)"}}>
         <div style={{display:"flex",alignItems:"center",gap:9}}>
           <span style={{fontSize:16}}>🔒</span>
-          <div style={{fontWeight:700,fontSize:13,color:C.teal}}>Anonymous & Safe Space</div>
+          <div style={{fontWeight:700,fontSize:13,color:C.teal}}>{T.anonymousSafeSpace}</div>
         </div>
         <div style={{fontSize:12,color:C.textLight,marginTop:5}}>Your real name is never shown. Choose a topic below to join the conversation.</div>
       </GCard>
       <div style={{padding:"0 18px"}}>
-        <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:12}}>Topics</div>
+        <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:12}}>{T.topics}</div>
         {CHANNELS.map(ch=>(
           <div key={ch.id} onClick={()=>setChannel(ch)}
             style={{display:"flex",alignItems:"center",gap:14,padding:"14px 16px",marginBottom:10,borderRadius:16,background:"rgba(255,255,255,0.52)",border:`1.5px solid ${ch.id==="crisis"?"rgba(244,162,97,0.4)":"rgba(26,111,160,0.12)"}`,cursor:"pointer",backdropFilter:"blur(14px)",transition:"all 0.15s",boxShadow:"0 4px 16px rgba(26,80,130,0.07)"}}>
@@ -2576,7 +3122,7 @@ const CommunityModule=({user,onBack})=>{
     <div style={{display:"flex",flexDirection:"column",height:"100%"}}>
       {/* Channel header */}
       <div style={{padding:"12px 18px 8px",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setChannel(null)} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>setChannel(null)} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{width:34,height:34,borderRadius:10,background:`${channel.color}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{channel.icon}</div>
         <div>
           <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:15,color:channel.color}}>{channel.label}</div>
@@ -2776,7 +3322,8 @@ const PERIOD_OPTIONS=[
   {label:"All",days:null},
   {label:"Custom",days:"custom"},
 ];
-const TrendsTab=({history,onBack,embedded})=>{
+const TrendsTab=({history,onBack,embedded,user})=>{
+  const T=getLang(user);
   const [period,setPeriod]=useState(7);
   const today=new Date().toISOString().slice(0,10);
   const weekAgo=new Date(Date.now()-6*86400000).toISOString().slice(0,10);
@@ -2838,8 +3385,8 @@ const TrendsTab=({history,onBack,embedded})=>{
         {displayHistory.length>0?[
           {label:"Avg Pain",value:(displayHistory.reduce((a,b)=>a+b.painLevel,0)/displayHistory.length).toFixed(1),color:C.red},
           {label:"Wellbeing",value:toStars(displayHistory.reduce((a,b)=>a+b.score,0)/displayHistory.length).toFixed(1)+"⭐",color:C.gold},
-          {label:"Best Day",value:displayHistory.reduce((a,b)=>b.score>a.score?b:a,displayHistory[0]).date,color:C.green},
-          {label:"Trend",value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"=",color:trend>0?C.red:trend<0?C.green:C.textLight}
+          {label:T.bestDay,value:displayHistory.reduce((a,b)=>b.score>a.score?b:a,displayHistory[0]).date,color:C.green},
+          {label:T.trend,value:trend>0?`+${trend}↑`:trend<0?`${trend}↓`:"=",color:trend>0?C.red:trend<0?C.green:C.textLight}
         ].map(s=>(
           <div key={s.label} className="glass" style={{borderRadius:13,padding:"11px 13px",flexShrink:0}}>
             <div style={{fontSize:10,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>{s.label}</div>
@@ -2875,6 +3422,7 @@ const TrendsTab=({history,onBack,embedded})=>{
 
 /* ══ PROFILE TAB ══ */
 const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
+  const T=getLang(user);
   const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
   const daysLeft=Math.max(0,5-Math.floor((Date.now()-(user?.trialStart||Date.now()))/86400000));
   const [screen,setScreen]=useState("main"); // main | editProfile | mydata | deleteConfirm
@@ -2898,8 +3446,8 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
   if(screen==="editProfile") return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setScreen("main")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>✏️ Edit Profile</div>
+        <button onClick={()=>setScreen("main")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>{T.editProfile}</div>
       </div>
 
       {/* Avatar */}
@@ -2913,19 +3461,19 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
       <GCard>
         {/* Name */}
         <div style={{marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6}}>Full Name</div>
+          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6}}>{T.fullName}</div>
           <input className="field" value={editName} onChange={e=>setEditName(e.target.value)} placeholder="Your name"/>
         </div>
         {/* DOB */}
         <div style={{marginBottom:14}}>
-          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6}}>Date of Birth</div>
+          <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:6}}>{T.dateOfBirth}</div>
           <input className="field" type="date" value={editDob} onChange={e=>setEditDob(e.target.value)}/>
         </div>
         {/* Gender */}
         <div style={{marginBottom:14}}>
           <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:8}}>Gender</div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-            {["Male","Female","Non-binary","Prefer not to say"].map(g=>(
+            {[T.male,T.female,"Non-binary","Prefer not to say"].map(g=>(
               <button key={g} onClick={()=>setEditGender(g)}
                 style={{padding:"8px 14px",borderRadius:20,border:`1.5px solid ${editGender===g?C.blue:"rgba(26,111,160,0.2)"}`,background:editGender===g?"rgba(26,111,160,0.1)":"transparent",color:editGender===g?C.blue:C.textMid,fontWeight:700,fontSize:12,cursor:"pointer",fontFamily:"'Nunito',sans-serif"}}>
                 {g}
@@ -3000,7 +3548,7 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
   if(screen==="deleteConfirm") return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setScreen("mydata")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>setScreen("mydata")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.red}}>⚠️ Delete All Data</div>
       </div>
       <GCard style={{marginTop:14,background:"rgba(230,57,70,0.06)",border:"1px solid rgba(230,57,70,0.2)"}}>
@@ -3015,7 +3563,7 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
         </div>
       </GCard>
       <div style={{padding:"0 18px",display:"flex",gap:10,marginBottom:28}}>
-        <button onClick={()=>setScreen("mydata")} className="btn-outline" style={{flex:1}}>Cancel</button>
+        <button onClick={()=>setScreen("mydata")} className="btn-outline" style={{flex:1}}>{T.cancel}</button>
         <button onClick={deleteAllData} disabled={deleting}
           style={{flex:2,padding:"16px",borderRadius:50,border:"none",background:"linear-gradient(135deg,#e63946,#ff5868)",color:"#fff",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:14,cursor:"pointer"}}>
           {deleting?"Deleting…":"🗑 Delete Everything"}
@@ -3027,7 +3575,7 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
   if(screen==="mydata") return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setScreen("main")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={()=>setScreen("main")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>🔐 My Data (GDPR)</div>
       </div>
 
@@ -3104,10 +3652,10 @@ const ProfileTab=({user,onLogout,onShowPaywall,onUpdateUser,onBack})=>{
       {/* Subscription card — shown for trial users */}
       {!isPaid&&(
         <div className="glass" style={{margin:"0 18px 14px",borderRadius:16,padding:"16px 16px",border:"1px solid rgba(26,111,160,0.15)"}}>
-          <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:4}}>Free Trial</div>
+          <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:4}}>{T.freeTrial}</div>
           <div style={{fontSize:12,color:C.textLight,marginBottom:12}}>
             ⏳ {daysLeft} day{daysLeft!==1?"s":""} remaining · Normal Plan features active<br/>
-            🔒 Premium features not available during trial
+            {T.premiumNotAvailable}
           </div>
           <div style={{display:"flex",gap:8}}>
             <button onClick={onShowPaywall}
@@ -3178,7 +3726,7 @@ const NotificationsScreen=({onBack,user})=>{
   return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
+        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
         <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>🔔 Notifications</div>
       </div>
       <GCard style={{marginTop:14}}>
@@ -3205,6 +3753,7 @@ const NotificationsScreen=({onBack,user})=>{
 
 /* ══ LANGUAGE SCREEN ══ */
 const LanguageScreen=({onBack,user})=>{
+  const T=getLang(user);
   const key=`p2c_lang_${user?.uid||"local"}`;
   const [selected,setSelected]=useState(()=>localStorage.getItem(key)||"en");
   const langs=[
@@ -3219,8 +3768,8 @@ const LanguageScreen=({onBack,user})=>{
   return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>🌍 Language</div>
+        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>{T.language}</div>
         <button onClick={()=>{localStorage.setItem(key,selected);onBack();}} style={{marginLeft:"auto",background:"linear-gradient(135deg,#1a6fa0,#0e4f78)",border:"none",borderRadius:9,padding:"5px 16px",fontSize:12,fontWeight:700,color:"#fff",cursor:"pointer"}}>💾 Save</button>
       </div>
       <GCard style={{marginTop:14}}>
@@ -3244,7 +3793,8 @@ const LanguageScreen=({onBack,user})=>{
 };
 
 /* ══ HELP & SUPPORT SCREEN ══ */
-const HelpScreen=({onBack})=>{
+const HelpScreen=({onBack,user})=>{
+  const T=getLang(user);
   const [openFaq,setOpenFaq]=useState(null);
   const faqs=[
     {q:"How do I track my pain?",a:"Go to the Pain tab → tap 'Start Check-in'. You can rate your pain, mark body areas, set your mood and add voice notes."},
@@ -3257,8 +3807,8 @@ const HelpScreen=({onBack})=>{
   return(
     <div style={{animation:"fadeIn 0.3s ease both"}}>
       <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>← Back</button>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>❓ Help & Support</div>
+        <button onClick={onBack} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
+        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.textDark}}>{T.helpSupport}</div>
       </div>
 
       <GCard style={{marginTop:14,background:"rgba(26,111,160,0.06)",border:"1px solid rgba(26,111,160,0.15)"}}>
@@ -3328,7 +3878,7 @@ const MainApp=({user:initialUser,onLogout,onShowPaywall})=>{
       case "violence": return <ViolenceModule user={user} onShowPaywall={onShowPaywall} onBack={()=>setTab("home")}/>;
       case "trauma": return <TraumaModule user={user} onBack={()=>setTab("home")}/>;
       case "community": return <CommunityModule user={user} onBack={()=>setTab("home")}/>;
-      case "trends": return <TrendsTab history={history} onBack={()=>setTab("home")}/>;
+      case "trends": return <TrendsTab history={history} onBack={()=>setTab("home")} user={user}/>;
       case "profile": return <ProfileTab user={user} onLogout={onLogout} onShowPaywall={onShowPaywall} onUpdateUser={handleUpdateUser} onBack={()=>setTab("home")}/>;
       default: return <HomeTab user={user} onModuleSelect={setTab} onShowPaywall={onShowPaywall} history={history}/>;
     }
