@@ -269,25 +269,23 @@ const filterByGender = (items, gender) => {
 
 // ── SUBAREAS (complete anatomical list) ─────────────────────
 const SUBAREAS_V2 = {
-  // FRONT
+  // ── FRONT VIEW ──────────────────────────────────────────────
   forehead:['Forehead (centre)','Forehead (left)','Forehead (right)','Left temple','Right temple'],
   face:['Left eye','Right eye','Left eyelid','Right eyelid','Nose (bridge)','Nose (tip)','Left nostril','Right nostril','Upper lip','Lower lip','Tongue','Left cheek','Right cheek','Left cheekbone','Right cheekbone','Chin','Jaw (left)','Jaw (right)','Left ear','Right ear','Teeth (upper)','Teeth (lower)','Gums','Sinuses (left)','Sinuses (right)','Throat','Tonsils'],
   neck_f:['Front of neck','Larynx (Adam\'s apple)','Left side of neck','Right side of neck','Left lymph nodes (neck)','Right lymph nodes (neck)','Thyroid','Base of neck'],
+  chest:['Upper chest (centre)','Upper chest (left)','Upper chest (right)','Lower chest (left)','Lower chest (right)','Sternum (upper)','Sternum (centre)','Sternum (lower)','Left ribs (front, upper)','Left ribs (front, lower)','Right ribs (front, upper)','Right ribs (front, lower)','Left breast / pectoral','Right breast / pectoral','Heart area','Left lung area','Right lung area','Left lymph nodes (chest)','Right lymph nodes (chest)'],
+  abdomen:['Upper abdomen (centre)','Upper abdomen (left)','Upper abdomen (right)','Lower abdomen (centre)','Lower abdomen (left)','Lower abdomen (right)','Navel area','Stomach area','Liver area (right upper)','Gallbladder area','Spleen area (left upper)','Pancreas area','Left kidney (front)','Right kidney (front)','Left colon','Right colon','Small intestine area','Left flank','Right flank','Left lymph nodes (groin)','Right lymph nodes (groin)'],
+  pelvis:['Pubic bone','Left groin','Right groin','Left hip (front)','Right hip (front)','Left inguinal area','Right inguinal area','Urethra','Bladder area','Penis','Scrotum / testicles','Left testicle','Right testicle','Vulva','Vagina (external)','Clitoris','Labia (left)','Labia (right)','Uterus area','Ovary (left)','Ovary (right)','Prostate area','Perineum','Anal area','Rectum area'],
   lshoulder:['Left shoulder top','Left shoulder front','Left shoulder joint','Left collarbone (clavicle)','Left AC joint','Left deltoid (front)','Left rotator cuff','Left bicep tendon','Left axilla (armpit)','Left lymph nodes (armpit)'],
   rshoulder:['Right shoulder top','Right shoulder front','Right shoulder joint','Right collarbone (clavicle)','Right AC joint','Right deltoid (front)','Right rotator cuff','Right bicep tendon','Right axilla (armpit)','Right lymph nodes (armpit)'],
-  chest:['Upper chest (left)','Upper chest (right)','Upper chest (centre)','Lower chest (left)','Lower chest (right)','Sternum (upper)','Sternum (centre)','Sternum (lower)','Left ribs (front, upper)','Left ribs (front, lower)','Right ribs (front, upper)','Right ribs (front, lower)','Left breast / pectoral','Right breast / pectoral','Heart area','Left lung area','Right lung area','Left lymph nodes (chest)','Right lymph nodes (chest)'],
-  luparm:['Left upper arm (front)','Left bicep','Left deltoid (outer)'],
-  ruparm:['Right upper arm (front)','Right bicep','Right deltoid (outer)'],
+  luparm:['Left upper arm (front)','Left bicep','Left deltoid (outer)','Left upper arm (inner)'],
+  ruparm:['Right upper arm (front)','Right bicep','Right deltoid (outer)','Right upper arm (inner)'],
   lelbow:['Left elbow (front)','Left elbow (inner — funny bone)','Left elbow joint','Left elbow (outer)'],
   relbow:['Right elbow (front)','Right elbow (inner — funny bone)','Right elbow joint','Right elbow (outer)'],
-  lfarm:['Left forearm (front)','Left forearm (outer)','Left forearm (inner)'],
-  rfarm:['Right forearm (front)','Right forearm (outer)','Right forearm (inner)'],
+  lfarm:['Left forearm (front)','Left forearm (outer)','Left forearm (inner)','Left extensor muscles','Left flexor muscles'],
+  rfarm:['Right forearm (front)','Right forearm (outer)','Right forearm (inner)','Right extensor muscles','Right flexor muscles'],
   lwrist:['Left wrist (front)','Left wrist (back)','Left wrist (outer)','Left wrist (inner)','Left palm','Left back of hand','Left thumb','Left index finger','Left middle finger','Left ring finger','Left little finger','Left knuckles'],
   rwrist:['Right wrist (front)','Right wrist (back)','Right wrist (outer)','Right wrist (inner)','Right palm','Right back of hand','Right thumb','Right index finger','Right middle finger','Right ring finger','Right little finger','Right knuckles'],
-  abdomen:['Upper abdomen (centre)','Upper abdomen (left)','Upper abdomen (right)','Lower abdomen (centre)','Lower abdomen (left)','Lower abdomen (right)','Navel area','Stomach area','Liver area (right upper)','Gallbladder area','Spleen area (left upper)','Pancreas area','Left kidney (front)','Right kidney (front)','Left colon','Right colon','Small intestine area','Left flank','Right flank','Left lymph nodes (groin)','Right lymph nodes (groin)'],
-  liver:['Liver (upper right)','Gallbladder','Right rib (lower front)','Right side abdomen (upper)'],
-  stomach:['Stomach / gastric area','Pancreas area','Left rib (lower front)','Left side abdomen (upper)','Spleen area'],
-  pelvis:['Pubic bone','Left groin','Right groin','Left hip (front)','Right hip (front)','Left inguinal area','Right inguinal area','Urethra','Bladder area','Penis','Scrotum / testicles','Left testicle','Right testicle','Vulva','Vagina (external)','Clitoris','Labia (left)','Labia (right)','Uterus area','Ovary (left)','Ovary (right)','Prostate area','Perineum','Anal area','Rectum area'],
   lhip:['Left hip (front)','Left hip bone (iliac crest)','Left hip flexor','Left groin (inner)','Left inguinal lymph nodes'],
   rhip:['Right hip (front)','Right hip bone (iliac crest)','Right hip flexor','Right groin (inner)','Right inguinal lymph nodes'],
   lthigh:['Left thigh (front, centre)','Left thigh (front, inner)','Left thigh (front, outer)','Left quadriceps'],
@@ -298,20 +296,20 @@ const SUBAREAS_V2 = {
   rshin:['Right shin (upper)','Right shin (lower)','Right tibia','Right ankle (front)','Right ankle (inner)','Right ankle (outer)','Right ankle joint'],
   lankle:['Left foot (top)','Left big toe','Left 2nd toe','Left 3rd toe','Left 4th toe','Left little toe','Left ball of foot','Left arch (inner)','Left arch (outer)','Left heel','Left sole','Left plantar fascia'],
   rankle:['Right foot (top)','Right big toe','Right 2nd toe','Right 3rd toe','Right 4th toe','Right little toe','Right ball of foot','Right arch (inner)','Right arch (outer)','Right heel','Right sole','Right plantar fascia'],
-  // BACK
+  // ── BACK VIEW ───────────────────────────────────────────────
   skull:['Back of head (centre)','Back of head (left)','Back of head (right)','Base of skull / occiput (left)','Base of skull / occiput (right)'],
   neck_b:['Back of neck (centre)','Left neck (back)','Right neck (back)','Cervical spine C1–C2','Cervical spine C3–C4','Cervical spine C5–C7','Base of neck (back)'],
   ltrap:['Left trapezius (upper)','Left trapezius (mid)','Left shoulder blade (scapula)','Left shoulder blade (inner edge)','Left rhomboid','Left deltoid (back)','Left rotator cuff (back)'],
   rtrap:['Right trapezius (upper)','Right trapezius (mid)','Right shoulder blade (scapula)','Right shoulder blade (inner edge)','Right rhomboid','Right deltoid (back)','Right rotator cuff (back)'],
-  lupback:['Left upper back','Between shoulder blades (upper)','Between shoulder blades (lower)','Thoracic spine T1–T4','Thoracic spine T5–T8','Left rib (back, upper)','Left mid-back'],
-  rupback:['Right upper back','Between shoulder blades (upper)','Between shoulder blades (lower)','Thoracic spine T1–T4','Thoracic spine T5–T8','Right rib (back, upper)','Right mid-back'],
+  lupback:['Left upper back','Left shoulder blade (scapula)','Left trapezius (mid)','Left rhomboid','Thoracic spine T1–T4','Thoracic spine T5–T8','Left rib (back, upper)','Left mid-back'],
+  rupback:['Right upper back','Right shoulder blade (scapula)','Right trapezius (mid)','Right rhomboid','Thoracic spine T1–T4','Thoracic spine T5–T8','Right rib (back, upper)','Right mid-back'],
   spine:['Cervical spine (neck)','Thoracic spine T1–T4','Thoracic spine T5–T8','Thoracic spine T9–T12','Lumbar spine L1–L2','Lumbar spine L3','Lumbar spine L4–L5'],
-  llowback:['Left lower back','Lumbar spine L1–L2','Lumbar spine L3–L5','Left SI joint (sacroiliac)','Left rib (back, lower)'],
-  rlowback:['Right lower back','Lumbar spine L1–L2','Lumbar spine L3–L5','Right SI joint (sacroiliac)','Right rib (back, lower)'],
+  llowback:['Left lower back','Left lumbar muscles','Left SI joint (sacroiliac)','Left rib (back, lower)','Left QL muscle','Lumbar spine L3–L5'],
+  rlowback:['Right lower back','Right lumbar muscles','Right SI joint (sacroiliac)','Right rib (back, lower)','Right QL muscle','Lumbar spine L3–L5'],
   lkidney:['Left kidney area','Left flank (back)','Left adrenal area'],
   rkidney:['Right kidney area','Right flank (back)','Right adrenal area'],
-  lglute:['Left glute (upper)','Left glute (lower)','Left glute (deep / piriformis)','Left sit bone (ischium)','Tailbone (coccyx)','Sacrum','Anal area','Rectum area'],
-  rglute:['Right glute (upper)','Right glute (lower)','Right glute (deep / piriformis)','Right sit bone (ischium)','Tailbone (coccyx)','Sacrum','Anal area','Rectum area'],
+  lglute:['Left glute (upper)','Left glute (lower)','Left glute (deep / piriformis)','Left sit bone (ischium)','Tailbone (coccyx)','Sacrum'],
+  rglute:['Right glute (upper)','Right glute (lower)','Right glute (deep / piriformis)','Right sit bone (ischium)','Tailbone (coccyx)','Sacrum'],
   lhamst:['Left hamstring (upper)','Left hamstring (mid)','Left hamstring (lower)','Left inner thigh (adductor)'],
   rhamst:['Right hamstring (upper)','Right hamstring (mid)','Right hamstring (lower)','Right inner thigh (adductor)'],
   lkneeb:['Left knee (back)','Left popliteal (behind knee)','Left calf (upper)'],
@@ -320,7 +318,7 @@ const SUBAREAS_V2 = {
   rcalf:['Right calf (inner / gastrocnemius)','Right calf (outer / soleus)','Right Achilles tendon','Right ankle (back)'],
   lheel:['Left heel (centre)','Left heel (inner)','Left heel (outer)','Left heel (bottom)','Left sole','Left plantar fascia'],
   rheel:['Right heel (centre)','Right heel (inner)','Right heel (outer)','Right heel (bottom)','Right sole','Right plantar fascia'],
-  // LEFT LATERAL
+  // ── LEFT LATERAL VIEW ───────────────────────────────────────
   head_l:['Left temple','Left ear','Left side of head','Left forehead (side)','Left jaw (side)','Left cheekbone','Left eye (outer)'],
   neck_l:['Left side of neck','Left sternocleidomastoid','Left lymph nodes (neck)','Left carotid area','Left scalene muscles'],
   lshoulder_l:['Left shoulder top','Left shoulder joint','Left AC joint','Left deltoid (outer)','Left rotator cuff','Left supraspinatus','Left axilla (armpit)'],
@@ -334,11 +332,11 @@ const SUBAREAS_V2 = {
   llowback_l:['Left lower back','Left lumbar muscles','Left SI joint','Left flank (back)','Left kidney area','Left QL muscle'],
   lhip_l:['Left hip (side)','Left greater trochanter','Left hip joint (lateral)','Left IT band (hip)','Left TFL muscle'],
   lglute_l:['Left glute (upper)','Left glute (middle)','Left piriformis','Left glute (lower)','Left sit bone'],
-  lthigh_l:['Left IT band (thigh)','Left thigh (outer)','Left thigh (side)','Left quadriceps (outer)','Left hamstring (outer)'],
+  lthigh_l:['Left thigh (outer)','Left thigh (side)','Left IT band (thigh)','Left quadriceps (outer)','Left hamstring (outer)'],
   lknee_l:['Left knee (outer)','Left lateral meniscus','Left IT band (knee)','Left fibular head','Left lateral collateral ligament'],
   lshin_l:['Left shin (outer)','Left calf (outer / soleus)','Left peroneal muscles','Left fibula area'],
   lankle_l:['Left ankle (outer)','Left lateral malleolus','Left peroneal tendons','Left foot (outer side)','Left 5th metatarsal'],
-  // RIGHT LATERAL
+  // ── RIGHT LATERAL VIEW ──────────────────────────────────────
   head_r:['Right temple','Right ear','Right side of head','Right forehead (side)','Right jaw (side)','Right cheekbone','Right eye (outer)'],
   neck_r:['Right side of neck','Right sternocleidomastoid','Right lymph nodes (neck)','Right carotid area','Right scalene muscles'],
   rshoulder_r:['Right shoulder top','Right shoulder joint','Right AC joint','Right deltoid (outer)','Right rotator cuff','Right supraspinatus','Right axilla (armpit)'],
@@ -352,10 +350,13 @@ const SUBAREAS_V2 = {
   rlowback_r:['Right lower back','Right lumbar muscles','Right SI joint','Right flank (back)','Right kidney area','Right QL muscle'],
   rhip_r:['Right hip (side)','Right greater trochanter','Right hip joint (lateral)','Right IT band (hip)','Right TFL muscle'],
   rglute_r:['Right glute (upper)','Right glute (middle)','Right piriformis','Right glute (lower)','Right sit bone'],
-  rthigh_r:['Right IT band (thigh)','Right thigh (outer)','Right thigh (side)','Right quadriceps (outer)','Right hamstring (outer)'],
+  rthigh_r:['Right thigh (outer)','Right thigh (side)','Right IT band (thigh)','Right quadriceps (outer)','Right hamstring (outer)'],
   rknee_r:['Right knee (outer)','Right lateral meniscus','Right IT band (knee)','Right fibular head','Right lateral collateral ligament'],
   rshin_r:['Right shin (outer)','Right calf (outer / soleus)','Right peroneal muscles','Right fibula area'],
   rankle_r:['Right ankle (outer)','Right lateral malleolus','Right peroneal tendons','Right foot (outer side)','Right 5th metatarsal'],
+  // ── EXTRA (internal organs, not on figure) ──────────────────
+  liver:['Liver (upper right)','Gallbladder','Right rib (lower front)','Right side abdomen (upper)'],
+  stomach:['Stomach / gastric area','Pancreas area','Left rib (lower front)','Left side abdomen (upper)','Spleen area'],
 };
 
 // Custom areas localStorage
