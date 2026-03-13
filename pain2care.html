@@ -516,12 +516,20 @@ const FigureBack = ({ areaSymptoms, onAreaClick }) => {
   );
 };
 
+// Mirror helper: swaps l↔r prefix in area IDs so clicking FigureLeft on "right" tab gives correct side
+const mirrorId = (id) => {
+  if(id.startsWith('l')) return 'r'+id.slice(1);
+  if(id.startsWith('r')) return 'l'+id.slice(1);
+  return id;
+};
+
 // ── LEFT LATERAL FIGURE (patient faces right → viewer sees left side) ──
-const FigureLeft = ({ areaSymptoms, onAreaClick }) => {
+const FigureLeft = ({ areaSymptoms, onAreaClick, mirror=false }) => {
+  const _click = mirror ? (id) => onAreaClick(mirrorId(id)) : onAreaClick;
   const gc = mkColor(areaSymptoms);
   const gs = mkStroke(areaSymptoms);
   const sw = 1.5;
-  const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
+  const hit = (id) => ({ onClick: () => _click(id), style: { cursor: 'pointer' } });
   return (
     <svg viewBox="0 0 120 340" width="100%" style={{maxWidth:160,display:'block',margin:'0 auto'}}>
       {/* HEAD — profile facing right */}
@@ -567,11 +575,12 @@ const FigureLeft = ({ areaSymptoms, onAreaClick }) => {
 };
 
 // ── RIGHT LATERAL FIGURE (patient faces left → viewer sees right side) ──
-const FigureRight = ({ areaSymptoms, onAreaClick }) => {
+const FigureRight = ({ areaSymptoms, onAreaClick, mirror=false }) => {
+  const _click = mirror ? (id) => onAreaClick(mirrorId(id)) : onAreaClick;
   const gc = mkColor(areaSymptoms);
   const gs = mkStroke(areaSymptoms);
   const sw = 1.5;
-  const hit = (id) => ({ onClick: () => onAreaClick(id), style: { cursor: 'pointer' } });
+  const hit = (id) => ({ onClick: () => _click(id), style: { cursor: 'pointer' } });
   return (
     <svg viewBox="0 0 120 340" width="100%" style={{maxWidth:160,display:'block',margin:'0 auto'}}>
       {/* HEAD — profile facing left */}
@@ -868,8 +877,8 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
             <div style={{fontSize:11,color:C.textLight,textAlign:'center',marginBottom:8}}>Tap to select · Colors show saved pain</div>
             {side==='front' && <FigureFront areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
             {side==='back' && <FigureBack areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
-            {side==='left' && <FigureRight areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
-            {side==='right' && <FigureLeft areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
+            {side==='left' && <FigureRight areaSymptoms={areaSymptoms} onAreaClick={openArea} mirror={true}/>}
+            {side==='right' && <FigureLeft areaSymptoms={areaSymptoms} onAreaClick={openArea} mirror={true}/>}
           </div>
         </>
       )}
