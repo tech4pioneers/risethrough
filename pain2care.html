@@ -523,104 +523,150 @@ const mirrorId = (id) => {
   return id;
 };
 
-// ── LEFT LATERAL FIGURE (patient faces right → viewer sees left side) ──
+// ── LEFT LATERAL FIGURE — patient faces right, left side visible, arm on RIGHT of screen ──
 const FigureLeft = ({ areaSymptoms, onAreaClick, mirror=false }) => {
   const _click = mirror ? (id) => onAreaClick(mirrorId(id)) : onAreaClick;
   const gc = mkColor(areaSymptoms);
   const gs = mkStroke(areaSymptoms);
   const sw = 1.5;
   const hit = (id) => ({ onClick: () => _click(id), style: { cursor: 'pointer' } });
+  // Colours by group
+  const tC='#b8d8f0', tS='#1a6fa0';   // torso: blue
+  const aC='#ffc878', aS='#c87020';   // arm: orange
+  const lC='#d0e8c0', lS='#4a8a30';   // leg: green
+  const bC='#e0d0f8', bS='#7040a0';   // back: purple
+  const sC='#f0c8a0', sS='#c8966e';   // skin: nude
   return (
-    <svg viewBox="0 0 120 340" width="100%" style={{maxWidth:160,display:'block',margin:'0 auto'}}>
-      {/* HEAD — profile facing right */}
-      <ellipse cx="65" cy="26" rx="18" ry="22" fill={gc('head_l')} stroke={gs('head_l')} strokeWidth={sw} {...hit('head_l')}/>
-      {/* Nose bump */}
-      <ellipse cx="80" cy="26" rx="7" ry="5" fill={gc('face')} stroke={gs('face')} strokeWidth="1" {...hit('face')}/>
-      {/* Eye */}
-      <circle cx="76" cy="21" r="2.5" fill="#c07850" opacity="0.7"/>
+    <svg viewBox="0 0 120 310" width="100%" style={{maxWidth:160,display:'block',margin:'0 auto'}}>
+      {/* HEAD — faces right */}
+      <ellipse cx="62" cy="22" rx="16" ry="19" fill={gc('head_l')||sC} stroke={gs('head_l')||sS} strokeWidth={sw} {...hit('head_l')}/>
+      <ellipse cx="76" cy="24" rx="6" ry="4" fill={gc('face')||sC} stroke={gs('face')||sS} strokeWidth="1" {...hit('face')}/>
+      <circle cx="72" cy="18" r="2" fill="#8a6040" opacity="0.7"/>
       {/* NECK */}
-      <rect x="58" y="46" width="14" height="14" rx="5" fill={gc('neck_l')} stroke={gs('neck_l')} strokeWidth={sw} {...hit('neck_l')}/>
-      {/* SHOULDER */}
-      <ellipse cx="55" cy="68" rx="16" ry="14" fill={gc('lshoulder_l')} stroke={gs('lshoulder_l')} strokeWidth={sw} {...hit('lshoulder_l')}/>
-      {/* CHEST (front of torso) */}
-      <rect x="56" y="60" width="26" height="60" rx="10" fill={gc('chest_l')} stroke={gs('chest_l')} strokeWidth={sw} {...hit('chest_l')}/>
+      <rect x="55" y="40" width="12" height="11" rx="4" fill={gc('neck_l')||sC} stroke={gs('neck_l')||sS} strokeWidth={sw} {...hit('neck_l')}/>
+      {/* UPPER TORSO */}
+      <rect x="38" y="51" width="36" height="34" rx="8" fill={gc('chest_l')||tC} stroke={gs('chest_l')||tS} strokeWidth="2" {...hit('chest_l')}/>
+      <text x="56" y="65" textAnchor="middle" fontSize="7" fontWeight="700" fill={tS} style={{pointerEvents:'none'}}>Upper</text>
+      <text x="56" y="74" textAnchor="middle" fontSize="7" fontWeight="700" fill={tS} style={{pointerEvents:'none'}}>Torso</text>
+      {/* LOWER TORSO */}
+      <rect x="38" y="87" width="36" height="28" rx="7" fill={gc('abdomen_l')||tC} stroke={gs('abdomen_l')||tS} strokeWidth="2" {...hit('abdomen_l')}/>
+      <text x="56" y="104" textAnchor="middle" fontSize="7" fontWeight="700" fill={tS} style={{pointerEvents:'none'}}>Lower</text>
+      <text x="56" y="113" textAnchor="middle" fontSize="7" fontWeight="700" fill={tS} style={{pointerEvents:'none'}}>Torso</text>
+      {/* HIP */}
+      <rect x="40" y="117" width="32" height="20" rx="6" fill={gc('lhip_l')||tC} stroke={gs('lhip_l')||tS} strokeWidth="1.5" {...hit('lhip_l')}/>
+      <text x="56" y="130" textAnchor="middle" fontSize="7" fill={tS} style={{pointerEvents:'none'}}>Hip</text>
       {/* UPPER BACK */}
-      <rect x="34" y="60" width="26" height="60" rx="10" fill={gc('lupback_l')} stroke={gs('lupback_l')} strokeWidth={sw} {...hit('lupback_l')}/>
-      {/* ABDOMEN */}
-      <rect x="56" y="116" width="26" height="40" rx="8" fill={gc('abdomen_l')} stroke={gs('abdomen_l')} strokeWidth={sw} {...hit('abdomen_l')}/>
+      <rect x="18" y="51" width="22" height="34" rx="7" fill={gc('lupback_l')||bC} stroke={gs('lupback_l')||bS} strokeWidth="1.5" {...hit('lupback_l')}/>
+      <text x="29" y="66" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={bS} style={{pointerEvents:'none'}}>Upper</text>
+      <text x="29" y="75" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={bS} style={{pointerEvents:'none'}}>Back</text>
       {/* LOWER BACK */}
-      <rect x="34" y="116" width="26" height="40" rx="8" fill={gc('llowback_l')} stroke={gs('llowback_l')} strokeWidth={sw} {...hit('llowback_l')}/>
-      {/* ARM */}
-      <rect x="28" y="76" width="18" height="72" rx="9" fill={gc('larm_l')} stroke={gs('larm_l')} strokeWidth={sw} {...hit('larm_l')}/>
-      {/* ELBOW */}
-      <ellipse cx="37" cy="152" rx="12" ry="10" fill={gc('lelbow_l')} stroke={gs('lelbow_l')} strokeWidth={sw} {...hit('lelbow_l')}/>
-      {/* FOREARM */}
-      <rect x="28" y="160" width="18" height="34" rx="9" fill={gc('lfarm_l')} stroke={gs('lfarm_l')} strokeWidth={sw} {...hit('lfarm_l')}/>
-      {/* WRIST/HAND */}
-      <ellipse cx="37" cy="200" rx="12" ry="9" fill={gc('lwrist_l')} stroke={gs('lwrist_l')} strokeWidth={sw} {...hit('lwrist_l')}/>
-      {/* HIP (front) */}
-      <ellipse cx="62" cy="164" rx="14" ry="12" fill={gc('lhip_l')} stroke={gs('lhip_l')} strokeWidth={sw} {...hit('lhip_l')}/>
+      <rect x="18" y="87" width="22" height="28" rx="6" fill={gc('llowback_l')||bC} stroke={gs('llowback_l')||bS} strokeWidth="1.5" {...hit('llowback_l')}/>
+      <text x="29" y="102" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={bS} style={{pointerEvents:'none'}}>Lower</text>
+      <text x="29" y="111" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={bS} style={{pointerEvents:'none'}}>Back</text>
       {/* GLUTE */}
-      <ellipse cx="42" cy="168" rx="16" ry="16" fill={gc('lglute_l')} stroke={gs('lglute_l')} strokeWidth={sw} {...hit('lglute_l')}/>
-      {/* THIGH */}
-      <rect x="48" y="180" width="22" height="52" rx="11" fill={gc('lthigh_l')} stroke={gs('lthigh_l')} strokeWidth={sw} {...hit('lthigh_l')}/>
-      {/* KNEE */}
-      <ellipse cx="59" cy="236" rx="14" ry="12" fill={gc('lknee_l')} stroke={gs('lknee_l')} strokeWidth={sw} {...hit('lknee_l')}/>
-      {/* SHIN/CALF */}
-      <rect x="48" y="246" width="22" height="46" rx="10" fill={gc('lshin_l')} stroke={gs('lshin_l')} strokeWidth={sw} {...hit('lshin_l')}/>
-      {/* ANKLE/FOOT */}
-      <ellipse cx="64" cy="298" rx="18" ry="10" fill={gc('lankle_l')} stroke={gs('lankle_l')} strokeWidth={sw} {...hit('lankle_l')}/>
+      <ellipse cx="26" cy="130" rx="13" ry="14" fill={gc('lglute_l')||bC} stroke={gs('lglute_l')||bS} strokeWidth="1.5" {...hit('lglute_l')}/>
+      <text x="26" y="133" textAnchor="middle" fontSize="6.5" fill={bS} style={{pointerEvents:'none'}}>Glute</text>
+      {/* ARM GROUP — on right side of torso */}
+      {/* Shoulder */}
+      <ellipse cx="81" cy="60" rx="11" ry="10" fill={gc('lshoulder_l')||aC} stroke={gs('lshoulder_l')||aS} strokeWidth="2" {...hit('lshoulder_l')}/>
+      <text x="81" y="63" textAnchor="middle" fontSize="6" fill={aS} style={{pointerEvents:'none'}}>Shoulder</text>
+      {/* Upper Arm */}
+      <rect x="75" y="70" width="15" height="28" rx="7" fill={gc('larm_l')||aC} stroke={gs('larm_l')||aS} strokeWidth="2" {...hit('larm_l')}/>
+      <text x="82" y="82" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={aS} style={{pointerEvents:'none'}}>Upper</text>
+      <text x="82" y="91" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={aS} style={{pointerEvents:'none'}}>Arm</text>
+      {/* Elbow */}
+      <ellipse cx="82" cy="101" rx="10" ry="7" fill={gc('lelbow_l')||aC} stroke={gs('lelbow_l')||aS} strokeWidth="2" {...hit('lelbow_l')}/>
+      <text x="82" y="104" textAnchor="middle" fontSize="6" fill={aS} style={{pointerEvents:'none'}}>Elbow</text>
+      {/* Lower Arm */}
+      <rect x="75" y="109" width="15" height="26" rx="7" fill={gc('lfarm_l')||aC} stroke={gs('lfarm_l')||aS} strokeWidth="2" {...hit('lfarm_l')}/>
+      <text x="82" y="120" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={aS} style={{pointerEvents:'none'}}>Lower</text>
+      <text x="82" y="129" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={aS} style={{pointerEvents:'none'}}>Arm</text>
+      {/* Hand */}
+      <ellipse cx="82" cy="143" rx="10" ry="7" fill={gc('lwrist_l')||aC} stroke={gs('lwrist_l')||aS} strokeWidth="2" {...hit('lwrist_l')}/>
+      <text x="82" y="146" textAnchor="middle" fontSize="6" fill={aS} style={{pointerEvents:'none'}}>Hand</text>
+      {/* LEG GROUP */}
+      {/* Thigh */}
+      <rect x="42" y="139" width="20" height="40" rx="9" fill={gc('lthigh_l')||lC} stroke={gs('lthigh_l')||lS} strokeWidth="2" {...hit('lthigh_l')}/>
+      <text x="52" y="162" textAnchor="middle" fontSize="7" fontWeight="700" fill={lS} style={{pointerEvents:'none'}}>Thigh</text>
+      {/* Knee */}
+      <ellipse cx="52" cy="182" rx="12" ry="9" fill={gc('lknee_l')||lC} stroke={gs('lknee_l')||lS} strokeWidth="2" {...hit('lknee_l')}/>
+      <text x="52" y="185" textAnchor="middle" fontSize="6" fill={lS} style={{pointerEvents:'none'}}>Knee</text>
+      {/* Shin/Calf */}
+      <rect x="42" y="193" width="20" height="38" rx="8" fill={gc('lshin_l')||lC} stroke={gs('lshin_l')||lS} strokeWidth="2" {...hit('lshin_l')}/>
+      <text x="52" y="210" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={lS} style={{pointerEvents:'none'}}>Shin</text>
+      <text x="52" y="220" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={lS} style={{pointerEvents:'none'}}>/Calf</text>
+      {/* Ankle/Foot */}
+      <ellipse cx="56" cy="238" rx="16" ry="8" fill={gc('lankle_l')||lC} stroke={gs('lankle_l')||lS} strokeWidth="2" {...hit('lankle_l')}/>
+      <text x="56" y="241" textAnchor="middle" fontSize="6" fill={lS} style={{pointerEvents:'none'}}>Ankle/Foot</text>
     </svg>
   );
 };
 
-// ── RIGHT LATERAL FIGURE (patient faces left → viewer sees right side) ──
+// ── RIGHT LATERAL FIGURE — patient faces left, right side visible, arm on LEFT of screen ──
 const FigureRight = ({ areaSymptoms, onAreaClick, mirror=false }) => {
   const _click = mirror ? (id) => onAreaClick(mirrorId(id)) : onAreaClick;
   const gc = mkColor(areaSymptoms);
   const gs = mkStroke(areaSymptoms);
   const sw = 1.5;
   const hit = (id) => ({ onClick: () => _click(id), style: { cursor: 'pointer' } });
+  const tC='#b8d8f0', tS='#1a6fa0';
+  const aC='#ffc878', aS='#c87020';
+  const lC='#d0e8c0', lS='#4a8a30';
+  const bC='#e0d0f8', bS='#7040a0';
+  const sC='#f0c8a0', sS='#c8966e';
   return (
-    <svg viewBox="0 0 120 340" width="100%" style={{maxWidth:160,display:'block',margin:'0 auto'}}>
-      {/* HEAD — profile facing left */}
-      <ellipse cx="55" cy="26" rx="18" ry="22" fill={gc('head_r')} stroke={gs('head_r')} strokeWidth={sw} {...hit('head_r')}/>
-      {/* Nose bump (left-facing) */}
-      <ellipse cx="40" cy="26" rx="7" ry="5" fill={gc('face')} stroke={gs('face')} strokeWidth="1" {...hit('face')}/>
-      {/* Eye */}
-      <circle cx="44" cy="21" r="2.5" fill="#c07850" opacity="0.7"/>
+    <svg viewBox="0 0 120 310" width="100%" style={{maxWidth:160,display:'block',margin:'0 auto'}}>
+      {/* HEAD — faces left */}
+      <ellipse cx="58" cy="22" rx="16" ry="19" fill={gc('head_r')||sC} stroke={gs('head_r')||sS} strokeWidth={sw} {...hit('head_r')}/>
+      <ellipse cx="44" cy="24" rx="6" ry="4" fill={gc('face')||sC} stroke={gs('face')||sS} strokeWidth="1" {...hit('face')}/>
+      <circle cx="48" cy="18" r="2" fill="#8a6040" opacity="0.7"/>
       {/* NECK */}
-      <rect x="48" y="46" width="14" height="14" rx="5" fill={gc('neck_r')} stroke={gs('neck_r')} strokeWidth={sw} {...hit('neck_r')}/>
-      {/* SHOULDER */}
-      <ellipse cx="65" cy="68" rx="16" ry="14" fill={gc('rshoulder_r')} stroke={gs('rshoulder_r')} strokeWidth={sw} {...hit('rshoulder_r')}/>
-      {/* CHEST (front of torso) */}
-      <rect x="38" y="60" width="26" height="60" rx="10" fill={gc('chest_r')} stroke={gs('chest_r')} strokeWidth={sw} {...hit('chest_r')}/>
+      <rect x="53" y="40" width="12" height="11" rx="4" fill={gc('neck_r')||sC} stroke={gs('neck_r')||sS} strokeWidth={sw} {...hit('neck_r')}/>
+      {/* UPPER TORSO */}
+      <rect x="46" y="51" width="36" height="34" rx="8" fill={gc('chest_r')||tC} stroke={gs('chest_r')||tS} strokeWidth="2" {...hit('chest_r')}/>
+      <text x="64" y="65" textAnchor="middle" fontSize="7" fontWeight="700" fill={tS} style={{pointerEvents:'none'}}>Upper</text>
+      <text x="64" y="74" textAnchor="middle" fontSize="7" fontWeight="700" fill={tS} style={{pointerEvents:'none'}}>Torso</text>
+      {/* LOWER TORSO */}
+      <rect x="46" y="87" width="36" height="28" rx="7" fill={gc('abdomen_r')||tC} stroke={gs('abdomen_r')||tS} strokeWidth="2" {...hit('abdomen_r')}/>
+      <text x="64" y="104" textAnchor="middle" fontSize="7" fontWeight="700" fill={tS} style={{pointerEvents:'none'}}>Lower</text>
+      <text x="64" y="113" textAnchor="middle" fontSize="7" fontWeight="700" fill={tS} style={{pointerEvents:'none'}}>Torso</text>
+      {/* HIP */}
+      <rect x="48" y="117" width="32" height="20" rx="6" fill={gc('rhip_r')||tC} stroke={gs('rhip_r')||tS} strokeWidth="1.5" {...hit('rhip_r')}/>
+      <text x="64" y="130" textAnchor="middle" fontSize="7" fill={tS} style={{pointerEvents:'none'}}>Hip</text>
       {/* UPPER BACK */}
-      <rect x="60" y="60" width="26" height="60" rx="10" fill={gc('rupback_r')} stroke={gs('rupback_r')} strokeWidth={sw} {...hit('rupback_r')}/>
-      {/* ABDOMEN */}
-      <rect x="38" y="116" width="26" height="40" rx="8" fill={gc('abdomen_r')} stroke={gs('abdomen_r')} strokeWidth={sw} {...hit('abdomen_r')}/>
+      <rect x="80" y="51" width="22" height="34" rx="7" fill={gc('rupback_r')||bC} stroke={gs('rupback_r')||bS} strokeWidth="1.5" {...hit('rupback_r')}/>
+      <text x="91" y="66" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={bS} style={{pointerEvents:'none'}}>Upper</text>
+      <text x="91" y="75" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={bS} style={{pointerEvents:'none'}}>Back</text>
       {/* LOWER BACK */}
-      <rect x="60" y="116" width="26" height="40" rx="8" fill={gc('rlowback_r')} stroke={gs('rlowback_r')} strokeWidth={sw} {...hit('rlowback_r')}/>
-      {/* ARM */}
-      <rect x="74" y="76" width="18" height="72" rx="9" fill={gc('rarm_r')} stroke={gs('rarm_r')} strokeWidth={sw} {...hit('rarm_r')}/>
-      {/* ELBOW */}
-      <ellipse cx="83" cy="152" rx="12" ry="10" fill={gc('relbow_r')} stroke={gs('relbow_r')} strokeWidth={sw} {...hit('relbow_r')}/>
-      {/* FOREARM */}
-      <rect x="74" y="160" width="18" height="34" rx="9" fill={gc('rfarm_r')} stroke={gs('rfarm_r')} strokeWidth={sw} {...hit('rfarm_r')}/>
-      {/* WRIST/HAND */}
-      <ellipse cx="83" cy="200" rx="12" ry="9" fill={gc('rwrist_r')} stroke={gs('rwrist_r')} strokeWidth={sw} {...hit('rwrist_r')}/>
-      {/* HIP (front) */}
-      <ellipse cx="58" cy="164" rx="14" ry="12" fill={gc('rhip_r')} stroke={gs('rhip_r')} strokeWidth={sw} {...hit('rhip_r')}/>
+      <rect x="80" y="87" width="22" height="28" rx="6" fill={gc('rlowback_r')||bC} stroke={gs('rlowback_r')||bS} strokeWidth="1.5" {...hit('rlowback_r')}/>
+      <text x="91" y="102" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={bS} style={{pointerEvents:'none'}}>Lower</text>
+      <text x="91" y="111" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={bS} style={{pointerEvents:'none'}}>Back</text>
       {/* GLUTE */}
-      <ellipse cx="78" cy="168" rx="16" ry="16" fill={gc('rglute_r')} stroke={gs('rglute_r')} strokeWidth={sw} {...hit('rglute_r')}/>
-      {/* THIGH */}
-      <rect x="50" y="180" width="22" height="52" rx="11" fill={gc('rthigh_r')} stroke={gs('rthigh_r')} strokeWidth={sw} {...hit('rthigh_r')}/>
-      {/* KNEE */}
-      <ellipse cx="61" cy="236" rx="14" ry="12" fill={gc('rknee_r')} stroke={gs('rknee_r')} strokeWidth={sw} {...hit('rknee_r')}/>
-      {/* SHIN/CALF */}
-      <rect x="50" y="246" width="22" height="46" rx="10" fill={gc('rshin_r')} stroke={gs('rshin_r')} strokeWidth={sw} {...hit('rshin_r')}/>
-      {/* ANKLE/FOOT */}
-      <ellipse cx="56" cy="298" rx="18" ry="10" fill={gc('rankle_r')} stroke={gs('rankle_r')} strokeWidth={sw} {...hit('rankle_r')}/>
+      <ellipse cx="94" cy="130" rx="13" ry="14" fill={gc('rglute_r')||bC} stroke={gs('rglute_r')||bS} strokeWidth="1.5" {...hit('rglute_r')}/>
+      <text x="94" y="133" textAnchor="middle" fontSize="6.5" fill={bS} style={{pointerEvents:'none'}}>Glute</text>
+      {/* ARM GROUP — on left side of torso */}
+      <ellipse cx="39" cy="60" rx="11" ry="10" fill={gc('rshoulder_r')||aC} stroke={gs('rshoulder_r')||aS} strokeWidth="2" {...hit('rshoulder_r')}/>
+      <text x="39" y="63" textAnchor="middle" fontSize="6" fill={aS} style={{pointerEvents:'none'}}>Shoulder</text>
+      <rect x="31" y="70" width="15" height="28" rx="7" fill={gc('rarm_r')||aC} stroke={gs('rarm_r')||aS} strokeWidth="2" {...hit('rarm_r')}/>
+      <text x="38" y="82" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={aS} style={{pointerEvents:'none'}}>Upper</text>
+      <text x="38" y="91" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={aS} style={{pointerEvents:'none'}}>Arm</text>
+      <ellipse cx="38" cy="101" rx="10" ry="7" fill={gc('relbow_r')||aC} stroke={gs('relbow_r')||aS} strokeWidth="2" {...hit('relbow_r')}/>
+      <text x="38" y="104" textAnchor="middle" fontSize="6" fill={aS} style={{pointerEvents:'none'}}>Elbow</text>
+      <rect x="31" y="109" width="15" height="26" rx="7" fill={gc('rfarm_r')||aC} stroke={gs('rfarm_r')||aS} strokeWidth="2" {...hit('rfarm_r')}/>
+      <text x="38" y="120" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={aS} style={{pointerEvents:'none'}}>Lower</text>
+      <text x="38" y="129" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={aS} style={{pointerEvents:'none'}}>Arm</text>
+      <ellipse cx="38" cy="143" rx="10" ry="7" fill={gc('rwrist_r')||aC} stroke={gs('rwrist_r')||aS} strokeWidth="2" {...hit('rwrist_r')}/>
+      <text x="38" y="146" textAnchor="middle" fontSize="6" fill={aS} style={{pointerEvents:'none'}}>Hand</text>
+      {/* LEG GROUP */}
+      <rect x="58" y="139" width="20" height="40" rx="9" fill={gc('rthigh_r')||lC} stroke={gs('rthigh_r')||lS} strokeWidth="2" {...hit('rthigh_r')}/>
+      <text x="68" y="162" textAnchor="middle" fontSize="7" fontWeight="700" fill={lS} style={{pointerEvents:'none'}}>Thigh</text>
+      <ellipse cx="68" cy="182" rx="12" ry="9" fill={gc('rknee_r')||lC} stroke={gs('rknee_r')||lS} strokeWidth="2" {...hit('rknee_r')}/>
+      <text x="68" y="185" textAnchor="middle" fontSize="6" fill={lS} style={{pointerEvents:'none'}}>Knee</text>
+      <rect x="58" y="193" width="20" height="38" rx="8" fill={gc('rshin_r')||lC} stroke={gs('rshin_r')||lS} strokeWidth="2" {...hit('rshin_r')}/>
+      <text x="68" y="210" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={lS} style={{pointerEvents:'none'}}>Shin</text>
+      <text x="68" y="220" textAnchor="middle" fontSize="6.5" fontWeight="700" fill={lS} style={{pointerEvents:'none'}}>/Calf</text>
+      <ellipse cx="64" cy="238" rx="16" ry="8" fill={gc('rankle_r')||lC} stroke={gs('rankle_r')||lS} strokeWidth="2" {...hit('rankle_r')}/>
+      <text x="64" y="241" textAnchor="middle" fontSize="6" fill={lS} style={{pointerEvents:'none'}}>Ankle/Foot</text>
     </svg>
   );
 };
@@ -654,16 +700,6 @@ const AREAS_BY_SIDE = {
     {id:'lheel',label:'L. Heel'},{id:'rheel',label:'R. Heel'},
   ],
   left: [
-    {id:'head_r',label:'Head (right)'},{id:'face',label:'Face (right)'},{id:'neck_r',label:'Neck (right)'},
-    {id:'rshoulder_r',label:'R. Shoulder'},{id:'chest_r',label:'Chest (right)'},
-    {id:'rupback_r',label:'Upper Back (right)'},{id:'rarm_r',label:'R. Upper Arm'},
-    {id:'relbow_r',label:'R. Elbow'},{id:'rfarm_r',label:'R. Forearm'},{id:'rwrist_r',label:'R. Wrist/Hand'},
-    {id:'abdomen_r',label:'Abdomen (right)'},{id:'rlowback_r',label:'R. Lower Back'},
-    {id:'rhip_r',label:'R. Hip'},{id:'rglute_r',label:'R. Glute'},
-    {id:'rthigh_r',label:'R. Thigh'},{id:'rknee_r',label:'R. Knee'},
-    {id:'rshin_r',label:'R. Shin/Calf'},{id:'rankle_r',label:'R. Ankle/Foot'},
-  ],
-  right: [
     {id:'head_l',label:'Head (left)'},{id:'face',label:'Face (left)'},{id:'neck_l',label:'Neck (left)'},
     {id:'lshoulder_l',label:'L. Shoulder'},{id:'chest_l',label:'Chest (left)'},
     {id:'lupback_l',label:'Upper Back (left)'},{id:'larm_l',label:'L. Upper Arm'},
@@ -672,6 +708,16 @@ const AREAS_BY_SIDE = {
     {id:'lhip_l',label:'L. Hip'},{id:'lglute_l',label:'L. Glute'},
     {id:'lthigh_l',label:'L. Thigh'},{id:'lknee_l',label:'L. Knee'},
     {id:'lshin_l',label:'L. Shin/Calf'},{id:'lankle_l',label:'L. Ankle/Foot'},
+  ],
+  right: [
+    {id:'head_r',label:'Head (right)'},{id:'face',label:'Face (right)'},{id:'neck_r',label:'Neck (right)'},
+    {id:'rshoulder_r',label:'R. Shoulder'},{id:'chest_r',label:'Chest (right)'},
+    {id:'rupback_r',label:'Upper Back (right)'},{id:'rarm_r',label:'R. Upper Arm'},
+    {id:'relbow_r',label:'R. Elbow'},{id:'rfarm_r',label:'R. Forearm'},{id:'rwrist_r',label:'R. Wrist/Hand'},
+    {id:'abdomen_r',label:'Abdomen (right)'},{id:'rlowback_r',label:'R. Lower Back'},
+    {id:'rhip_r',label:'R. Hip'},{id:'rglute_r',label:'R. Glute'},
+    {id:'rthigh_r',label:'R. Thigh'},{id:'rknee_r',label:'R. Knee'},
+    {id:'rshin_r',label:'R. Shin/Calf'},{id:'rankle_r',label:'R. Ankle/Foot'},
   ],
 };
 
@@ -877,8 +923,8 @@ const BodyMapV2 = ({ user, areaSymptoms, onSave, bodyType = 'normal' }) => {
             <div style={{fontSize:11,color:C.textLight,textAlign:'center',marginBottom:8}}>Tap to select · Colors show saved pain</div>
             {side==='front' && <FigureFront areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
             {side==='back' && <FigureBack areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
-            {side==='left' && <FigureRight areaSymptoms={areaSymptoms} onAreaClick={openArea} mirror={true}/>}
-            {side==='right' && <FigureLeft areaSymptoms={areaSymptoms} onAreaClick={openArea} mirror={true}/>}
+            {side==='left' && <FigureLeft areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
+            {side==='right' && <FigureRight areaSymptoms={areaSymptoms} onAreaClick={openArea}/>}
           </div>
         </>
       )}
