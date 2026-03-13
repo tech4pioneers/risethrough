@@ -983,10 +983,24 @@ const CHANNELS=[
   ]},
 ];
 
+const SEED_AREAS=[
+  [{id:"lknee",label:"Left knee",maxIntensity:7,subareas:{patella:7,lateral:5},hasSwelling:true,hasNumbness:false},
+   {id:"llowback",label:"Lower back",maxIntensity:5,subareas:{lumbar:5},hasSwelling:false,hasNumbness:false}],
+  [{id:"rshoulder",label:"Right shoulder",maxIntensity:6,subareas:{"deltoid":6,"rotator cuff":4},hasSwelling:false,hasNumbness:true}],
+  [{id:"neck_f",label:"Neck",maxIntensity:4,subareas:{"cervical":4},hasSwelling:false,hasNumbness:false},
+   {id:"lknee",label:"Left knee",maxIntensity:8,subareas:{patella:8,lateral:6},hasSwelling:true,hasNumbness:false}],
+  [{id:"llowback",label:"Lower back",maxIntensity:6,subareas:{lumbar:6,"left hip":4},hasSwelling:false,hasNumbness:false}],
+  [{id:"lknee",label:"Left knee",maxIntensity:5,subareas:{patella:5},hasSwelling:false,hasNumbness:false}],
+  [{id:"rshoulder",label:"Right shoulder",maxIntensity:7,subareas:{"deltoid":7,"rotator cuff":5},hasSwelling:true,hasNumbness:false},
+   {id:"neck_f",label:"Neck",maxIntensity:3,subareas:{"cervical":3},hasSwelling:false,hasNumbness:false}],
+  [{id:"llowback",label:"Lower back",maxIntensity:4,subareas:{lumbar:4},hasSwelling:false,hasNumbness:false}],
+];
+const SEED_NOTES=["Rough morning but better after lunch","","Tension after long sit","Hard day overall","Better than yesterday","Struggled with movement","Manageable with rest"];
 const seedHistory=()=>Array.from({length:7},(_,i)=>{
   const pain=Math.floor(Math.random()*5)+3,mood=Math.floor(Math.random()*3)+2,checks=Math.floor(Math.random()*4)+1;
+  const traumaChecks={sleep:i%3===0,anxiety:i%2===0,trigger:i%4===0,safe:i%2!==0,grounded:i%3!==0,support:i%5===0};
   return{id:i,date:DAYS[i],fullDate:new Date(Date.now()-(6-i)*86400000).toLocaleDateString("en-US",{month:"short",day:"numeric"}),
-    painLevel:pain,mood,checkedCount:checks,areas:[],notes:"",score:Math.round(((10-pain)*3+mood*4+checks*5)/3)};
+    painLevel:pain,mood,checkedCount:checks,areas:SEED_AREAS[i]||[],notes:SEED_NOTES[i]||"",traumaChecks,score:Math.round(((10-pain)*3+mood*4+checks*5)/3)};
 });
 
 /* ── Logo SVG ── */
@@ -1466,7 +1480,7 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
   const handleSubmit=()=>{
     const score=Math.min(30,Math.round(((10-painLevel)*3+(mood||3)*4+checkedCount*5)/3));
     const areas=Object.entries(areaSymptoms).filter(([,d])=>d?.maxIntensity>0).map(([id,data])=>({id,...data}));
-    setHistory(prev=>[...prev.slice(-13),{id:Date.now(),date:new Date().toLocaleDateString("en-US",{weekday:"short"}),fullDate:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),painLevel,mood,checkedCount,areas,notes,score}]);
+    setHistory(prev=>[...prev.slice(-13),{id:Date.now(),date:new Date().toLocaleDateString("en-US",{weekday:"short"}),fullDate:new Date().toLocaleDateString("en-US",{month:"short",day:"numeric"}),painLevel,mood,checkedCount,traumaChecks,areas,notes,score}]);
     setScreen("results");
   };
   const resetForm=()=>{setPainLevel(5);setAreaSymptoms({});setTraumaChecks({});setMood(null);setNotes("");setScreen("form");};
