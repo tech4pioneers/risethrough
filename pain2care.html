@@ -2885,31 +2885,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
         </GCard>
       )}
 
-      <GCard>
-        <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:13}}>📤 Share With</div>
-        {[
-          {icon:"👮",label:"Police / Law Enforcement"},
-          {icon:"🏥",label:"Healthcare Provider"},
-          {icon:"👥",label:"Social Workers"},
-          {icon:"👫",label:"Trusted Friend"},
-        ].map((item,i,arr)=>(
-          <div key={item.label} onClick={()=>{
-            if(records.length===0) return;
-            if(!recordsUnlocked){
-              if(!pin){setScreen("pinSetup");}
-              else{setScreen("pinEntryRecords");setPinInput("");setPinError("");}
-              return;
-            }
-            setActiveDoc(records[0]);setScreen("viewDoc");
-          }}
-            style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:records.length>0?"pointer":"default",opacity:records.length>0?1:0.4}}>
-            <span style={{fontSize:20}}>{item.icon}</span>
-            <span style={{flex:1,fontSize:13,fontWeight:600,color:C.textMid}}>{item.label}</span>
-            <span style={{fontSize:15,color:records.length>0?C.purple:C.textLight}}>→</span>
-          </div>
-        ))}
-        {records.length===0&&<div style={{fontSize:11,color:C.textLight,textAlign:"center",marginTop:8}}>Add a record first to share</div>}
-      </GCard>
+
     </div>
   );
 };
