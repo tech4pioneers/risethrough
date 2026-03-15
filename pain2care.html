@@ -2485,6 +2485,58 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
 };
 
 /* ══ VIOLENCE MODULE ══ */
+const ViolencePdfShare=({activeDoc,user})=>{
+  const [pdfPinInput,setPdfPinInput]=useState("");
+  const [pdfPinError,setPdfPinError]=useState("");
+  const [showPdfPin,setShowPdfPin]=useState(false);
+  const storedPin=localStorage.getItem(`p2c_vpin_${user?.uid||user?.email||"local"}`);
+  const doShare=async()=>{
+    const r=window.generatePDF({...activeDoc,returnBlob:true},null);
+    if(r&&r.blob) await window.sharePDF(r);
+    else alert("PDF generation failed.");
+  };
+  return(
+    <div style={{padding:"0 18px",marginTop:8,marginBottom:28}}>
+      {!showPdfPin
+        ?<button onClick={()=>{if(!storedPin){doShare();}else{setShowPdfPin(true);setPdfPinInput("");setPdfPinError("");}}}
+          style={{width:"100%",padding:"13px",borderRadius:50,border:"none",cursor:"pointer",
+            fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:14,color:"#fff",
+            background:"linear-gradient(135deg,#16a34a,#15803d)",
+            boxShadow:"0 4px 14px rgba(22,163,74,0.35)"}}>
+          📤 Share PDF Report
+        </button>
+        :<div className="glass" style={{borderRadius:14,padding:16}}>
+          <div style={{fontWeight:700,fontSize:13,color:C.textDark,marginBottom:10}}>🔒 Enter PIN to share PDF</div>
+          <input type="password" inputMode="numeric" maxLength={6} value={pdfPinInput}
+            onChange={e=>setPdfPinInput(e.target.value)}
+            placeholder="Enter your PIN"
+            style={{width:"100%",padding:"10px 14px",borderRadius:10,border:"1.5px solid rgba(26,111,160,0.25)",
+              fontSize:18,textAlign:"center",letterSpacing:"0.3em",boxSizing:"border-box",
+              fontFamily:"'Nunito',sans-serif",outline:"none",marginBottom:8}}/>
+          {pdfPinError&&<div style={{fontSize:12,color:C.red,marginBottom:8,textAlign:"center"}}>⚠️ {pdfPinError}</div>}
+          <div style={{display:"flex",gap:8}}>
+            <button onClick={()=>setShowPdfPin(false)}
+              style={{flex:1,padding:"10px",borderRadius:50,border:"1.5px solid rgba(26,111,160,0.2)",
+                background:"transparent",fontFamily:"'Nunito',sans-serif",fontWeight:700,fontSize:13,
+                cursor:"pointer",color:C.textLight}}>
+              Cancel
+            </button>
+            <button onClick={async()=>{
+              if(pdfPinInput===storedPin){setShowPdfPin(false);await doShare();}
+              else{setPdfPinError("Incorrect PIN. Try again.");setPdfPinInput("");}
+            }}
+              style={{flex:2,padding:"10px",borderRadius:50,border:"none",
+                background:"linear-gradient(135deg,#16a34a,#15803d)",color:"#fff",
+                fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:13,cursor:"pointer"}}>
+              📤 Share PDF
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  );
+};
+
 const ViolenceModule=({user,onShowPaywall,onBack})=>{
   const T=getLang(user);
   const isPaid=["normal_monthly","normal_annual","premium_monthly","premium_annual"].includes(user?.plan);
@@ -2797,23 +2849,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
         }} className="btn-outline" style={{flex:1,borderColor:"rgba(230,57,70,0.3)",color:C.red}}>🗑 Delete</button>
 
       </div>
-      <div style={{padding:"0 18px",marginTop:8,marginBottom:28}}>
-        <button onClick={async()=>{
-          // PIN check before opening PDF
-          const storedPin=localStorage.getItem(`p2c_vpin_${user?.uid||user?.email||"local"}`);
-          if(!storedPin){ const r=window.generatePDF({...activeDoc,returnBlob:true},null); if(r) window.sharePDF(r); return; }
-          const entered=window.prompt("Enter your PIN to open PDF:");
-          if(entered===null) return;
-          if(entered===storedPin){ const r=window.generatePDF({...activeDoc,returnBlob:true},null); if(r) window.sharePDF(r); }
-          else { alert("Incorrect PIN. PDF access denied."); }
-        }}
-          style={{width:"100%",padding:"13px",borderRadius:50,border:"none",cursor:"pointer",
-            fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:14,color:"#fff",
-            background:"linear-gradient(135deg,#16a34a,#15803d)",
-            boxShadow:"0 4px 14px rgba(22,163,74,0.35)"}}>
-          📤 Share PDF Report
-        </button>
-      </div>
+      <ViolencePdfShare activeDoc={activeDoc} user={user}/>
     </div>
   );
 
