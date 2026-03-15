@@ -4136,9 +4136,16 @@ const AdminDashboard = () => {
         )}
 
         {/* DISCOUNT CODES */}
-        {tab==="codes" && (()=>{
-          const [codeFrom,setCodeFrom]=React.useState("");
-          const [codeTo,setCodeTo]=React.useState("");
+        {tab==="codes" && <CodesTab subs={subs}/>}
+
+      </div>
+    </div>
+  );
+};
+
+const CodesTab=({subs})=>{
+  const [codeFrom,setCodeFrom]=useState("");
+  const [codeTo,setCodeTo]=useState("");
           const filteredSubs=subs.filter(s=>{
             if(!s.subscribedAt) return true;
             const d=new Date(s.subscribedAt);
@@ -4150,8 +4157,8 @@ const AdminDashboard = () => {
           const overallRevenue=filteredPaid.reduce((a,b)=>a+(b.revenue||0),0);
           const overallDiscount=filteredPaid.filter(s=>s.discountCode).reduce((a,b)=>a+(b.revenue||0)*0.1,0);
           const discountCount=filteredPaid.filter(s=>s.discountCode).length;
-          return(
-          <div>
+  return(
+    <div>
             {/* Date filter */}
             <div style={{background:"#fff",borderRadius:14,padding:"16px 20px",boxShadow:"0 2px 8px rgba(0,0,0,0.06)",border:"1px solid #e8f0f7",marginBottom:16}}>
               <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:12}}>🗓️ Filter by Date Range</div>
@@ -4218,12 +4225,7 @@ const AdminDashboard = () => {
             </div>
           </div>
           );
-        })()}
-
-      </div>
-    </div>
-  );
-};
+        };
 
 const MainApp=({user:initialUser,onLogout,onShowPaywall})=>{
   const [tab,setTab]=useState("home");
