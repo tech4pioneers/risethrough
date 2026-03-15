@@ -2793,10 +2793,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
           saveRecords(updated);
           setActiveDoc(null);setScreen("main");
         }} className="btn-outline" style={{flex:1,borderColor:"rgba(230,57,70,0.3)",color:C.red}}>🗑 Delete</button>
-        <button onClick={()=>setScreen("share")}
-          className="btn-blue" style={{flex:2,background:`linear-gradient(135deg,${C.purple},#9c4fbf)`}}>
-          📤 Share Record
-        </button>
+
       </div>
       <div style={{padding:"0 18px",marginTop:8,marginBottom:28}}>
         <button onClick={()=>{
@@ -2818,86 +2815,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
     </div>
   );
 
-  // Share screen
-  if(screen==="share"&&activeDoc) return(
-    <div style={{animation:"fadeIn 0.3s ease both"}}>
-      <div style={{padding:"18px 22px 0",display:"flex",alignItems:"center",gap:10}}>
-        <button onClick={()=>setScreen("viewDoc")} style={{background:"rgba(26,111,160,0.09)",border:"none",borderRadius:9,padding:"5px 12px",fontSize:12,fontWeight:700,color:C.blue,cursor:"pointer"}}>{T.back_btn}</button>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:17,color:C.purple}}>📤 Share Record</div>
-      </div>
-      <GCard style={{marginTop:14,background:"rgba(123,63,158,0.05)",border:"1px solid rgba(123,63,158,0.15)"}}>
-        <div style={{fontSize:13,color:C.textMid,marginBottom:4}}>Sharing: <strong>{activeDoc.type}</strong></div>
-        <div style={{fontSize:12,color:C.textLight}}>{activeDoc.date}{activeDoc.location?` · ${activeDoc.location}`:""}</div>
-      </GCard>
-      <GCard>
-        <div style={{fontWeight:800,fontSize:13,color:C.textDark,marginBottom:14}}>Who do you want to share with?</div>
-        {[
-          {icon:"👮",label:"Police / Law Enforcement",desc:"Share as official evidence report"},
-          {icon:"🏥",label:"Healthcare Provider",desc:"Share with your doctor or nurse"},
-          {icon:"👥",label:"Social Workers",desc:"Share with social services"},
-          {icon:"👫",label:"Trusted Friend",desc:"Share with someone you trust"},
-        ].map((item,i,arr)=>{
-          const alreadyShared=activeDoc.shareLog?.some(l=>l.recipient===item.label);
-          return(
-            <div key={item.label} onClick={()=>{
-              const now=new Date();
-              const dateStr=now.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"});
-              const newLog={recipient:item.label,icon:item.icon,date:dateStr,ts:Date.now()};
-              const updatedDoc={
-                ...activeDoc,
-                shared:true,
-                shareLog:[...(activeDoc.shareLog||[]),newLog]
-              };
-              const updatedRecords=records.map(r=>r.id===activeDoc.id?updatedDoc:r);
-              saveRecords(updatedRecords);
-              setActiveDoc(updatedDoc);
-              setScreen("shareConfirm");
-            }}
-              style={{display:"flex",alignItems:"center",gap:12,padding:"13px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:"pointer",opacity:1}}>
-              <div style={{width:44,height:44,borderRadius:13,background:alreadyShared?"rgba(45,154,110,0.12)":"rgba(123,63,158,0.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:21,flexShrink:0}}>{item.icon}</div>
-              <div style={{flex:1}}>
-                <div style={{fontWeight:700,fontSize:13,color:C.textDark}}>{item.label}</div>
-                <div style={{fontSize:11,color:C.textLight,marginTop:2}}>{alreadyShared?"Already shared — share again?":item.desc}</div>
-              </div>
-              {alreadyShared
-                ?<span style={{fontSize:10,background:"rgba(45,154,110,0.12)",color:C.green,borderRadius:7,padding:"2px 8px",fontWeight:700}}>✓ Shared</span>
-                :<span style={{fontSize:15,color:C.purple}}>→</span>}
-            </div>
-          );
-        })}
-      </GCard>
-    </div>
-  );
 
-  // Share confirmation
-  if(screen==="shareConfirm"&&activeDoc){
-    const lastShare=activeDoc.shareLog?.[activeDoc.shareLog.length-1];
-
-    return(
-      <div style={{animation:"scaleIn 0.3s ease both",minHeight:"60vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 24px",gap:16}}>
-        <div style={{fontSize:56}}>✅</div>
-        <div style={{fontFamily:"'Montserrat',sans-serif",fontWeight:800,fontSize:22,color:C.green,textAlign:"center"}}>Record Shared!</div>
-        <div style={{fontSize:14,color:C.textMid,textAlign:"center",lineHeight:1.7}}>
-          <strong>{activeDoc.type}</strong> prepared for<br/>
-          <strong>{lastShare?.icon} {lastShare?.recipient}</strong><br/>
-          <span style={{fontSize:12,color:C.textLight}}>{lastShare?.date}</span>
-        </div>
-
-        {/* PDF download */}
-        <div style={{width:"100%",maxWidth:320,background:"rgba(123,63,158,0.07)",border:"1px solid rgba(123,63,158,0.2)",borderRadius:16,padding:"16px 18px"}}>
-          <div style={{fontWeight:800,fontSize:13,color:C.purple,marginBottom:6}}>📄 Download PDF Report</div>
-          <div style={{fontSize:12,color:C.textLight,marginBottom:12,lineHeight:1.5}}>A confidential report with all incident details, ready to share with {lastShare?.recipient}.</div>
-          <button onClick={()=>window.generatePDF(activeDoc,lastShare)}
-            style={{width:"100%",padding:"13px",borderRadius:50,border:"none",background:`linear-gradient(135deg,${C.purple},#9c4fbf)`,color:"#fff",fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:14,cursor:"pointer"}}>
-            ⬇️ Download PDF
-          </button>
-        </div>
-
-        <button onClick={()=>setScreen("viewDoc")} className="btn-blue" style={{width:"100%",maxWidth:320}}>← Back to Record</button>
-        <button onClick={()=>setScreen("share")} className="btn-outline" style={{width:"100%",maxWidth:320}}>Share with Someone Else</button>
-      </div>
-    );
-  }
 
   // Main screen
   return(
@@ -2982,7 +2900,7 @@ const ViolenceModule=({user,onShowPaywall,onBack})=>{
               else{setScreen("pinEntryRecords");setPinInput("");setPinError("");}
               return;
             }
-            setActiveDoc(records[0]);setScreen("share");
+            setActiveDoc(records[0]);setScreen("viewDoc");
           }}
             style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderBottom:i<arr.length-1?"1px solid rgba(26,111,160,0.09)":"none",cursor:records.length>0?"pointer":"default",opacity:records.length>0?1:0.4}}>
             <span style={{fontSize:20}}>{item.icon}</span>
