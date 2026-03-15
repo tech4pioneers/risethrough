@@ -4136,28 +4136,89 @@ const AdminDashboard = () => {
         )}
 
         {/* DISCOUNT CODES */}
-        {tab==="codes" && (
-          <div style={{background:"#fff",borderRadius:14,padding:20,boxShadow:"0 2px 8px rgba(0,0,0,0.06)",border:"1px solid #e8f0f7"}}>
-            <div style={{fontWeight:800,fontSize:15,color:C.textDark,marginBottom:16}}>Discount Codes (10% off)</div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:12}}>
-              {DISCOUNT_CODES_LIST.map(code=>{
-                const usages=subs.filter(s=>s.discountCode===code);
-                const saved=usages.reduce((a,b)=>a+(b.revenue||0)*0.1,0);
-                return(
-                  <div key={code} style={{background:"#f8fafc",borderRadius:12,padding:"14px 16px",border:"1px solid #e0eaf0"}}>
-                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-                      <code style={{fontSize:14,fontWeight:800,color:C.blue,letterSpacing:"0.05em"}}>{code}</code>
-                      <span style={{fontSize:11,background:"rgba(26,160,100,0.1)",color:"#1a8a50",padding:"2px 8px",borderRadius:50,fontWeight:700}}>10% OFF</span>
-                    </div>
-                    <div style={{fontSize:12,color:C.textLight}}>Used: <strong style={{color:C.textDark}}>{usages.length}×</strong></div>
-                    <div style={{fontSize:12,color:C.textLight}}>Discount given: <strong style={{color:C.red}}>-€{saved.toFixed(2)}</strong></div>
-                    <div style={{fontSize:11,color:C.textLight,marginTop:4}}>Valid: Normal & Premium · Monthly & Annual</div>
+        {tab==="codes" && (()=>{
+          const [codeFrom,setCodeFrom]=React.useState("");
+          const [codeTo,setCodeTo]=React.useState("");
+          const filteredSubs=subs.filter(s=>{
+            if(!s.subscribedAt) return true;
+            const d=new Date(s.subscribedAt);
+            if(codeFrom && d < new Date(codeFrom)) return false;
+            if(codeTo && d > new Date(codeTo+"T23:59:59")) return false;
+            return true;
+          });
+          const filteredPaid=filteredSubs.filter(s=>s.plan&&s.plan!=="trial");
+          const overallRevenue=filteredPaid.reduce((a,b)=>a+(b.revenue||0),0);
+          const overallDiscount=filteredPaid.filter(s=>s.discountCode).reduce((a,b)=>a+(b.revenue||0)*0.1,0);
+          const discountCount=filteredPaid.filter(s=>s.discountCode).length;
+          return(
+          <div>
+            {/* Date filter */}
+            <div style={{background:"#fff",borderRadius:14,padding:"16px 20px",boxShadow:"0 2px 8px rgba(0,0,0,0.06)",border:"1px solid #e8f0f7",marginBottom:16}}>
+              <div style={{fontWeight:800,fontSize:14,color:C.textDark,marginBottom:12}}>🗓️ Filter by Date Range</div>
+              <div style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+                <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                  <label style={{fontSize:11,fontWeight:700,color:C.textLight}}>FROM</label>
+                  <input type="date" value={codeFrom} onChange={e=>setCodeFrom(e.target.value)}
+                    style={{padding:"8px 10px",borderRadius:8,border:"1px solid #d0e4f0",fontSize:13,color:C.textDark,background:"#f8fafc",outline:"none"}}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:4}}>
+                  <label style={{fontSize:11,fontWeight:700,color:C.textLight}}>TO</label>
+                  <input type="date" value={codeTo} onChange={e=>setCodeTo(e.target.value)}
+                    style={{padding:"8px 10px",borderRadius:8,border:"1px solid #d0e4f0",fontSize:13,color:C.textDark,background:"#f8fafc",outline:"none"}}/>
+                </div>
+                {(codeFrom||codeTo)&&<button onClick={()=>{setCodeFrom("");setCodeTo("");}}
+                  style={{marginTop:18,padding:"8px 14px",borderRadius:8,border:"none",background:"rgba(230,57,70,0.1)",color:C.red,fontWeight:700,fontSize:12,cursor:"pointer"}}>
+                  ✕ Clear
+                </button>}
+                <div style={{marginTop:18,fontSize:12,color:C.textLight}}>
+                  {filteredPaid.length} transaction{filteredPaid.length!==1?"s":""} in range
+                </div>
+              </div>
+            </div>
+            {/* Overall Revenue Summary */}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:12,marginBottom:16}}>
+              {[
+                {label:"Overall Revenue",value:"€"+overallRevenue.toFixed(2),icon:"💰",color:"#16a34a",sub:"gross in period"},
+                {label:"Discount Revenue Lost",value:"-€"+overallDiscount.toFixed(2),icon:"🏷️",color:C.red,sub:`${discountCount} discounted orders`},
+                {label:"Net Revenue",value:"€"+(overallRevenue).toFixed(2),icon:"📈",color:C.blue,sub:"after discount applied"},
+                {label:"Avg Order Value",value:filteredPaid.length?"€"+(overallRevenue/filteredPaid.length).toFixed(2):"—",icon:"🧾",color:C.purple,sub:`${filteredPaid.length} orders`},
+              ].map(s=>(
+                <div key={s.label} style={{background:"#fff",borderRadius:12,padding:"14px 16px",boxShadow:"0 2px 8px rgba(0,0,0,0.06)",border:"1px solid #e8f0f7"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                    <div style={{fontSize:11,fontWeight:700,color:C.textLight,textTransform:"uppercase",letterSpacing:"0.07em"}}>{s.label}</div>
+                    <span style={{fontSize:18}}>{s.icon}</span>
                   </div>
-                );
-              })}
+                  <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:24,fontWeight:800,color:s.color}}>{s.value}</div>
+                  <div style={{fontSize:11,color:C.textLight,marginTop:3}}>{s.sub}</div>
+                </div>
+              ))}
+            </div>
+            {/* Code cards */}
+            <div style={{background:"#fff",borderRadius:14,padding:20,boxShadow:"0 2px 8px rgba(0,0,0,0.06)",border:"1px solid #e8f0f7"}}>
+              <div style={{fontWeight:800,fontSize:15,color:C.textDark,marginBottom:16}}>Discount Codes (10% off)</div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:12}}>
+                {DISCOUNT_CODES_LIST.map(code=>{
+                  const usages=filteredSubs.filter(s=>s.discountCode===code);
+                  const revenue=usages.reduce((a,b)=>a+(b.revenue||0),0);
+                  const saved=revenue*0.1;
+                  return(
+                    <div key={code} style={{background:"#f8fafc",borderRadius:12,padding:"14px 16px",border:"1px solid #e0eaf0"}}>
+                      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                        <code style={{fontSize:14,fontWeight:800,color:C.blue,letterSpacing:"0.05em"}}>{code}</code>
+                        <span style={{fontSize:11,background:"rgba(26,160,100,0.1)",color:"#1a8a50",padding:"2px 8px",borderRadius:50,fontWeight:700}}>10% OFF</span>
+                      </div>
+                      <div style={{fontSize:12,color:C.textLight}}>Used: <strong style={{color:C.textDark}}>{usages.length}×</strong></div>
+                      <div style={{fontSize:12,color:C.textLight}}>Revenue: <strong style={{color:"#16a34a"}}>€{revenue.toFixed(2)}</strong></div>
+                      <div style={{fontSize:12,color:C.textLight}}>Discount given: <strong style={{color:C.red}}>-€{saved.toFixed(2)}</strong></div>
+                      <div style={{fontSize:11,color:C.textLight,marginTop:4}}>Valid: Normal & Premium · Monthly & Annual</div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        )}
+          );
+        })()}
 
       </div>
     </div>
