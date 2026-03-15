@@ -2323,9 +2323,38 @@ const PainModule=({user,history,setHistory,onShowPaywall,onBack,initialTab})=>{
             );
           })}
         </GCard>}
-        <div style={{margin:"0 18px 28px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+        <div style={{margin:"0 18px 4px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
           <button className="btn-blue" onClick={resetForm}>{T.newCheckIn}</button>
           <button className="btn-outline" onClick={()=>setScreen("form")}>{T.viewBodyMap}</button>
+        </div>
+        <div style={{margin:"0 18px 4px"}}>
+          <button onClick={()=>{
+            const activeAreas2=Object.entries(areaSymptoms).filter(([,d])=>d?.maxIntensity>0);
+            const ok=window.generatePainPDF({
+              userName:user?.name||"",
+              stars:toStars(score).toFixed(1),
+              starsLabel:starsLabel(toStars(score)),
+              painLevel,
+              painLabel,
+              mood:selMood?selMood.emoji+" "+selMood.label:"—",
+              areaCount:activeAreas2.length,
+              checkedCount,
+              totalChecks:TRAUMA_CHECKS.length,
+              areas:activeAreas2.map(([id,d])=>({...d,id,label:d.label||id})),
+              recoveryItems:TRAUMA_CHECKS.map(tc=>({label:tc.icon+" "+tc.label,checked:!!traumaChecks[tc.id]})),
+              notes,
+            });
+            if(!ok) alert("PDF generation failed. Please try again.");
+          }}
+            style={{width:"100%",padding:"13px",borderRadius:50,border:"none",cursor:"pointer",
+              fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:14,color:"#fff",
+              background:"linear-gradient(135deg,#16a34a,#15803d)",
+              boxShadow:"0 4px 14px rgba(22,163,74,0.35)"}}>
+            📄 Download PDF Report
+          </button>
+        </div>
+        <div style={{margin:"0 18px 28px"}}>
+          <button className="btn-outline" onClick={onBack}>🏠 Back to Home</button>
         </div>
       </div>
     );
@@ -3477,6 +3506,32 @@ const TrendsTab=({history,onBack,embedded,user})=>{
         </div>
         <CheckInLog entries={displayHistory} />
       </GCard>
+      {/* PDF Export */}
+      <div style={{margin:"0 18px 32px"}}>
+        <button onClick={()=>{
+          const avgPain=(displayHistory.reduce((a,b)=>a+b.painLevel,0)/displayHistory.length).toFixed(1);
+          const avgScore=toStars(displayHistory.reduce((a,b)=>a+b.score,0)/displayHistory.length).toFixed(1);
+          const periodLabel=period==="custom"
+            ?customStart+" → "+customEnd
+            :period===null?"All time":"Last "+period+" days";
+          const ok=window.generateHistoryPDF({
+            userName:user?.name||"",
+            periodLabel,
+            entries:displayHistory,
+            avgPain,
+            avgScore,
+            trend,
+            totalEntries:displayHistory.length,
+          });
+          if(!ok) alert("PDF generation failed.");
+        }}
+          style={{width:"100%",padding:"14px",borderRadius:50,border:"none",cursor:"pointer",
+            fontFamily:"'Nunito',sans-serif",fontWeight:800,fontSize:14,color:"#fff",
+            background:"linear-gradient(135deg,#16a34a,#15803d)",
+            boxShadow:"0 4px 14px rgba(22,163,74,0.35)"}}>
+          📄 Download PDF Report · {displayHistory.length} check-in{displayHistory.length!==1?"s":""}
+        </button>
+      </div>
     </div>
   );
 };
@@ -4418,6 +4473,205 @@ ReactDOM.createRoot(document.getElementById("root")).render(checkAdmin() ? <Admi
 </script>
 
 <script>
+window.generatePainPDF = function(reportData) {
+  try {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    var pw = 210;
+    var margin = 18;
+    var cw = pw - margin * 2;
+    var y = 0;
+
+    // ── HEADER ──
+    doc.setFillColor(26, 111, 160);
+    doc.rect(0, 0, pw, 32, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica','bold');
+    doc.text('Pain2Care', margin, 14);
+    doc.setFontSize(10);
+    doc.setFont('helvetica','normal');
+    doc.text('Pain Check-In Report', margin + 48, 14);
+    doc.setFontSize(9);
+    doc.text('CONFIDENTIAL – Health Record', pw - margin, 14, {align:'right'});
+
+    // Date + patient
+    doc.setFontSize(9);
+    doc.setTextColor(200,230,255);
+    var d = new Date();
+    doc.text('Report date: ' + d.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}), margin, 23);
+    doc.text('Time: ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}), margin + 80, 23);
+    if(reportData.userName) doc.text('Patient: ' + reportData.userName, pw - margin, 23, {align:'right'});
+
+    y = 42;
+
+    // ── WELLBEING SCORE ──
+    doc.setFillColor(240, 248, 255);
+    doc.roundedRect(margin, y, cw, 22, 3, 3, 'F');
+    doc.setTextColor(26,111,160);
+    doc.setFontSize(10);
+    doc.setFont('helvetica','bold');
+    doc.text('WELLBEING SCORE', margin + 5, y + 8);
+    doc.setFontSize(22);
+    doc.setTextColor(26,80,130);
+    doc.text(reportData.stars + ' / 5', margin + 5, y + 18);
+    doc.setFontSize(10);
+    doc.setTextColor(100,140,170);
+    doc.setFont('helvetica','normal');
+    doc.text(reportData.starsLabel || '', margin + 40, y + 18);
+    y += 30;
+
+    // ── SUMMARY TABLE ──
+    doc.setTextColor(30,30,30);
+    doc.setFontSize(13);
+    doc.setFont('helvetica','bold');
+    doc.text('Summary', margin, y);
+    y += 7;
+
+    var summaryRows = [
+      ['Pain Level', reportData.painLevel + '/10  (' + reportData.painLabel + ')'],
+      ['Mood', reportData.mood || '—'],
+      ['Areas Logged', reportData.areaCount + ' area' + (reportData.areaCount!==1?'s':'')],
+      ['Recovery Checks', reportData.checkedCount + ' / ' + reportData.totalChecks],
+    ];
+    summaryRows.forEach(function(row, i) {
+      var bg = i%2===0 ? [248,252,255] : [255,255,255];
+      doc.setFillColor(bg[0],bg[1],bg[2]);
+      doc.rect(margin, y, cw, 9, 'F');
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(9);
+      doc.setTextColor(100,130,160);
+      doc.text(row[0].toUpperCase(), margin+3, y+6);
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(30,30,30);
+      doc.setFontSize(10);
+      doc.text(String(row[1]), margin + 55, y+6);
+      y += 9;
+    });
+    y += 8;
+
+    // ── PAIN AREAS ──
+    if(reportData.areas && reportData.areas.length > 0) {
+      doc.setDrawColor(200,220,240);
+      doc.setLineWidth(0.3);
+      doc.line(margin, y, pw-margin, y);
+      y += 7;
+      doc.setFontSize(13);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(30,30,30);
+      doc.text('Pain Areas', margin, y);
+      y += 7;
+
+      reportData.areas.forEach(function(area) {
+        if(y > 260) { doc.addPage(); y = 20; }
+        // Area header
+        doc.setFillColor(230,245,255);
+        doc.roundedRect(margin, y, cw, 8, 2, 2, 'F');
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(10);
+        doc.setTextColor(26,80,130);
+        doc.text(area.label || area.id, margin+3, y+5.5);
+        var intensity = area.maxIntensity || 0;
+        var intColor = intensity>=7?[230,57,70]:intensity>=4?[244,162,97]:[46,160,67];
+        doc.setTextColor(intColor[0],intColor[1],intColor[2]);
+        doc.text('Intensity: ' + intensity + '/10', pw-margin-3, y+5.5, {align:'right'});
+        y += 10;
+
+        // Subareas
+        if(area.subareas && Object.keys(area.subareas).length>0) {
+          var subs = Object.entries(area.subareas).filter(function(e){return e[1]>0;});
+          subs.forEach(function(sub) {
+            if(y > 265) { doc.addPage(); y = 20; }
+            doc.setFont('helvetica','normal');
+            doc.setFontSize(9);
+            doc.setTextColor(60,60,60);
+            doc.text('  • ' + sub[0] + ': ' + sub[1] + '/10', margin+3, y);
+            y += 5.5;
+          });
+        }
+        // Swelling / Numbness
+        var flags = [];
+        if(area.hasSwelling) flags.push('Swelling: Yes');
+        if(area.hasNumbness) flags.push('Numbness: Yes');
+        if(flags.length>0) {
+          doc.setFontSize(9);
+          doc.setTextColor(100,100,100);
+          doc.setFont('helvetica','italic');
+          doc.text('  ' + flags.join('  |  '), margin+3, y);
+          y += 5.5;
+        }
+        y += 3;
+      });
+    }
+
+    // ── RECOVERY CHECKS ──
+    if(reportData.recoveryItems && reportData.recoveryItems.length>0) {
+      if(y > 240) { doc.addPage(); y = 20; }
+      doc.setDrawColor(200,220,240);
+      doc.line(margin, y, pw-margin, y);
+      y += 7;
+      doc.setFontSize(13);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(30,30,30);
+      doc.text('Recovery Checks', margin, y);
+      y += 7;
+      reportData.recoveryItems.forEach(function(item) {
+        if(y > 268) { doc.addPage(); y = 20; }
+        doc.setFontSize(10);
+        doc.setFont('helvetica','normal');
+        doc.setTextColor(item.checked ? 46 : 160, item.checked ? 160 : 160, item.checked ? 67 : 160);
+        doc.text((item.checked ? '☑ ' : '☐ ') + item.label, margin+3, y);
+        y += 6.5;
+      });
+      y += 4;
+    }
+
+    // ── NOTES ──
+    if(reportData.notes && reportData.notes.trim()) {
+      if(y > 240) { doc.addPage(); y = 20; }
+      doc.setDrawColor(200,220,240);
+      doc.line(margin, y, pw-margin, y);
+      y += 7;
+      doc.setFontSize(13);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(30,30,30);
+      doc.text('Notes', margin, y);
+      y += 7;
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(10);
+      doc.setTextColor(60,60,60);
+      var noteLines = doc.splitTextToSize(reportData.notes, cw-4);
+      doc.text(noteLines, margin+3, y);
+      y += noteLines.length * 5.5 + 6;
+    }
+
+    // ── FOOTER ──
+    var pageCount = doc.getNumberOfPages();
+    for(var p=1; p<=pageCount; p++) {
+      doc.setPage(p);
+      doc.setDrawColor(200,220,240);
+      doc.setLineWidth(0.3);
+      doc.line(margin, 285, pw-margin, 285);
+      doc.setFontSize(8);
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(150,150,150);
+      doc.text('Pain2Care Health Report  |  Generated: ' + new Date().toLocaleDateString(), margin, 290);
+      doc.text('Page ' + p + ' of ' + pageCount, pw-margin, 290, {align:'right'});
+    }
+
+    // Save
+    var filename = 'pain2care_report_' + new Date().toISOString().slice(0,10) + '.pdf';
+    doc.save(filename);
+    return true;
+  } catch(e) {
+    console.error('PDF error:', e);
+    return false;
+  }
+};
+</script>
+
+
+<script>
 window.generatePDF = function(activeDoc, lastShare) {
   try {
     var jsPDF = window.jspdf.jsPDF;
@@ -4525,6 +4779,144 @@ window.generatePDF = function(activeDoc, lastShare) {
     doc.save(fileName);
   } catch(e) {
     alert('PDF error: ' + e.message);
+  }
+};
+</script>
+
+<script>
+window.generateHistoryPDF = function(data) {
+  try {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+    var pw = 210, margin = 18, cw = pw - margin*2, y = 0;
+    var MOODS_MAP = {1:'😞 Low',2:'😐 Okay',3:'🙂 Good',4:'😊 Great',5:'🥰 Amazing'};
+
+    // ── HEADER ──
+    doc.setFillColor(26,111,160);
+    doc.rect(0,0,pw,32,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(20); doc.setFont('helvetica','bold');
+    doc.text('Pain2Care',margin,14);
+    doc.setFontSize(10); doc.setFont('helvetica','normal');
+    doc.text('Pain History Report',margin+48,14);
+    doc.setFontSize(9);
+    doc.text('CONFIDENTIAL – Health Record',pw-margin,14,{align:'right'});
+    doc.setTextColor(200,230,255);
+    var genDate = new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+    doc.text('Generated: '+genDate, margin, 24);
+    if(data.userName) doc.text('Patient: '+data.userName, pw-margin, 24, {align:'right'});
+    y = 42;
+
+    // ── PERIOD + SUMMARY ──
+    doc.setFillColor(240,248,255);
+    doc.roundedRect(margin,y,cw,28,3,3,'F');
+    doc.setTextColor(26,80,130); doc.setFontSize(11); doc.setFont('helvetica','bold');
+    doc.text('Period: '+data.periodLabel, margin+4, y+8);
+    doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(60,80,100);
+    doc.text('Total check-ins: '+data.totalEntries, margin+4, y+16);
+    doc.text('Avg pain: '+data.avgPain+'/10', margin+4, y+23);
+    doc.text('Avg wellbeing: '+data.avgScore+'/5 ⭐', margin+70, y+16);
+    var trendTxt = data.trend>0?'↑ Worsening':data.trend<0?'↓ Improving':'→ Stable';
+    doc.text('Trend: '+trendTxt, margin+70, y+23);
+    y += 36;
+
+    // ── ENTRIES ──
+    doc.setTextColor(30,30,30); doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text('Check-In Log', margin, y);
+    y += 8;
+
+    // Table header
+    doc.setFillColor(26,111,160);
+    doc.rect(margin,y,cw,8,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text('DATE',      margin+2,   y+5.5);
+    doc.text('PAIN',      margin+32,  y+5.5);
+    doc.text('MOOD',      margin+52,  y+5.5);
+    doc.text('WELLBEING', margin+78,  y+5.5);
+    doc.text('AREAS',     margin+108, y+5.5);
+    doc.text('RECOVERY',  margin+130, y+5.5);
+    doc.text('NOTES',     margin+155, y+5.5);
+    y += 10;
+
+    data.entries.forEach(function(entry, i) {
+      if(y > 268) {
+        doc.addPage(); y = 20;
+        // Repeat header
+        doc.setFillColor(26,111,160);
+        doc.rect(margin,y,cw,8,'F');
+        doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont('helvetica','bold');
+        doc.text('DATE',margin+2,y+5.5);
+        doc.text('PAIN',margin+32,y+5.5);
+        doc.text('MOOD',margin+52,y+5.5);
+        doc.text('WELLBEING',margin+78,y+5.5);
+        doc.text('AREAS',margin+108,y+5.5);
+        doc.text('RECOVERY',margin+130,y+5.5);
+        doc.text('NOTES',margin+155,y+5.5);
+        y += 10;
+      }
+
+      // Row bg
+      var rowH = 9;
+      var bg = i%2===0?[248,252,255]:[255,255,255];
+      doc.setFillColor(bg[0],bg[1],bg[2]);
+      doc.rect(margin,y,cw,rowH,'F');
+
+      // Pain color indicator
+      var pl = entry.painLevel||0;
+      var pc = pl>=7?[230,57,70]:pl>=4?[244,162,97]:[46,160,67];
+      doc.setFillColor(pc[0],pc[1],pc[2]);
+      doc.rect(margin,y,3,rowH,'F');
+
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(30,30,30);
+      doc.text(String(entry.fullDate||entry.date||''), margin+5, y+6);
+      doc.setTextColor(pc[0],pc[1],pc[2]); doc.setFont('helvetica','bold');
+      doc.text(String(pl)+'/10', margin+32, y+6);
+      doc.setTextColor(30,30,30); doc.setFont('helvetica','normal');
+      var moodStr = entry.mood ? (MOODS_MAP[entry.mood]||String(entry.mood)) : '—';
+      doc.text(moodStr.slice(0,10), margin+52, y+6);
+      var stars = Math.min(5,Math.max(1,Math.round(((10-pl)*3+(entry.mood||3)*4+(entry.checkedCount||0)*5)/30*5)));
+      doc.text(stars.toFixed(1)+'/5', margin+78, y+6);
+      var areaCount = (entry.areas||[]).filter(function(a){return a.maxIntensity>0;}).length;
+      doc.text(String(areaCount)+' area'+(areaCount!==1?'s':''), margin+108, y+6);
+      doc.text(String(entry.checkedCount||0)+'/6', margin+130, y+6);
+      var notePreview = (entry.notes||'').slice(0,18)+(entry.notes&&entry.notes.length>18?'…':'');
+      doc.text(notePreview||'—', margin+155, y+6);
+      y += rowH;
+
+      // Expand areas if any
+      if(entry.areas && entry.areas.length>0) {
+        entry.areas.forEach(function(area) {
+          if(!area.maxIntensity && !area.label) return;
+          if(y > 272) { doc.addPage(); y = 20; }
+          doc.setFillColor(232,244,255);
+          doc.rect(margin+3,y,cw-3,6,'F');
+          doc.setFontSize(7); doc.setTextColor(26,80,130);
+          var aLabel = (area.label||area.id||'').slice(0,30);
+          var subs = Object.entries(area.subareas||{}).filter(function(s){return s[1]>0;}).map(function(s){return s[0]+' ('+s[1]+'/10)';}).join(', ');
+          var aLine = '  📍 '+aLabel+(area.maxIntensity?' · '+area.maxIntensity+'/10':'')+(subs?' · '+subs.slice(0,50):'');
+          doc.text(aLine, margin+5, y+4.5);
+          y += 6;
+        });
+      }
+    });
+
+    // ── FOOTER ──
+    var pages = doc.getNumberOfPages();
+    for(var p=1;p<=pages;p++){
+      doc.setPage(p);
+      doc.setDrawColor(200,220,240); doc.setLineWidth(0.3);
+      doc.line(margin,285,pw-margin,285);
+      doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(150,150,150);
+      doc.text('Pain2Care Health History Report  |  '+genDate, margin, 290);
+      doc.text('Page '+p+' of '+pages, pw-margin, 290, {align:'right'});
+    }
+
+    var filename = 'pain2care_history_'+new Date().toISOString().slice(0,10)+'.pdf';
+    doc.save(filename);
+    return true;
+  } catch(e) {
+    console.error('PDF error:',e);
+    return false;
   }
 };
 </script>
